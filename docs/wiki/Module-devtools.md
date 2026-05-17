@@ -381,6 +381,7 @@ do
   local function inner_function()
     local frames = lurek.devtools.getCallStack(5)
     for i, f in ipairs(frames) do
+      ---@cast f {source: string, line: integer, name: string, what: string}
       lurek.devtools.debug(string.format(
         "#%d %s:%d in %s (%s)", i, f.source, f.line, f.name, f.what
       ))

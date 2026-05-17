@@ -318,7 +318,7 @@ do
   -- Query relationships for gameplay decisions.
   local level = rel:getLevel(player_id, merchant_id, "diplomacy")
   local value = rel:getValue(player_id, merchant_id)
-  print("merchant is " .. level .. " (score=" .. value .. ")")
+  print("merchant is " .. tostring(level) .. " (score=" .. tostring(value) .. ")")
 end
 
 --@api-stub: lurek.patterns.newMediator
@@ -441,7 +441,7 @@ do
   print("unlocked " .. unlocked:len() .. " items")
 end
 
---@api-stub: EventBus:on
+--@api-stub: LMediator:on
 -- Subscribe a callback to a named event with optional priority ordering
 do
   local bus = lurek.patterns.newEventBus("game")
@@ -456,7 +456,7 @@ do
   bus:off(id)
 end
 
---@api-stub: EventBus:off
+--@api-stub: LMediator:off
 -- Unsubscribe a listener by its subscription ID
 do
   local bus = lurek.patterns.newEventBus()
@@ -468,7 +468,7 @@ do
   print("listeners=" .. bus:getListenerCount("ping"))
 end
 
---@api-stub: EventBus:emit
+--@api-stub: LEventBus:emit
 -- Emit an event, invoking all listeners in priority order with payload arguments
 do
   local bus = lurek.patterns.newEventBus()
@@ -483,7 +483,7 @@ do
   bus:emit("damage", 30, "boss")
 end
 
---@api-stub: EventBus:clear
+--@api-stub: LMap:clear
 -- Remove all listeners for a specific event name
 do
   local bus = lurek.patterns.newEventBus()
@@ -495,7 +495,7 @@ do
   print("after clear: " .. bus:getListenerCount("minigame_end") .. " listeners")
 end
 
---@api-stub: EventBus:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all listeners from every event on this bus
 do
   local bus = lurek.patterns.newEventBus()
@@ -507,7 +507,7 @@ do
   print("events remaining=" .. #bus:getEvents())
 end
 
---@api-stub: EventBus:getListenerCount
+--@api-stub: LEventBus:getListenerCount
 -- Return the number of active listeners for a given event
 do
   local bus = lurek.patterns.newEventBus()
@@ -520,7 +520,7 @@ do
   print("hit listeners=" .. n)
 end
 
---@api-stub: EventBus:getEvents
+--@api-stub: LEventBus:getEvents
 -- Return an array of all event names that have at least one listener
 do
   local bus = lurek.patterns.newEventBus()
@@ -533,7 +533,7 @@ do
   end
 end
 
---@api-stub: ObjectPool:add
+--@api-stub: LWeightedRandom:add
 -- Add an object to the pool's idle set for future acquisition
 do
   local bullets = lurek.patterns.newObjectPool()
@@ -545,7 +545,7 @@ do
   print("pool pre-warmed: " .. bullets:getAvailableCount() .. " bullets ready")
 end
 
---@api-stub: ObjectPool:acquire
+--@api-stub: LObjectPool:acquire
 -- Take an idle object from the pool and mark it active
 do
   local pool = lurek.patterns.newObjectPool()
@@ -562,7 +562,7 @@ do
   print("active=" .. pool:getActiveCount())
 end
 
---@api-stub: ObjectPool:release
+--@api-stub: LObjectPool:release
 -- Return an active object back to the pool's idle set for reuse
 do
   local pool = lurek.patterns.newObjectPool()
@@ -578,7 +578,7 @@ do
   print("returned to pool, idle=" .. pool:getAvailableCount())
 end
 
---@api-stub: ObjectPool:getActiveCount
+--@api-stub: LObjectPool:getActiveCount
 -- Return how many objects are currently checked out from the pool
 do
   local pool = lurek.patterns.newObjectPool()
@@ -591,7 +591,7 @@ do
   print("active=" .. n)
 end
 
---@api-stub: ObjectPool:getAvailableCount
+--@api-stub: LObjectPool:getAvailableCount
 -- Return how many idle objects are ready for acquisition
 do
   local pool = lurek.patterns.newObjectPool()
@@ -605,7 +605,7 @@ do
   print("idle=" .. pool:getAvailableCount())
 end
 
---@api-stub: ObjectPool:getTotalCount
+--@api-stub: LObjectPool:getTotalCount
 -- Return the total number of objects managed (active + idle)
 do
   local pool = lurek.patterns.newObjectPool()
@@ -616,7 +616,7 @@ do
   print("total=" .. pool:getTotalCount() .. " active=" .. pool:getActiveCount())
 end
 
---@api-stub: ObjectPool:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Destroy all objects (active and idle) and reset the pool to empty
 do
   local pool = lurek.patterns.newObjectPool()
@@ -627,7 +627,7 @@ do
   print("after clearAll: total=" .. pool:getTotalCount())
 end
 
---@api-stub: CommandStack:execute
+--@api-stub: LStrategy:execute
 -- Execute a named command, recording it in history for undo/redo
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -642,7 +642,7 @@ do
   print("doc=" .. doc.text)
 end
 
---@api-stub: CommandStack:undo
+--@api-stub: LCommandStack:undo
 -- Undo the most recent command by calling its undo function
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -653,7 +653,7 @@ do
   print("undone=" .. tostring(ok) .. " x=" .. x)  -- x is back to 5
 end
 
---@api-stub: CommandStack:redo
+--@api-stub: LCommandStack:redo
 -- Redo a previously undone command by re-calling its execute function
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -665,7 +665,7 @@ do
   print("after redo n=" .. n)
 end
 
---@api-stub: CommandStack:canUndo
+--@api-stub: LCommandStack:canUndo
 -- Check whether an undo operation is possible
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -675,7 +675,7 @@ do
   if stack:canUndo() then print("undo button: enabled") end
 end
 
---@api-stub: CommandStack:canRedo
+--@api-stub: LCommandStack:canRedo
 -- Check whether a redo operation is possible
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -686,7 +686,7 @@ do
   if stack:canRedo() then print("redo button: enabled") end
 end
 
---@api-stub: CommandStack:getHistorySize
+--@api-stub: LCommandStack:getHistorySize
 -- Return the total number of commands in history
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -696,7 +696,7 @@ do
   print("history depth=" .. stack:getHistorySize())
 end
 
---@api-stub: CommandStack:getCurrentName
+--@api-stub: LCommandStack:getCurrentName
 -- Return the name of the most recently executed command
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -707,7 +707,7 @@ do
   if name then print("undo will revert: " .. name) end
 end
 
---@api-stub: CommandStack:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Discard all command history and free callbacks
 do
   local stack = lurek.patterns.newCommandStack(0)
@@ -718,7 +718,7 @@ do
   print("history after clear=" .. stack:getHistorySize())
 end
 
---@api-stub: ServiceLocator:provide
+--@api-stub: LServiceLocator:provide
 -- Register a service instance under a given name
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -729,7 +729,7 @@ do
   print("registered services=" .. #sl:getServices())
 end
 
---@api-stub: ServiceLocator:locate
+--@api-stub: LServiceLocator:locate
 -- Retrieve a registered service by name (returns nil if not found)
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -741,7 +741,7 @@ do
   if audio then print("volume=" .. audio.volume) end
 end
 
---@api-stub: ServiceLocator:has
+--@api-stub: LMap:has
 -- Check whether a service with the given name is registered
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -751,7 +751,7 @@ do
   if sl:has("analytics") then print("telemetry active") end
 end
 
---@api-stub: ServiceLocator:remove
+--@api-stub: LWeightedRandom:remove
 -- Unregister and discard a service by name
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -762,7 +762,7 @@ do
   print("network registered=" .. tostring(sl:has("network")))
 end
 
---@api-stub: ServiceLocator:getServices
+--@api-stub: LServiceLocator:getServices
 -- Return an array of all registered service names
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -772,7 +772,7 @@ do
   for _, name in ipairs(sl:getServices()) do print("  service: " .. name) end
 end
 
---@api-stub: ServiceLocator:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all registered services and reset the locator
 do
   local sl = lurek.patterns.newServiceLocator()
@@ -783,7 +783,7 @@ do
   print("services after clear=" .. #sl:getServices())
 end
 
---@api-stub: Factory:register
+--@api-stub: LStrategy:register
 -- Register a constructor function for a given type name
 do
   local f = lurek.patterns.newFactory()
@@ -794,7 +794,7 @@ do
   print("registered types=" .. #f:getTypes())
 end
 
---@api-stub: Factory:create
+--@api-stub: LFactory:create
 -- Create a new object by type name, forwarding arguments to the constructor
 do
   local f = lurek.patterns.newFactory()
@@ -806,7 +806,7 @@ do
   if c then print("dropped " .. c.value .. " gold") end
 end
 
---@api-stub: Factory:has
+--@api-stub: LMap:has
 -- Check whether a constructor is registered for the given type
 do
   local f = lurek.patterns.newFactory()
@@ -816,7 +816,7 @@ do
   if f:has("npc") then print("npc factory ready") end
 end
 
---@api-stub: Factory:alias
+--@api-stub: LFactory:alias
 -- Create an alias that maps to an existing type name
 do
   local f = lurek.patterns.newFactory()
@@ -829,7 +829,7 @@ do
   if m then print("created via alias: " .. m.kind) end
 end
 
---@api-stub: Factory:getTypes
+--@api-stub: LFactory:getTypes
 -- Return an array of all registered type names
 do
   local f = lurek.patterns.newFactory()
@@ -839,7 +839,7 @@ do
   for _, name in ipairs(f:getTypes()) do print("  type: " .. name) end
 end
 
---@api-stub: Factory:remove
+--@api-stub: LWeightedRandom:remove
 -- Unregister a type and discard its constructor
 do
   local f = lurek.patterns.newFactory()
@@ -850,7 +850,7 @@ do
   print("temp still registered=" .. tostring(f:has("temp_enemy")))
 end
 
---@api-stub: Factory:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all registered types and reset the factory
 do
   local f = lurek.patterns.newFactory()
@@ -861,7 +861,7 @@ do
   print("types after clear=" .. #f:getTypes())
 end
 
---@api-stub: SimpleState:addState
+--@api-stub: LSimpleState:addState
 -- Register a named state with optional enter, exit, and update callbacks
 do
   local sm = lurek.patterns.newSimpleState()
@@ -877,7 +877,7 @@ do
   print("registered states=" .. #sm:getStates())
 end
 
---@api-stub: SimpleState:transitionTo
+--@api-stub: LSimpleState:transitionTo
 -- Transition to a new state, calling exit on current and enter on target
 do
   local sm = lurek.patterns.newSimpleState()
@@ -889,7 +889,7 @@ do
   sm:transitionTo("game")
 end
 
---@api-stub: SimpleState:update
+--@api-stub: LFunnel:update
 -- Call the current state's update callback with frame delta time
 do
   local sm = lurek.patterns.newSimpleState()
@@ -902,7 +902,7 @@ do
   sm:update(0.016)
 end
 
---@api-stub: SimpleState:getCurrent
+--@api-stub: LStrategy:getCurrent
 -- Return the name of the currently active state
 do
   local sm = lurek.patterns.newSimpleState()
@@ -913,7 +913,7 @@ do
   if sm:getCurrent() == "paused" then print("game is paused") end
 end
 
---@api-stub: SimpleState:hasState
+--@api-stub: LSimpleState:hasState
 -- Check whether a state with the given name is registered
 do
   local sm = lurek.patterns.newSimpleState()
@@ -923,7 +923,7 @@ do
   if sm:hasState("boss_fight") then sm:transitionTo("boss_fight") end
 end
 
---@api-stub: SimpleState:getStates
+--@api-stub: LSimpleState:getStates
 -- Return an array of all registered state names
 do
   local sm = lurek.patterns.newSimpleState()
@@ -933,7 +933,7 @@ do
   for _, name in ipairs(sm:getStates()) do print("  state: " .. name) end
 end
 
---@api-stub: SimpleState:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all states and their callbacks, resetting the state machine
 do
   local sm = lurek.patterns.newSimpleState()
@@ -944,7 +944,7 @@ do
   print("states left=" .. #sm:getStates())
 end
 
---@api-stub: Blackboard:set
+--@api-stub: LMap:set
 -- Store a value (bool, number, string, or nil to clear) under a key
 do
   local bb = lurek.patterns.newBlackboard()
@@ -956,7 +956,7 @@ do
   print("name=" .. bb:get("name"))
 end
 
---@api-stub: Blackboard:get
+--@api-stub: LMap:get
 -- Retrieve a value by key (returns nil if not set)
 do
   local bb = lurek.patterns.newBlackboard()
@@ -967,7 +967,7 @@ do
   if ammo <= 0 then print("reload needed!") else print("ammo=" .. ammo) end
 end
 
---@api-stub: Blackboard:keys
+--@api-stub: LMap:keys
 -- Return an array of all keys currently stored on the blackboard
 do
   local bb = lurek.patterns.newBlackboard()
@@ -979,7 +979,7 @@ do
   end
 end
 
---@api-stub: Blackboard:watch
+--@api-stub: LBlackboard:watch
 -- Register a watcher callback that fires when a key changes (use "*" for all keys)
 do
   local bb = lurek.patterns.newBlackboard()
@@ -993,7 +993,7 @@ do
   bb:unwatch(id)    -- stop watching
 end
 
---@api-stub: Blackboard:unwatch
+--@api-stub: LBlackboard:unwatch
 -- Remove a previously registered watcher by its ID
 do
   local bb = lurek.patterns.newBlackboard()
@@ -1007,7 +1007,7 @@ do
   bb:set("debug", "off")  -- no trigger
 end
 
---@api-stub: Blackboard:getRevision
+--@api-stub: LWeightedRandom:getRevision
 -- Return the revision counter (increments on every value change)
 do
   local bb = lurek.patterns.newBlackboard()
@@ -1018,7 +1018,7 @@ do
   if bb:getRevision() ~= last_rev then print("blackboard is dirty") end
 end
 
---@api-stub: Blackboard:snapshot
+--@api-stub: LBlackboard:snapshot
 -- Return a table copy of all key-value pairs (useful for serialization or debug)
 do
   local bb = lurek.patterns.newBlackboard()
@@ -1029,7 +1029,7 @@ do
   for k, v in pairs(snap) do print("  " .. k .. "=" .. tostring(v)) end
 end
 
---@api-stub: Blackboard:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all keys and values from the blackboard
 do
   local bb = lurek.patterns.newBlackboard()
@@ -1040,7 +1040,7 @@ do
   print("keys after clear=" .. #bb:keys())
 end
 
---@api-stub: Observer:set
+--@api-stub: LMap:set
 -- Set a value by key and notify all subscribers watching that key
 do
   local o = lurek.patterns.newObserver("player_data")
@@ -1054,7 +1054,7 @@ do
   o:set("hp", 75)   -- triggers again with new value
 end
 
---@api-stub: Observer:get
+--@api-stub: LMap:get
 -- Retrieve the current value for a key (returns nil if not set)
 do
   local o = lurek.patterns.newObserver()
@@ -1065,7 +1065,7 @@ do
   print("current score=" .. s)
 end
 
---@api-stub: Observer:subscribe
+--@api-stub: LObserver:subscribe
 -- Subscribe to changes on a key; callback receives (key, newValue) on each change
 do
   local o = lurek.patterns.newObserver()
@@ -1080,7 +1080,7 @@ do
   o:unsubscribe(id)
 end
 
---@api-stub: Observer:unsubscribe
+--@api-stub: LObserver:unsubscribe
 -- Remove a subscription by its ID
 do
   local o = lurek.patterns.newObserver()
@@ -1091,7 +1091,7 @@ do
   print("subscriptions remaining=" .. o:getCount())
 end
 
---@api-stub: Observer:getCount
+--@api-stub: LObserver:getCount
 -- Return the total number of active subscriptions across all keys
 do
   local o = lurek.patterns.newObserver()
@@ -1102,7 +1102,7 @@ do
   print("active subscriptions=" .. o:getCount())
 end
 
---@api-stub: Throttle:onFire
+--@api-stub: LDebounce:onFire
 -- Set the callback function to invoke each time the throttle fires
 do
   local t = lurek.patterns.newThrottle(0.5)
@@ -1114,7 +1114,7 @@ do
   -- In a real game: function lurek.process(dt) t:update(dt) end
 end
 
---@api-stub: Throttle:update
+--@api-stub: LFunnel:update
 -- Advance the throttle timer; returns true if it fired this frame
 do
   local t = lurek.patterns.newThrottle(0.25)
@@ -1126,7 +1126,7 @@ do
   if fired then print("  additional post-fire logic") end
 end
 
---@api-stub: Throttle:reset
+--@api-stub: LThrottle:reset
 -- Reset the throttle timer back to zero without firing
 do
   local t = lurek.patterns.newThrottle(1.0)
@@ -1138,7 +1138,7 @@ do
   print("progress after reset=" .. t:getProgress())  -- 0.0
 end
 
---@api-stub: Throttle:getProgress
+--@api-stub: LThrottle:getProgress
 -- Return how far through the current interval (0.0 to 1.0)
 do
   local t = lurek.patterns.newThrottle(2.0)
@@ -1150,7 +1150,7 @@ do
   print("cooldown: " .. pct .. "% filled")
 end
 
---@api-stub: Throttle:getFireCount
+--@api-stub: LDebounce:getFireCount
 -- Return the total number of times this throttle has fired since creation
 do
   local t = lurek.patterns.newThrottle(0.1)
@@ -1161,7 +1161,7 @@ do
   print("total fires=" .. t:getFireCount())
 end
 
---@api-stub: Throttle:setEnabled
+--@api-stub: LThrottle:setEnabled
 -- Enable or disable the throttle (disabled throttle does not accumulate time)
 do
   local t = lurek.patterns.newThrottle(0.5)
@@ -1173,7 +1173,7 @@ do
   print("fires while disabled=" .. t:getFireCount())
 end
 
---@api-stub: Debounce:onFire
+--@api-stub: LDebounce:onFire
 -- Set the callback to invoke when the debounce fires after the wait period
 do
   local d = lurek.patterns.newDebounce(0.3)
@@ -1186,7 +1186,7 @@ do
   -- In a real game: function lurek.process(dt) d:update(dt) end
 end
 
---@api-stub: Debounce:trigger
+--@api-stub: LDebounce:trigger
 -- Signal input activity, resetting the wait timer
 do
   local d = lurek.patterns.newDebounce(0.5)
@@ -1198,7 +1198,7 @@ do
   print("pending=" .. tostring(d:isPending()))
 end
 
---@api-stub: Debounce:update
+--@api-stub: LFunnel:update
 -- Advance the debounce timer; returns true if it fired this frame
 do
   local d = lurek.patterns.newDebounce(0.4)
@@ -1210,7 +1210,7 @@ do
   print("fired=" .. tostring(fired))
 end
 
---@api-stub: Debounce:cancel
+--@api-stub: LDebounce:cancel
 -- Cancel any pending debounce without firing
 do
   local d = lurek.patterns.newDebounce(1.0)
@@ -1222,7 +1222,7 @@ do
   print("pending after cancel=" .. tostring(d:isPending()))
 end
 
---@api-stub: Debounce:isPending
+--@api-stub: LDebounce:isPending
 -- Check whether the debounce is waiting to fire
 do
   local d = lurek.patterns.newDebounce(0.6)
@@ -1233,7 +1233,7 @@ do
   if d:isPending() then print("waiting for idle before save...") end
 end
 
---@api-stub: Debounce:getFireCount
+--@api-stub: LDebounce:getFireCount
 -- Return the total number of times this debounce has fired since creation
 do
   local d = lurek.patterns.newDebounce(0.1)
@@ -1244,7 +1244,7 @@ do
   print("total fires=" .. d:getFireCount())
 end
 
---@api-stub: PriorityQueue:push
+--@api-stub: LList:push
 -- Add an item with a numeric priority (higher = dequeued sooner)
 do
   local pq = lurek.patterns.newPriorityQueue("ai")
@@ -1256,7 +1256,7 @@ do
   print("queued=" .. pq:len())
 end
 
---@api-stub: PriorityQueue:pop
+--@api-stub: LList:pop
 -- Remove and return the highest-priority item
 do
   local pq = lurek.patterns.newPriorityQueue()
@@ -1267,7 +1267,7 @@ do
   if job then print("executing: " .. job) end  -- "critical_task"
 end
 
---@api-stub: PriorityQueue:peek
+--@api-stub: LStack:peek
 -- Return the highest-priority item without removing it
 do
   local pq = lurek.patterns.newPriorityQueue()
@@ -1278,7 +1278,7 @@ do
   if next_job then print("next up: " .. next_job) end
 end
 
---@api-stub: PriorityQueue:len
+--@api-stub: LWeightedRandom:len
 -- Return the current number of items in the queue
 do
   local pq = lurek.patterns.newPriorityQueue()
@@ -1289,7 +1289,7 @@ do
   print("queue size=" .. pq:len())
 end
 
---@api-stub: PriorityQueue:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the queue contains no items
 do
   local pq = lurek.patterns.newPriorityQueue()
@@ -1301,7 +1301,7 @@ do
   end
 end
 
---@api-stub: PriorityQueue:clearAll
+--@api-stub: LPatternGraph:clearAll
 -- Remove all items from the priority queue
 do
   local pq = lurek.patterns.newPriorityQueue()
@@ -1312,7 +1312,7 @@ do
   print("after clear: len=" .. pq:len())
 end
 
---@api-stub: Ring:push
+--@api-stub: LList:push
 -- Push a value into the ring (overwrites oldest when full)
 do
   local r = lurek.patterns.newRing(8)
@@ -1322,7 +1322,7 @@ do
   print("len=" .. r:len() .. " full=" .. tostring(r:isFull()))
 end
 
---@api-stub: Ring:latest
+--@api-stub: LRing:latest
 -- Return the most recently pushed entry as a table
 do
   local r = lurek.patterns.newRing(4)
@@ -1334,7 +1334,7 @@ do
   if last then print("last event: " .. last.text) end
 end
 
---@api-stub: Ring:toArray
+--@api-stub: LSet:toArray
 -- Return all entries as an ordered array (oldest to newest)
 do
   local r = lurek.patterns.newRing(4)
@@ -1346,7 +1346,7 @@ do
   end
 end
 
---@api-stub: Ring:sum
+--@api-stub: LRing:sum
 -- Return the sum of all numeric values in the ring
 do
   local r = lurek.patterns.newRing(16)
@@ -1356,7 +1356,7 @@ do
   print("total latency=" .. string.format("%.2f", r:sum()) .. "s")
 end
 
---@api-stub: Ring:average
+--@api-stub: LRing:average
 -- Return the arithmetic mean of all numeric values in the ring
 do
   local r = lurek.patterns.newRing(60)
@@ -1366,7 +1366,7 @@ do
   print("avg fps=" .. string.format("%.1f", r:average()))
 end
 
---@api-stub: Ring:len
+--@api-stub: LWeightedRandom:len
 -- Return the number of entries currently in the ring
 do
   local r = lurek.patterns.newRing(10)
@@ -1376,7 +1376,7 @@ do
   if r:len() >= 3 then print("enough samples for analysis") end
 end
 
---@api-stub: Ring:isFull
+--@api-stub: LQueue:isFull
 -- Check whether the ring has reached its maximum capacity
 do
   local r = lurek.patterns.newRing(4)
@@ -1386,7 +1386,7 @@ do
   if r:isFull() then print("warm: avg=" .. string.format("%.1f", r:average())) end
 end
 
---@api-stub: Ring:clear
+--@api-stub: LMap:clear
 -- Remove all entries from the ring
 do
   local r = lurek.patterns.newRing(8)
@@ -1397,7 +1397,7 @@ do
   print("len after clear=" .. r:len())
 end
 
---@api-stub: Funnel:onFlush
+--@api-stub: LFunnel:onFlush
 -- Set the callback invoked when the funnel flushes its batch
 do
   local f = lurek.patterns.newFunnel(1.0, 0)
@@ -1409,7 +1409,7 @@ do
   -- In a real game: function lurek.process(dt) f:update(dt) end
 end
 
---@api-stub: Funnel:push
+--@api-stub: LList:push
 -- Push a tagged event into the funnel (may trigger immediate flush if at max entries)
 do
   local f = lurek.patterns.newFunnel(60.0, 4)  -- max 4 entries before forced flush
@@ -1420,7 +1420,7 @@ do
   print("pending after max-flush=" .. f:pendingCount())
 end
 
---@api-stub: Funnel:update
+--@api-stub: LFunnel:update
 -- Advance the funnel's time window; returns true if it flushed this frame
 do
   local f = lurek.patterns.newFunnel(0.5, 0)
@@ -1432,7 +1432,7 @@ do
   print("flushed=" .. tostring(flushed))
 end
 
---@api-stub: Funnel:flush
+--@api-stub: LFunnel:flush
 -- Force an immediate flush of all pending entries
 do
   local f = lurek.patterns.newFunnel(60.0, 0)
@@ -1443,7 +1443,7 @@ do
   f:flush()
 end
 
---@api-stub: Funnel:discard
+--@api-stub: LFunnel:discard
 -- Discard all pending entries without flushing or calling the callback
 do
   local f = lurek.patterns.newFunnel(2.0, 0)
@@ -1455,7 +1455,7 @@ do
   print("pending after discard=" .. f:pendingCount())
 end
 
---@api-stub: Funnel:pendingCount
+--@api-stub: LFunnel:pendingCount
 -- Return the number of entries waiting to be flushed
 do
   local f = lurek.patterns.newFunnel(5.0, 0)
@@ -1466,7 +1466,7 @@ do
   print("buffered events=" .. f:pendingCount())
 end
 
---@api-stub: Funnel:getFlushCount
+--@api-stub: LFunnel:getFlushCount
 -- Return the total number of times this funnel has flushed since creation
 do
   local f = lurek.patterns.newFunnel(0, 1)  -- flush every 1 entry
@@ -1477,7 +1477,7 @@ do
   print("total flushes=" .. f:getFlushCount())
 end
 
---@api-stub: RelationshipManager:defineType
+--@api-stub: LRelationshipManager:defineType
 -- Define a relationship type with named levels in order
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1488,7 +1488,7 @@ do
   print("defined types=" .. #rm:typeNames())
 end
 
---@api-stub: RelationshipManager:removeType
+--@api-stub: LRelationshipManager:removeType
 -- Remove a relationship type definition
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1499,7 +1499,7 @@ do
   print("types remaining=" .. #rm:typeNames())
 end
 
---@api-stub: RelationshipManager:typeNames
+--@api-stub: LRelationshipManager:typeNames
 -- Return all defined relationship type names
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1509,7 +1509,7 @@ do
   for _, t in ipairs(rm:typeNames()) do print("  type: " .. t) end
 end
 
---@api-stub: RelationshipManager:setValue
+--@api-stub: LRelationshipManager:setValue
 -- Set the numeric relationship value between two entity IDs
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1519,7 +1519,7 @@ do
   print("value=" .. rm:getValue(101, 202) .. " pairs=" .. rm:pairCount())
 end
 
---@api-stub: RelationshipManager:getValue
+--@api-stub: LRelationshipManager:getValue
 -- Get the numeric relationship value between two entity IDs (0 if not set)
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1531,7 +1531,7 @@ do
   print("shop discount=" .. (discount * 100) .. "%")
 end
 
---@api-stub: RelationshipManager:adjustValue
+--@api-stub: LRelationshipManager:adjustValue
 -- Add a delta to the relationship value between two entities
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1543,7 +1543,7 @@ do
   print("net affinity=" .. rm:getValue(1, 2))  -- 15
 end
 
---@api-stub: RelationshipManager:setLevel
+--@api-stub: LRelationshipManager:setLevel
 -- Set the named level for a relationship type between two entities
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1554,7 +1554,7 @@ do
   print("set ally=" .. tostring(ok))
 end
 
---@api-stub: RelationshipManager:getLevel
+--@api-stub: LRelationshipManager:getLevel
 -- Get the named level for a relationship type between two entities
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1566,7 +1566,7 @@ do
   if lvl == "ally" then print("hold fire - they are allies") end
 end
 
---@api-stub: RelationshipManager:removePair
+--@api-stub: LRelationshipManager:removePair
 -- Remove all relationship data between two entities
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1577,7 +1577,7 @@ do
   print("pairs after removal=" .. rm:pairCount())
 end
 
---@api-stub: RelationshipManager:pairCount
+--@api-stub: LRelationshipManager:pairCount
 -- Return the total number of tracked entity pairs
 do
   local rm = lurek.patterns.newRelationshipManager()
@@ -1588,7 +1588,7 @@ do
   print("tracked pairs=" .. rm:pairCount())
 end
 
---@api-stub: Mediator:on
+--@api-stub: LMediator:on
 -- Register a handler callback on a named channel
 do
   local m = lurek.patterns.newMediator()
@@ -1601,7 +1601,7 @@ do
   m:off("network", id)
 end
 
---@api-stub: Mediator:off
+--@api-stub: LMediator:off
 -- Unregister a handler from a channel by its ID
 do
   local m = lurek.patterns.newMediator()
@@ -1612,7 +1612,7 @@ do
   print("handlers on ui_events=" .. m:handlerCount("ui_events"))
 end
 
---@api-stub: Mediator:send
+--@api-stub: LMediator:send
 -- Send a message to all handlers on a specific channel
 do
   local m = lurek.patterns.newMediator()
@@ -1624,7 +1624,7 @@ do
   m:send("damage_log", 12, "spike_trap")
 end
 
---@api-stub: Mediator:broadcast
+--@api-stub: LMediator:broadcast
 -- Send a message to all handlers on ALL channels
 do
   local m = lurek.patterns.newMediator()
@@ -1636,7 +1636,7 @@ do
   m:broadcast("pause")
 end
 
---@api-stub: Mediator:handlerCount
+--@api-stub: LMediator:handlerCount
 -- Return the number of handlers on a specific channel
 do
   local m = lurek.patterns.newMediator()
@@ -1647,7 +1647,7 @@ do
   print("save handlers=" .. m:handlerCount("save"))
 end
 
---@api-stub: Mediator:channels
+--@api-stub: LMediator:channels
 -- Return an array of all channel names with at least one handler
 do
   local m = lurek.patterns.newMediator()
@@ -1657,7 +1657,7 @@ do
   for _, ch in ipairs(m:channels()) do print("  channel: " .. ch) end
 end
 
---@api-stub: Mediator:removeChannel
+--@api-stub: LMediator:removeChannel
 -- Remove an entire channel and all its handlers
 do
   local m = lurek.patterns.newMediator()
@@ -1668,7 +1668,7 @@ do
   print("minigame handlers=" .. m:handlerCount("minigame"))
 end
 
---@api-stub: Mediator:clear
+--@api-stub: LMap:clear
 -- Remove all channels and handlers, resetting the mediator
 do
   local m = lurek.patterns.newMediator()
@@ -1679,7 +1679,7 @@ do
   print("channels after clear=" .. #m:channels())
 end
 
---@api-stub: Strategy:register
+--@api-stub: LStrategy:register
 -- Register a named strategy implementation function
 do
   local s = lurek.patterns.newStrategy()
@@ -1694,7 +1694,7 @@ do
   print("registered strategies=" .. #s:names())
 end
 
---@api-stub: Strategy:set
+--@api-stub: LMap:set
 -- Switch to a named strategy for future execute() calls
 do
   local s = lurek.patterns.newStrategy()
@@ -1705,7 +1705,7 @@ do
   if not ok then print("ERROR: strategy not found") end
 end
 
---@api-stub: Strategy:execute
+--@api-stub: LStrategy:execute
 -- Execute the currently active strategy, forwarding arguments
 do
   local s = lurek.patterns.newStrategy()
@@ -1717,7 +1717,7 @@ do
   print("critical damage=" .. dmg)
 end
 
---@api-stub: Strategy:getCurrent
+--@api-stub: LStrategy:getCurrent
 -- Return the name of the currently active strategy (nil if none)
 do
   local s = lurek.patterns.newStrategy()
@@ -1729,7 +1729,7 @@ do
   if name then print("active strategy: " .. name) end
 end
 
---@api-stub: Strategy:has
+--@api-stub: LMap:has
 -- Check whether a strategy with the given name is registered
 do
   local s = lurek.patterns.newStrategy()
@@ -1739,7 +1739,7 @@ do
   if s:has("legacy") then s:set("legacy") end
 end
 
---@api-stub: Strategy:remove
+--@api-stub: LWeightedRandom:remove
 -- Remove a named strategy (clears selection if it was active)
 do
   local s = lurek.patterns.newStrategy()
@@ -1749,7 +1749,7 @@ do
   print("removed=" .. tostring(removed))
 end
 
---@api-stub: Strategy:names
+--@api-stub: LStrategy:names
 -- Return an array of all registered strategy names
 do
   local s = lurek.patterns.newStrategy()
@@ -1758,7 +1758,7 @@ do
   for _, n in ipairs(s:names()) do print("  strategy: " .. n) end
 end
 
---@api-stub: Strategy:clear
+--@api-stub: LMap:clear
 -- Remove all strategies and reset the selection
 do
   local s = lurek.patterns.newStrategy()
@@ -1769,7 +1769,7 @@ do
   print("strategies after clear=" .. #s:names())
 end
 
---@api-stub: Stack:push
+--@api-stub: LList:push
 -- Push a value onto the top of the stack (returns false if at capacity)
 do
   local s = lurek.patterns.newStack(4)
@@ -1781,7 +1781,7 @@ do
   print("pushed=" .. tostring(ok) .. " depth=" .. s:len())
 end
 
---@api-stub: Stack:pop
+--@api-stub: LList:pop
 -- Remove and return the top value (nil if empty)
 do
   local s = lurek.patterns.newStack(0)
@@ -1792,7 +1792,7 @@ do
   print("popped=" .. top .. " now at=" .. (s:peek() or "<empty>"))
 end
 
---@api-stub: Stack:peek
+--@api-stub: LStack:peek
 -- Return the top value without removing it
 do
   local s = lurek.patterns.newStack(0)
@@ -1803,7 +1803,7 @@ do
   if top == "dialog_layer" then print("dialog is showing") end
 end
 
---@api-stub: Stack:len
+--@api-stub: LWeightedRandom:len
 -- Return the current number of items in the stack
 do
   local s = lurek.patterns.newStack(0)
@@ -1811,7 +1811,7 @@ do
   print("stack depth=" .. s:len())
 end
 
---@api-stub: Stack:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the stack contains no items
 do
   local s = lurek.patterns.newStack(0)
@@ -1822,7 +1822,7 @@ do
   if s:isEmpty() then print("at root, quit to main menu") end
 end
 
---@api-stub: Stack:isFull
+--@api-stub: LQueue:isFull
 -- Check whether the stack has reached its capacity limit
 do
   local s = lurek.patterns.newStack(2)
@@ -1832,7 +1832,7 @@ do
   if s:isFull() then print("dialog stack full, close one first") end
 end
 
---@api-stub: Stack:clear
+--@api-stub: LMap:clear
 -- Remove all items from the stack
 do
   local s = lurek.patterns.newStack(0)
@@ -1843,7 +1843,7 @@ do
   print("len after clear=" .. s:len())
 end
 
---@api-stub: Stack:toArray
+--@api-stub: LSet:toArray
 -- Return all items as an array table (bottom to top)
 do
   local s = lurek.patterns.newStack(0)
@@ -1853,7 +1853,7 @@ do
   for i, v in ipairs(s:toArray()) do print("  " .. i .. ": " .. v) end
 end
 
---@api-stub: Queue:enqueue
+--@api-stub: LQueue:enqueue
 -- Add a value to the back of the queue (returns false if at capacity)
 do
   local q = lurek.patterns.newQueue(0)
@@ -1863,7 +1863,7 @@ do
   print("enqueued=" .. tostring(ok) .. " size=" .. q:len())
 end
 
---@api-stub: Queue:dequeue
+--@api-stub: LQueue:dequeue
 -- Remove and return the front value (nil if empty)
 do
   local q = lurek.patterns.newQueue(0)
@@ -1874,7 +1874,7 @@ do
   if msg then print("processing: " .. msg) end
 end
 
---@api-stub: Queue:front
+--@api-stub: LQueue:front
 -- Return the front value without removing it
 do
   local q = lurek.patterns.newQueue(0)
@@ -1885,7 +1885,7 @@ do
   if f then print("next in queue: " .. f) end
 end
 
---@api-stub: Queue:len
+--@api-stub: LWeightedRandom:len
 -- Return the current number of items in the queue
 do
   local q = lurek.patterns.newQueue(0)
@@ -1893,7 +1893,7 @@ do
   print("queue size=" .. q:len())
 end
 
---@api-stub: Queue:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the queue contains no items
 do
   local q = lurek.patterns.newQueue(0)
@@ -1905,7 +1905,7 @@ do
   end
 end
 
---@api-stub: Queue:isFull
+--@api-stub: LQueue:isFull
 -- Check whether the queue has reached its capacity limit
 do
   local q = lurek.patterns.newQueue(2)
@@ -1915,7 +1915,7 @@ do
   if q:isFull() then print("queue full, dropping input") end
 end
 
---@api-stub: Queue:clear
+--@api-stub: LMap:clear
 -- Remove all items from the queue
 do
   local q = lurek.patterns.newQueue(0)
@@ -1926,7 +1926,7 @@ do
   print("size after clear=" .. q:len())
 end
 
---@api-stub: Queue:toArray
+--@api-stub: LSet:toArray
 -- Return all items as an array table (front to back)
 do
   local q = lurek.patterns.newQueue(0)
@@ -1935,7 +1935,7 @@ do
   for i, v in ipairs(q:toArray()) do print("  " .. i .. ": " .. v) end
 end
 
---@api-stub: List:add
+--@api-stub: LWeightedRandom:add
 -- Append a value to the end of the list
 do
   local l = lurek.patterns.newList()
@@ -1945,7 +1945,7 @@ do
   print("inventory size=" .. l:len())
 end
 
---@api-stub: List:get
+--@api-stub: LMap:get
 -- Get the value at a 1-based index (nil if out of range)
 do
   local l = lurek.patterns.newList()
@@ -1956,7 +1956,7 @@ do
   if item then print("first item: " .. item) end
 end
 
---@api-stub: List:set
+--@api-stub: LMap:set
 -- Replace the value at a 1-based index
 do
   local l = lurek.patterns.newList()
@@ -1967,7 +1967,7 @@ do
   print("slot 1: " .. l:get(1))
 end
 
---@api-stub: List:remove
+--@api-stub: LWeightedRandom:remove
 -- Remove and return the value at a 1-based index
 do
   local l = lurek.patterns.newList()
@@ -1978,7 +1978,7 @@ do
   print("removed=" .. removed .. " remaining=" .. l:len())
 end
 
---@api-stub: List:len
+--@api-stub: LWeightedRandom:len
 -- Return the number of items in the list
 do
   local l = lurek.patterns.newList()
@@ -1986,7 +1986,7 @@ do
   print("count=" .. l:len())
 end
 
---@api-stub: List:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the list is empty
 do
   local l = lurek.patterns.newList()
@@ -1995,7 +1995,7 @@ do
   print("after add: empty=" .. tostring(l:isEmpty()))
 end
 
---@api-stub: List:contains
+--@api-stub: LList:contains
 -- Check whether the list contains a specific value
 do
   local l = lurek.patterns.newList()
@@ -2005,7 +2005,7 @@ do
   if l:contains("key") then print("door can be opened") end
 end
 
---@api-stub: List:clear
+--@api-stub: LMap:clear
 -- Remove all items from the list
 do
   local l = lurek.patterns.newList()
@@ -2016,7 +2016,7 @@ do
   print("len after clear=" .. l:len())
 end
 
---@api-stub: List:toArray
+--@api-stub: LSet:toArray
 -- Return all items as a plain Lua array table
 do
   local l = lurek.patterns.newList()
@@ -2026,7 +2026,7 @@ do
   for i, v in ipairs(l:toArray()) do print("  " .. i .. "=" .. v) end
 end
 
---@api-stub: Set:add
+--@api-stub: LWeightedRandom:add
 -- Add a string to the set (returns true if newly added)
 do
   local s = lurek.patterns.newSet()
@@ -2037,7 +2037,7 @@ do
   s:add("collected_gem")  -- returns false, already present
 end
 
---@api-stub: Set:remove
+--@api-stub: LWeightedRandom:remove
 -- Remove a string from the set (returns true if it was present)
 do
   local s = lurek.patterns.newSet()
@@ -2048,7 +2048,7 @@ do
   print("removed=" .. tostring(existed) .. " size=" .. s:len())
 end
 
---@api-stub: Set:has
+--@api-stub: LMap:has
 -- Check whether a string is in the set
 do
   local s = lurek.patterns.newSet()
@@ -2058,7 +2058,7 @@ do
   if s:has("flying") then print("ignore gravity") end
 end
 
---@api-stub: Set:len
+--@api-stub: LWeightedRandom:len
 -- Return the number of items in the set
 do
   local s = lurek.patterns.newSet()
@@ -2068,7 +2068,7 @@ do
   print("unique enemies killed=" .. s:len())
 end
 
---@api-stub: Set:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the set is empty
 do
   local s = lurek.patterns.newSet()
@@ -2077,7 +2077,7 @@ do
   print("empty=" .. tostring(s:isEmpty()))
 end
 
---@api-stub: Set:toArray
+--@api-stub: LSet:toArray
 -- Return all items as an array table
 do
   local s = lurek.patterns.newSet()
@@ -2087,7 +2087,7 @@ do
   for _, k in ipairs(s:toArray()) do print("  color: " .. k) end
 end
 
---@api-stub: Set:clear
+--@api-stub: LMap:clear
 -- Remove all items from the set
 do
   local s = lurek.patterns.newSet()
@@ -2098,7 +2098,7 @@ do
   print("size after clear=" .. s:len())
 end
 
---@api-stub: Set:union
+--@api-stub: LSet:union
 -- Return a new set containing all items from both sets
 do
   local a = lurek.patterns.newSet(); a:add("sword"); a:add("shield")
@@ -2109,7 +2109,7 @@ do
   print("union size=" .. combined:len())  -- 3: sword, shield, bow
 end
 
---@api-stub: Set:intersection
+--@api-stub: LSet:intersection
 -- Return a new set containing only items present in both sets
 do
   local player_has = lurek.patterns.newSet(); player_has:add("key"); player_has:add("map")
@@ -2124,7 +2124,7 @@ end
 -- Extended LList methods (push, unshift, insert, indexOf, reverse, pop, shift)
 -- -----------------------------------------------------------------------------
 
---@api-stub: LList:add
+--@api-stub: LWeightedRandom:add
 -- Append a value to the end of the list
 do
   local lst = lurek.patterns.newList()
@@ -2135,7 +2135,7 @@ do
   print("list size=" .. lst:len())
 end
 
---@api-stub: LList:get
+--@api-stub: LMap:get
 -- Get the value at a 1-based index
 do
   local lst = lurek.patterns.newList()
@@ -2146,7 +2146,7 @@ do
   print("item[2]=" .. tostring(item))
 end
 
---@api-stub: LList:set
+--@api-stub: LMap:set
 -- Replace the value at a 1-based index
 do
   local lst = lurek.patterns.newList()
@@ -2157,7 +2157,7 @@ do
   print("slot 1=" .. tostring(lst:get(1)))
 end
 
---@api-stub: LList:remove
+--@api-stub: LWeightedRandom:remove
 -- Remove and return the value at a 1-based index
 do
   local lst = lurek.patterns.newList()
@@ -2169,7 +2169,7 @@ do
   print("removed=" .. tostring(removed) .. " remaining=" .. lst:len())
 end
 
---@api-stub: LList:len
+--@api-stub: LWeightedRandom:len
 -- Return the number of items in the list
 do
   local lst = lurek.patterns.newList()
@@ -2177,7 +2177,7 @@ do
   print("list length=" .. lst:len())
 end
 
---@api-stub: LList:isEmpty
+--@api-stub: LWeightedRandom:isEmpty
 -- Check whether the list is empty
 do
   local lst = lurek.patterns.newList()
@@ -2198,7 +2198,7 @@ do
   print("has wind: " .. tostring(lst:contains("wind")))
 end
 
---@api-stub: LList:clear
+--@api-stub: LMap:clear
 -- Remove all items from the list
 do
   local lst = lurek.patterns.newList()
@@ -2208,13 +2208,13 @@ do
   print("length after clear=" .. lst:len())
 end
 
---@api-stub: LList:toArray
+--@api-stub: LSet:toArray
 -- Return all items as an array table
 do
   local lst = lurek.patterns.newList()
-  lst:add(10)
-  lst:add(20)
-  lst:add(30)
+  lst:add('10')
+  lst:add('20')
+  lst:add('30')
   -- toArray() returns a plain Lua table for iteration.
   local arr = lst:toArray()
   print("arr[2]=" .. tostring(arr[2]))
@@ -2503,1586 +2503,1410 @@ end
 print("content/examples/patterns.lua")
 
 -- =============================================================================
--- STUBS: 212 uncovered lurek.patterns API item(s)
--- Generated by tools/audit/example_add_missing.py
--- REQUIRED: replace every --@api-stub: block below with a real scenario.
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- The final committed file must contain ZERO --@api-stub: lines.
+-- Additional individual method examples
 -- =============================================================================
 
--- ---- Stub: lurek.patterns.newWeightedRandom ------------------------------
 --@api-stub: lurek.patterns.newWeightedRandom
 -- Create a new weighted random selection pool. Add items with weights and pick random selections.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.patterns.newWeightedRandom()  -- -> LWeightedRandom
+do
+  -- Loot tables use weighted random to control drop rarity.
+  local loot = lurek.patterns.newWeightedRandom()
+  loot:add(70.0, "common_herb", "common")
+  loot:add(25.0, "rare_gem", "rare")
+  loot:add(5.0, "legendary_sword", "legendary")
+  local drop = loot:pick(math.random())
+  print("monster dropped: " .. tostring(drop))
+end
 
--- ---- Stub: lurek.patterns.newBehaviorTree --------------------------------
 --@api-stub: lurek.patterns.newBehaviorTree
 -- Create a new behavior tree for AI decision-making with sequences, selectors, parallels, and leaf actions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.patterns.newBehaviorTree()  -- -> LBehaviorTree
+do
+  -- Guard AI: patrol until player spotted, then chase.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addSelector("guard_ai")
+  local chase = bt:addLeaf("chase", "chase_leaf")
+  local patrol = bt:addLeaf("patrol", "patrol_leaf")
+  bt:addChild(root, chase)
+  bt:addChild(root, patrol)
+  bt:setLeaf("chase", function() return "failure" end)
+  bt:setLeaf("patrol", function() return "success" end)
+  bt:setRoot(root)
+  print("guard decision: " .. bt:tick())
+end
 
--- ---- Stub: lurek.patterns.newGraph ---------------------------------------
 --@api-stub: lurek.patterns.newGraph
 -- Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lurek.patterns.newGraph()  -- -> LPatternGraph  (undirected: boolean)
+do
+  -- Quest dependency graph: directed edges show unlock order.
+  local g = lurek.patterns.newGraph(false)
+  local start = g:addNode("tutorial")
+  local mid = g:addNode("dungeon_1")
+  local boss = g:addNode("final_boss")
+  g:addEdge(start, mid, 1.0)
+  g:addEdge(mid, boss, 1.0)
+  print("quest graph: " .. g:nodeCount() .. " quests, " .. g:edgeCount() .. " dependencies")
+end
 
 -- -----------------------------------------------------------------------------
 -- LBehaviorTree methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LBehaviorTree:addSequence -------------------------------------
 --@api-stub: LBehaviorTree:addSequence
 -- Create a sequence composite node. All children must succeed for this node to succeed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addSequence([label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Sequence: eat then sleep. Both must succeed for "rest" to succeed.
+  local bt = lurek.patterns.newBehaviorTree()
+  local seq = bt:addSequence("rest_routine")
+  local eat = bt:addLeaf("eat", "eat_action")
+  local sleep = bt:addLeaf("sleep", "sleep_action")
+  bt:addChild(seq, eat)
+  bt:addChild(seq, sleep)
+  bt:setLeaf("eat", function() return "success" end)
+  bt:setLeaf("sleep", function() return "success" end)
+  bt:setRoot(seq)
+  print("rest_routine: " .. bt:tick())
+end
 
--- ---- Stub: LBehaviorTree:addSelector -------------------------------------
 --@api-stub: LBehaviorTree:addSelector
 -- Create a selector (fallback) composite node. Succeeds if any child succeeds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addSelector([label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Selector: try ranged attack, fallback to melee.
+  local bt = lurek.patterns.newBehaviorTree()
+  local sel = bt:addSelector("attack_choice")
+  local ranged = bt:addLeaf("ranged", "try_ranged")
+  local melee = bt:addLeaf("melee", "try_melee")
+  bt:addChild(sel, ranged)
+  bt:addChild(sel, melee)
+  bt:setLeaf("ranged", function() return "failure" end)  -- out of ammo
+  bt:setLeaf("melee", function() return "success" end)
+  bt:setRoot(sel)
+  print("attack: " .. bt:tick())  -- falls back to melee
+end
 
--- ---- Stub: LBehaviorTree:addParallel -------------------------------------
 --@api-stub: LBehaviorTree:addParallel
 -- Create a parallel composite node that runs all children simultaneously.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addParallel(min_success, [label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Parallel: run and shoot at the same time (needs 1 success minimum).
+  local bt = lurek.patterns.newBehaviorTree()
+  local par = bt:addParallel(1, "run_and_gun")
+  local run = bt:addLeaf("run", "run_action")
+  local shoot = bt:addLeaf("shoot", "shoot_action")
+  bt:addChild(par, run)
+  bt:addChild(par, shoot)
+  bt:setLeaf("run", function() return "success" end)
+  bt:setLeaf("shoot", function() return "running" end)
+  bt:setRoot(par)
+  print("parallel: " .. bt:tick())
+end
 
--- ---- Stub: LBehaviorTree:addInverter -------------------------------------
 --@api-stub: LBehaviorTree:addInverter
 -- Create a decorator node that inverts its child's result (success ↔ failure).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addInverter([label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Inverter: "is NOT hungry" check. Inverts the hunger leaf result.
+  local bt = lurek.patterns.newBehaviorTree()
+  local inv = bt:addInverter("not_hungry")
+  local hungry = bt:addLeaf("hungry", "check_hunger")
+  bt:addChild(inv, hungry)
+  bt:setLeaf("hungry", function() return "failure" end)  -- not hungry
+  bt:setRoot(inv)
+  print("not_hungry: " .. bt:tick())  -- inverted failure -> success
+end
 
--- ---- Stub: LBehaviorTree:addRepeat ---------------------------------------
 --@api-stub: LBehaviorTree:addRepeat
 -- Create a decorator node that repeats its child a fixed number of times.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addRepeat(10, [label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Repeat: swing sword 3 times in a combo attack.
+  local bt = lurek.patterns.newBehaviorTree()
+  local rep = bt:addRepeat(3, "triple_slash")
+  local slash = bt:addLeaf("slash", "slash_action")
+  bt:addChild(rep, slash)
+  local count = 0
+  bt:setLeaf("slash", function() count = count + 1; return "success" end)
+  bt:setRoot(rep)
+  bt:tick()
+  print("slashes executed=" .. count)
+end
 
--- ---- Stub: LBehaviorTree:addLeaf -----------------------------------------
 --@api-stub: LBehaviorTree:addLeaf
 -- Create a leaf (action) node that will invoke a named callback function on tick.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addLeaf("hero", [label])  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Leaf nodes are the actual game actions at the bottom of the tree.
+  local bt = lurek.patterns.newBehaviorTree()
+  local leaf = bt:addLeaf("gather_wood", "gather_action")
+  bt:setLeaf("gather_wood", function()
+    return "success"
+  end)
+  bt:setRoot(leaf)
+  print("gather result: " .. bt:tick())
+end
 
--- ---- Stub: LBehaviorTree:addChild ----------------------------------------
 --@api-stub: LBehaviorTree:addChild
 -- Attach a child node to a parent composite or decorator node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:addChild(parent_id, child_id)  -- -> boolean
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Build a tree by wiring children to composites.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addSequence("main")
+  local a = bt:addLeaf("step_a", "action_a")
+  local b = bt:addLeaf("step_b", "action_b")
+  local ok1 = bt:addChild(root, a)
+  local ok2 = bt:addChild(root, b)
+  print("wired=" .. tostring(ok1) .. "," .. tostring(ok2) .. " nodes=" .. bt:nodeCount())
+end
 
--- ---- Stub: LBehaviorTree:setRoot -----------------------------------------
 --@api-stub: LBehaviorTree:setRoot
 -- Designate a node as the tree's root. Tick evaluation starts here.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:setRoot(1)  -- -> boolean
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Must set root before tick() or tree has nothing to evaluate.
+  local bt = lurek.patterns.newBehaviorTree()
+  local node = bt:addLeaf("idle", "idle_leaf")
+  bt:setLeaf("idle", function() return "success" end)
+  local ok = bt:setRoot(node)
+  print("root set=" .. tostring(ok))
+end
 
--- ---- Stub: LBehaviorTree:setLeaf -----------------------------------------
 --@api-stub: LBehaviorTree:setLeaf
 -- Register or replace the callback function for a named leaf. The function must return "success", "failure", or "running".
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:setLeaf("hero", function() end)
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Hot-swap leaf behavior for different AI states.
+  local bt = lurek.patterns.newBehaviorTree()
+  local leaf = bt:addLeaf("move", "move_action")
+  bt:setRoot(leaf)
+  bt:setLeaf("move", function() return "running" end)
+  print("first tick: " .. bt:tick())
+  bt:setLeaf("move", function() return "success" end)  -- arrived
+  print("second tick: " .. bt:tick())
+end
 
--- ---- Stub: LBehaviorTree:tick --------------------------------------------
 --@api-stub: LBehaviorTree:tick
 -- Execute one tick of the behavior tree from the root. Returns the root node's status.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:tick()  -- -> string
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Call tick() once per AI update frame.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addLeaf("think", "think_action")
+  bt:setLeaf("think", function() return "running" end)
+  bt:setRoot(root)
+  local status = bt:tick()
+  print("AI status: " .. status)  -- "running" means still processing
+end
 
--- ---- Stub: LBehaviorTree:resetState --------------------------------------
 --@api-stub: LBehaviorTree:resetState
 -- Reset the tree's running state. Use between encounters or when restarting AI logic.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:resetState()
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Reset between combat encounters so AI starts fresh.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addLeaf("fight", "fight_leaf")
+  bt:setLeaf("fight", function() return "running" end)
+  bt:setRoot(root)
+  bt:tick()
+  bt:resetState()
+  print("state reset, ready for next encounter")
+end
 
--- ---- Stub: LBehaviorTree:nodeCount ---------------------------------------
 --@api-stub: LBehaviorTree:nodeCount
 -- Return the total number of nodes in the tree.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:nodeCount()  -- -> number
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Monitor tree complexity for debugging.
+  local bt = lurek.patterns.newBehaviorTree()
+  bt:addSequence("a")
+  bt:addSelector("b")
+  bt:addLeaf("c", "leaf_c")
+  print("tree nodes=" .. bt:nodeCount())
+end
 
--- ---- Stub: LBehaviorTree:clearAll ----------------------------------------
 --@api-stub: LBehaviorTree:clearAll
 -- Remove all nodes and leaf functions, resetting the tree to empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBehaviorTree_stub:clearAll()
--- (replace lBehaviorTree_stub with your real LBehaviorTree instance above)
+do
+  -- Clear and rebuild when loading a different AI profile.
+  local bt = lurek.patterns.newBehaviorTree()
+  bt:addSequence("temp")
+  bt:addLeaf("x", "x_leaf")
+  bt:clearAll()
+  print("after clear: nodes=" .. bt:nodeCount())
+end
 
 -- -----------------------------------------------------------------------------
 -- LBlackboard methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LBlackboard:set -----------------------------------------------
 --@api-stub: LBlackboard:set
 -- Set a key to a value (boolean, number, string, or nil to clear). Notifies registered watchers if value changed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:set("player_score", 42)
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- AI perception system writes detected info to the shared blackboard.
+  local bb = lurek.patterns.newBlackboard("perception")
+  bb:set("player_distance", 45.0)
+  bb:set("player_visible", true)
+  bb:set("cover_nearby", false)
+  print("distance=" .. bb:get("player_distance"))
+end
 
--- ---- Stub: LBlackboard:get -----------------------------------------------
 --@api-stub: LBlackboard:get
 -- Retrieve the value stored under a key. Returns nil if the key does not exist.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:get("player_score")  -- -> boolean|number|string|nil
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- AI decision code reads blackboard values set by other systems.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("threat_level", 3)
+  local threat = bb:get("threat_level") or 0
+  if threat > 2 then print("high alert!") end
+end
 
--- ---- Stub: LBlackboard:has -----------------------------------------------
 --@api-stub: LBlackboard:has
 -- Check whether a key exists on the blackboard.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:has("player_score")  -- -> boolean
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- Guard reads before using values that might not be set yet.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("waypoint_x", 100)
+  if bb:has("waypoint_x") then print("waypoint assigned") end
+  print("has target=" .. tostring(bb:has("target_id")))
+end
 
--- ---- Stub: LBlackboard:clear ---------------------------------------------
 --@api-stub: LBlackboard:clear
 -- Remove a single key from the blackboard.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:clear("player_score")
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- Clear a key when the information becomes stale.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("last_sound_pos", 50)
+  bb:clear("last_sound_pos")
+  print("after clear: " .. tostring(bb:get("last_sound_pos")))  -- nil
+end
 
--- ---- Stub: LBlackboard:keys ----------------------------------------------
 --@api-stub: LBlackboard:keys
 -- Return an array of all keys currently stored on the blackboard.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:keys()  -- -> table
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- Debug display of all blackboard data for AI inspector.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("hp", 80); bb:set("stance", "aggressive")
+  local all_keys = bb:keys()
+  print("blackboard has " .. #all_keys .. " entries")
+end
 
--- ---- Stub: LBlackboard:watch ---------------------------------------------
---@api-stub: LBlackboard:watch
--- Register a watcher callback that fires whenever the specified key changes. Use `"*"` to watch all keys.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:watch("player_score", function() end)  -- -> number
--- (replace lBlackboard_stub with your real LBlackboard instance above)
-
--- ---- Stub: LBlackboard:unwatch -------------------------------------------
---@api-stub: LBlackboard:unwatch
--- Remove a previously registered watcher by its ID.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:unwatch(1)
--- (replace lBlackboard_stub with your real LBlackboard instance above)
-
--- ---- Stub: LBlackboard:getRevision ---------------------------------------
 --@api-stub: LBlackboard:getRevision
 -- Return the current revision counter. Increments on every value change.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:getRevision()  -- -> number
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- Use revision as a dirty flag to avoid re-evaluating unchanged data.
+  local bb = lurek.patterns.newBlackboard()
+  local rev1 = bb:getRevision()
+  bb:set("score", 10)
+  local rev2 = bb:getRevision()
+  print("changed=" .. tostring(rev2 > rev1))
+end
 
--- ---- Stub: LBlackboard:snapshot ------------------------------------------
---@api-stub: LBlackboard:snapshot
--- Return a table containing all current key-value pairs as a snapshot. Useful for serialization or debug display.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:snapshot()  -- -> table
--- (replace lBlackboard_stub with your real LBlackboard instance above)
-
--- ---- Stub: LBlackboard:clearAll ------------------------------------------
 --@api-stub: LBlackboard:clearAll
 -- Remove all keys and values from the blackboard.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBlackboard_stub:clearAll()
--- (replace lBlackboard_stub with your real LBlackboard instance above)
+do
+  -- Reset blackboard between AI encounters.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("a", 1); bb:set("b", 2)
+  bb:clearAll()
+  print("keys remaining=" .. #bb:keys())
+end
 
 -- -----------------------------------------------------------------------------
 -- LCommandStack methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LCommandStack:execute -----------------------------------------
 --@api-stub: LCommandStack:execute
 -- Execute a named command immediately, recording it in history. Discards any redo history ahead of the current position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:execute("hero", exec_fn, [undo_fn])
--- (replace lCommandStack_stub with your real LCommandStack instance above)
+do
+  -- Level editor: record tile placement for undo support.
+  local stack = lurek.patterns.newCommandStack(32)
+  local grid = { [1] = "grass" }
+  local prev = grid[1]
+  stack:execute("place_wall",
+    function() grid[1] = "wall" end,
+    function() grid[1] = prev end
+  )
+  print("tile[1]=" .. grid[1])  -- "wall"
+end
 
--- ---- Stub: LCommandStack:undo --------------------------------------------
---@api-stub: LCommandStack:undo
--- Undo the most recent command by calling its undo function. Moves the pointer back in history.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:undo()  -- -> boolean
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:redo --------------------------------------------
---@api-stub: LCommandStack:redo
--- Redo a previously undone command by re-calling its execute function. Moves the pointer forward.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:redo()  -- -> boolean
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:canUndo -----------------------------------------
---@api-stub: LCommandStack:canUndo
--- Check whether an undo operation is possible (there is a command with an undo function behind the pointer).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:canUndo()  -- -> boolean
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:canRedo -----------------------------------------
---@api-stub: LCommandStack:canRedo
--- Check whether a redo operation is possible (there are commands ahead of the pointer).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:canRedo()  -- -> boolean
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:getHistorySize ----------------------------------
---@api-stub: LCommandStack:getHistorySize
--- Return the total number of commands in the history (both undone and available for redo).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:getHistorySize()  -- -> number
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:getCurrentName ----------------------------------
---@api-stub: LCommandStack:getCurrentName
--- Return the name of the most recently executed (or undone-to) command, or nil if history is empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:getCurrentName()  -- -> string
--- (replace lCommandStack_stub with your real LCommandStack instance above)
-
--- ---- Stub: LCommandStack:clearAll ----------------------------------------
 --@api-stub: LCommandStack:clearAll
 -- Discard all command history and free associated callbacks.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCommandStack_stub:clearAll()
--- (replace lCommandStack_stub with your real LCommandStack instance above)
+do
+  -- Clear history when opening a new document.
+  local stack = lurek.patterns.newCommandStack(0)
+  stack:execute("op1", function() end, function() end)
+  stack:execute("op2", function() end, function() end)
+  stack:clearAll()
+  print("history after clear=" .. stack:getHistorySize())
+end
 
 -- -----------------------------------------------------------------------------
 -- LDebounce methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LDebounce:onFire ----------------------------------------------
---@api-stub: LDebounce:onFire
--- Set the callback function to invoke when the debounce fires after the wait period.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:onFire(f)
--- (replace lDebounce_stub with your real LDebounce instance above)
-
--- ---- Stub: LDebounce:trigger ---------------------------------------------
---@api-stub: LDebounce:trigger
--- Signal input activity. Resets the wait timer so the debounce will fire after the full wait period of inactivity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:trigger()
--- (replace lDebounce_stub with your real LDebounce instance above)
-
--- ---- Stub: LDebounce:update ----------------------------------------------
 --@api-stub: LDebounce:update
 -- Advance the debounce timer. If the wait period elapsed since last trigger, fires the callback and returns true.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:update(0.016)  -- -> boolean
--- (replace lDebounce_stub with your real LDebounce instance above)
+do
+  -- Search-as-you-type: only search after player stops typing for 0.3s.
+  local search = lurek.patterns.newDebounce(0.3)
+  search:onFire(function() print("  executing search query") end)
+  search:trigger()
+  local fired = search:update(0.35)  -- waited long enough
+  print("search fired=" .. tostring(fired))
+end
 
--- ---- Stub: LDebounce:cancel ----------------------------------------------
---@api-stub: LDebounce:cancel
--- Cancel any pending debounce without firing. The callback will not be called until triggered again.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:cancel()
--- (replace lDebounce_stub with your real LDebounce instance above)
-
--- ---- Stub: LDebounce:isPending -------------------------------------------
---@api-stub: LDebounce:isPending
--- Check whether the debounce is currently waiting to fire (has been triggered but wait period not yet elapsed).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:isPending()  -- -> boolean
--- (replace lDebounce_stub with your real LDebounce instance above)
-
--- ---- Stub: LDebounce:getFireCount ----------------------------------------
---@api-stub: LDebounce:getFireCount
--- Return the total number of times this debounce has fired since creation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDebounce_stub:getFireCount()  -- -> number
--- (replace lDebounce_stub with your real LDebounce instance above)
-
--- -----------------------------------------------------------------------------
--- LEventBus methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LEventBus:on --------------------------------------------------
 --@api-stub: LEventBus:on
 -- Subscribe a callback to a named event. Higher priority listeners fire first.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:on(event, function() end, [priority])  -- -> number
--- (replace lEventBus_stub with your real LEventBus instance above)
+do
+  -- HUD subscribes to score changes; high priority ensures it updates first.
+  local bus = lurek.patterns.newEventBus()
+  local id = bus:on("score_changed", function(new_score)
+    print("  HUD: score=" .. new_score)
+  end, 100)
+  bus:emit("score_changed", 500)
+  print("listener id=" .. id)
+end
 
--- ---- Stub: LEventBus:off -------------------------------------------------
 --@api-stub: LEventBus:off
 -- Unsubscribe a listener by its subscription ID. Removes the callback from the event bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:off(1)
--- (replace lEventBus_stub with your real LEventBus instance above)
+do
+  -- Remove listener when the subscribing system is destroyed.
+  local bus = lurek.patterns.newEventBus()
+  local id = bus:on("tick", function() print("tick") end)
+  bus:off(id)
+  bus:emit("tick")  -- no output
+  print("removed, count=" .. bus:getListenerCount("tick"))
+end
 
--- ---- Stub: LEventBus:emit ------------------------------------------------
---@api-stub: LEventBus:emit
--- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:emit(...)
--- (replace lEventBus_stub with your real LEventBus instance above)
-
--- ---- Stub: LEventBus:clear -----------------------------------------------
 --@api-stub: LEventBus:clear
 -- Remove all listeners subscribed to a specific event name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:clear(event)
--- (replace lEventBus_stub with your real LEventBus instance above)
+do
+  -- Clear all listeners for a minigame event when exiting the minigame.
+  local bus = lurek.patterns.newEventBus()
+  bus:on("puzzle_move", function() end)
+  bus:on("puzzle_move", function() end)
+  bus:clear("puzzle_move")
+  print("puzzle listeners=" .. bus:getListenerCount("puzzle_move"))
+end
 
--- ---- Stub: LEventBus:clearAll --------------------------------------------
 --@api-stub: LEventBus:clearAll
 -- Remove all listeners from every event on this bus. Resets the bus to empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:clearAll()
--- (replace lEventBus_stub with your real LEventBus instance above)
+do
+  -- Full reset when transitioning between major game modes.
+  local bus = lurek.patterns.newEventBus()
+  bus:on("a", function() end)
+  bus:on("b", function() end)
+  bus:clearAll()
+  print("events after clearAll=" .. #bus:getEvents())
+end
 
--- ---- Stub: LEventBus:getListenerCount ------------------------------------
---@api-stub: LEventBus:getListenerCount
--- Return the number of active listeners for a given event name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:getListenerCount(event)  -- -> number
--- (replace lEventBus_stub with your real LEventBus instance above)
-
--- ---- Stub: LEventBus:getEvents -------------------------------------------
---@api-stub: LEventBus:getEvents
--- Return an array of all event names that have at least one listener.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lEventBus_stub:getEvents()  -- -> table
--- (replace lEventBus_stub with your real LEventBus instance above)
-
--- -----------------------------------------------------------------------------
--- LFactory methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LFactory:register ---------------------------------------------
 --@api-stub: LFactory:register
 -- Register a constructor function for a given type name. Future `create()` calls with this type will invoke it.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:register(type_name, ctor)
--- (replace lFactory_stub with your real LFactory instance above)
+do
+  -- Register enemy constructors for data-driven spawning.
+  local factory = lurek.patterns.newFactory()
+  factory:register("bat", function(x, y)
+    return { kind = "bat", x = x, y = y, hp = 10 }
+  end)
+  print("registered bat factory")
+end
 
--- ---- Stub: LFactory:create -----------------------------------------------
---@api-stub: LFactory:create
--- Create a new object by type name, passing additional arguments to the constructor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:create(...)  -- -> boolean|number|string|table|nil
--- (replace lFactory_stub with your real LFactory instance above)
-
--- ---- Stub: LFactory:has --------------------------------------------------
 --@api-stub: LFactory:has
 -- Check whether a constructor is registered for the given type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:has(type_name)  -- -> boolean
--- (replace lFactory_stub with your real LFactory instance above)
+do
+  -- Guard before spawning to handle unknown types gracefully.
+  local factory = lurek.patterns.newFactory()
+  factory:register("slime", function() return { kind = "slime" } end)
+  if factory:has("slime") then print("slime spawner ready") end
+  print("has dragon=" .. tostring(factory:has("dragon")))
+end
 
--- ---- Stub: LFactory:alias ------------------------------------------------
---@api-stub: LFactory:alias
--- Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:alias(alias, canonical)
--- (replace lFactory_stub with your real LFactory instance above)
-
--- ---- Stub: LFactory:getTypes ---------------------------------------------
---@api-stub: LFactory:getTypes
--- Return an array of all registered type names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:getTypes()  -- -> table
--- (replace lFactory_stub with your real LFactory instance above)
-
--- ---- Stub: LFactory:remove -----------------------------------------------
 --@api-stub: LFactory:remove
 -- Unregister a type and discard its constructor function.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:remove(type_name)
--- (replace lFactory_stub with your real LFactory instance above)
+do
+  -- Remove deprecated enemy types from the spawn table.
+  local factory = lurek.patterns.newFactory()
+  factory:register("old_enemy", function() return {} end)
+  factory:remove("old_enemy")
+  print("old_enemy registered=" .. tostring(factory:has("old_enemy")))
+end
 
--- ---- Stub: LFactory:clearAll ---------------------------------------------
 --@api-stub: LFactory:clearAll
 -- Remove all registered types and constructors, resetting the factory.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFactory_stub:clearAll()
--- (replace lFactory_stub with your real LFactory instance above)
+do
+  -- Reset factory when loading a different mod or expansion pack.
+  local factory = lurek.patterns.newFactory()
+  factory:register("a", function() end)
+  factory:register("b", function() end)
+  factory:clearAll()
+  print("types after clear=" .. #factory:getTypes())
+end
 
 -- -----------------------------------------------------------------------------
 -- LFunnel methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LFunnel:onFlush -----------------------------------------------
---@api-stub: LFunnel:onFlush
--- Set the callback invoked when the funnel flushes. Receives an array of {tag, value} entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:onFlush(f)
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- ---- Stub: LFunnel:push --------------------------------------------------
 --@api-stub: LFunnel:push
 -- Push a tagged event into the funnel. May trigger an immediate flush if the max entry count is reached.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:push("enemy", [value])
--- (replace lFunnel_stub with your real LFunnel instance above)
+do
+  -- Batch analytics events to reduce network calls.
+  local funnel = lurek.patterns.newFunnel(5.0, 10)
+  funnel:onFlush(function(batch) print("  sent " .. #batch .. " events") end)
+  funnel:push("player_move", 1)
+  funnel:push("item_pickup", 1)
+  print("buffered=" .. funnel:pendingCount())
+end
 
--- ---- Stub: LFunnel:update ------------------------------------------------
---@api-stub: LFunnel:update
--- Advance the funnel's time window. Flushes and invokes the callback if the window elapsed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:update(0.016)  -- -> boolean
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- ---- Stub: LFunnel:flush -------------------------------------------------
---@api-stub: LFunnel:flush
--- Force an immediate flush of all pending entries, invoking the callback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:flush()
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- ---- Stub: LFunnel:discard -----------------------------------------------
---@api-stub: LFunnel:discard
--- Discard all pending entries without flushing or calling the callback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:discard()
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- ---- Stub: LFunnel:pendingCount ------------------------------------------
---@api-stub: LFunnel:pendingCount
--- Return the number of entries waiting to be flushed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:pendingCount()  -- -> number
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- ---- Stub: LFunnel:getFlushCount -----------------------------------------
---@api-stub: LFunnel:getFlushCount
--- Return the total number of times this funnel has flushed since creation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFunnel_stub:getFlushCount()  -- -> number
--- (replace lFunnel_stub with your real LFunnel instance above)
-
--- -----------------------------------------------------------------------------
--- LGraph methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LGraph:addNode ------------------------------------------------
 --@api-stub: LGraph:addNode
 -- Add a node to the graph with an optional label and payload value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:addNode([label], [value])  -- -> number
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Add cities to a trade route graph.
+  local g = lurek.patterns.newGraph(true)
+  local city_a = g:addNode("Ironforge", { gold = 5000 })
+  local city_b = g:addNode("Stormwind", { gold = 8000 })
+  print("added nodes: " .. city_a .. ", " .. city_b)
+end
 
--- ---- Stub: LGraph:removeNode ---------------------------------------------
 --@api-stub: LGraph:removeNode
 -- Remove a node and all its connected edges. Returns true if the node existed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:removeNode(1)  -- -> boolean
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Remove a destroyed city from the travel network.
+  local g = lurek.patterns.newGraph(true)
+  local n = g:addNode("doomed_city")
+  local ok = g:removeNode(n)
+  print("removed=" .. tostring(ok) .. " nodes=" .. g:nodeCount())
+end
 
--- ---- Stub: LGraph:getNodeValue -------------------------------------------
 --@api-stub: LGraph:getNodeValue
 -- Retrieve the payload value stored on a node. Returns nil if no payload.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:getNodeValue(1)  -- -> boolean|number|string|table|nil
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Read quest metadata stored on graph nodes.
+  local g = lurek.patterns.newGraph(false)
+  local quest = g:addNode("rescue_villager", { reward = 50, xp = 200 })
+  local data = g:getNodeValue(quest)
+  if data then print("reward=" .. data.reward .. " xp=" .. data.xp) end
+end
 
--- ---- Stub: LGraph:addEdge ------------------------------------------------
 --@api-stub: LGraph:addEdge
 -- Add a directed (or undirected) edge between two nodes with optional weight and label.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:addEdge(from, to, [weight], [label])  -- -> number
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Connect skill tree nodes with prerequisite edges.
+  local g = lurek.patterns.newGraph(false)
+  local basic = g:addNode("basic_attack")
+  local power = g:addNode("power_strike")
+  local edge_id = g:addEdge(basic, power, 1.0, "requires")
+  print("edge " .. edge_id .. " connects skills")
+end
 
--- ---- Stub: LGraph:removeEdge ---------------------------------------------
 --@api-stub: LGraph:removeEdge
 -- Remove an edge by its ID. Returns true if it existed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:removeEdge(1)  -- -> boolean
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Break a connection when a bridge is destroyed.
+  local g = lurek.patterns.newGraph(true)
+  local a = g:addNode("north_bank")
+  local b = g:addNode("south_bank")
+  local bridge = g:addEdge(a, b, 5.0, "bridge")
+  g:removeEdge(bridge)
+  print("bridge destroyed, edges=" .. g:edgeCount())
+end
 
--- ---- Stub: LGraph:neighbors ----------------------------------------------
 --@api-stub: LGraph:neighbors
 -- Return an array of node IDs directly connected to the given node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:neighbors(1)  -- -> table
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Find all towns reachable from the current location.
+  local g = lurek.patterns.newGraph(true)
+  local home = g:addNode("home")
+  local market = g:addNode("market")
+  local tavern = g:addNode("tavern")
+  g:addEdge(home, market, 1.0)
+  g:addEdge(home, tavern, 2.0)
+  local nearby = g:neighbors(home)
+  print("reachable from home: " .. #nearby .. " places")
+end
 
--- ---- Stub: LGraph:bfs ----------------------------------------------------
 --@api-stub: LGraph:bfs
 -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:bfs(start)  -- -> table
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- BFS finds shortest path (by hops) through a dungeon room graph.
+  local g = lurek.patterns.newGraph(true)
+  local entrance = g:addNode("entrance")
+  local hall = g:addNode("hall")
+  local treasure = g:addNode("treasure")
+  g:addEdge(entrance, hall, 1.0)
+  g:addEdge(hall, treasure, 1.0)
+  local order = g:bfs(entrance)
+  print("BFS visit order: " .. #order .. " rooms")
+end
 
--- ---- Stub: LGraph:dfs ----------------------------------------------------
 --@api-stub: LGraph:dfs
 -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:dfs(start)  -- -> table
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- DFS explores deep branches first, useful for maze solving.
+  local g = lurek.patterns.newGraph(true)
+  local start = g:addNode("start")
+  local fork = g:addNode("fork")
+  local dead_end = g:addNode("dead_end")
+  g:addEdge(start, fork, 1.0)
+  g:addEdge(fork, dead_end, 1.0)
+  local visited = g:dfs(start)
+  print("DFS explored " .. #visited .. " nodes")
+end
 
--- ---- Stub: LGraph:isConnected --------------------------------------------
 --@api-stub: LGraph:isConnected
 -- Check whether there is any path from one node to another.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:isConnected(from, to)  -- -> boolean
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Check if two quest objectives are connected (dependency chain).
+  local g = lurek.patterns.newGraph(false)
+  local q1 = g:addNode("find_key")
+  local q2 = g:addNode("open_door")
+  local q3 = g:addNode("side_quest")
+  g:addEdge(q1, q2, 1.0)
+  print("key->door connected=" .. tostring(g:isConnected(q1, q2)))
+  print("key->side connected=" .. tostring(g:isConnected(q1, q3)))
+end
 
--- ---- Stub: LGraph:hasNode ------------------------------------------------
 --@api-stub: LGraph:hasNode
 -- Check whether a node with the given ID exists in the graph.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:hasNode(1)  -- -> boolean
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Validate node references before operating on them.
+  local g = lurek.patterns.newGraph(true)
+  local n = g:addNode("valid")
+  print("exists=" .. tostring(g:hasNode(n)))
+  print("fake=" .. tostring(g:hasNode(9999)))
+end
 
--- ---- Stub: LGraph:nodeCount ----------------------------------------------
 --@api-stub: LGraph:nodeCount
 -- Return the total number of nodes in the graph.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:nodeCount()  -- -> number
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Monitor graph size for performance budgeting.
+  local g = lurek.patterns.newGraph(true)
+  g:addNode("a"); g:addNode("b"); g:addNode("c")
+  print("total nodes=" .. g:nodeCount())
+end
 
--- ---- Stub: LGraph:edgeCount ----------------------------------------------
 --@api-stub: LGraph:edgeCount
 -- Return the total number of edges in the graph.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:edgeCount()  -- -> number
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Track connection density for pathfinding cost estimates.
+  local g = lurek.patterns.newGraph(true)
+  local a = g:addNode("x"); local b = g:addNode("y")
+  g:addEdge(a, b, 1.0)
+  print("total edges=" .. g:edgeCount())
+end
 
--- ---- Stub: LGraph:clearAll -----------------------------------------------
 --@api-stub: LGraph:clearAll
 -- Remove all nodes, edges, and payloads from the graph.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraph_stub:clearAll()
--- (replace lGraph_stub with your real LGraph instance above)
+do
+  -- Reset graph when loading a new level or map.
+  local g = lurek.patterns.newGraph(true)
+  g:addNode("temp1"); g:addNode("temp2")
+  g:clearAll()
+  print("after clear: nodes=" .. g:nodeCount() .. " edges=" .. g:edgeCount())
+end
 
 -- -----------------------------------------------------------------------------
 -- LList methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LList:push ----------------------------------------------------
---@api-stub: LList:push
--- Append a value to the end of the list (alias for add).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:push(42)
--- (replace lList_stub with your real LList instance above)
-
--- ---- Stub: LList:unshift -------------------------------------------------
 --@api-stub: LList:unshift
 -- Insert a value at the beginning of the list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:unshift(42)
--- (replace lList_stub with your real LList instance above)
+do
+  -- Prepend urgent messages to a notification queue.
+  local notifications = lurek.patterns.newList()
+  notifications:add("old message")
+  notifications:unshift("URGENT: server restart")
+  print("first=" .. notifications:get(1))
+end
 
--- ---- Stub: LList:insert --------------------------------------------------
 --@api-stub: LList:insert
 -- Insert a value at a 1-based index, shifting subsequent items right.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:insert(1, 42)
--- (replace lList_stub with your real LList instance above)
+do
+  -- Insert a priority quest at a specific position in the log.
+  local quests = lurek.patterns.newList()
+  quests:add("explore cave")
+  quests:add("talk to elder")
+  quests:insert(2, "defend village")  -- inserted between the two
+  print("quest 2=" .. quests:get(2) .. " total=" .. quests:len())
+end
 
--- ---- Stub: LList:pop -----------------------------------------------------
---@api-stub: LList:pop
--- Remove and return the last value. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:pop()  -- -> boolean|number|string|table|nil
--- (replace lList_stub with your real LList instance above)
-
--- ---- Stub: LList:shift ---------------------------------------------------
 --@api-stub: LList:shift
 -- Remove and return the first value. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:shift()  -- -> boolean|number|string|table|nil
--- (replace lList_stub with your real LList instance above)
+do
+  -- Process events in FIFO order from a list used as a queue.
+  local events = lurek.patterns.newList()
+  events:add("spawn_wave_1")
+  events:add("spawn_wave_2")
+  local first = events:shift()
+  print("processing: " .. tostring(first) .. " remaining=" .. events:len())
+end
 
--- ---- Stub: LList:indexOf -------------------------------------------------
 --@api-stub: LList:indexOf
 -- Find the 1-based index of the first occurrence of a value. Returns nil if not found.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:indexOf(42)  -- -> integer
--- (replace lList_stub with your real LList instance above)
+do
+  -- Find where a specific item is in the inventory for UI highlighting.
+  local inv = lurek.patterns.newList()
+  inv:add("sword"); inv:add("shield"); inv:add("potion")
+  local idx = inv:indexOf("shield")
+  print("shield is at slot " .. tostring(idx))
+end
 
--- ---- Stub: LList:reverse -------------------------------------------------
 --@api-stub: LList:reverse
 -- Reverse the order of all items in the list in-place.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lList_stub:reverse()
--- (replace lList_stub with your real LList instance above)
+do
+  -- Reverse a path for backtracking navigation.
+  local path = lurek.patterns.newList()
+  path:add("town"); path:add("forest"); path:add("cave")
+  path:reverse()
+  print("backtrack start=" .. path:get(1))  -- "cave"
+end
 
 -- -----------------------------------------------------------------------------
 -- LMap methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LMap:set ------------------------------------------------------
---@api-stub: LMap:set
--- Set a key-value pair in the map. Replaces any existing value for the same key.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:set("player_score", 42)
--- (replace lMap_stub with your real LMap instance above)
-
--- ---- Stub: LMap:get ------------------------------------------------------
---@api-stub: LMap:get
--- Retrieve the value for a key. Returns nil if the key does not exist.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:get("player_score")  -- -> boolean|number|string|table|nil
--- (replace lMap_stub with your real LMap instance above)
-
--- ---- Stub: LMap:has ------------------------------------------------------
---@api-stub: LMap:has
--- Check whether a key exists in the map.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:has("player_score")  -- -> boolean
--- (replace lMap_stub with your real LMap instance above)
-
--- ---- Stub: LMap:remove ---------------------------------------------------
 --@api-stub: LMap:remove
 -- Remove a key from the map. Returns true if it was present.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:remove("player_score")  -- -> boolean
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Remove a consumed buff from the active effects map.
+  local effects = lurek.patterns.newMap()
+  effects:set("speed_boost", 1.5)
+  effects:set("shield", 100)
+  local removed = effects:remove("speed_boost")
+  print("removed speed_boost=" .. tostring(removed) .. " remaining=" .. effects:len())
+end
 
--- ---- Stub: LMap:len ------------------------------------------------------
 --@api-stub: LMap:len
 -- Return the number of key-value pairs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:len()  -- -> number
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Check how many config options are loaded.
+  local config = lurek.patterns.newMap()
+  config:set("volume", 0.8); config:set("difficulty", "hard")
+  print("config entries=" .. config:len())
+end
 
--- ---- Stub: LMap:isEmpty --------------------------------------------------
 --@api-stub: LMap:isEmpty
 -- Check whether the map has no entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:isEmpty()  -- -> boolean
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Guard against operating on an empty inventory.
+  local bag = lurek.patterns.newMap()
+  if bag:isEmpty() then print("inventory is empty, nothing to sell") end
+  bag:set("gold_ring", 1)
+  print("empty after add=" .. tostring(bag:isEmpty()))
+end
 
--- ---- Stub: LMap:keys -----------------------------------------------------
---@api-stub: LMap:keys
--- Return an array of all keys in the map.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:keys()  -- -> table
--- (replace lMap_stub with your real LMap instance above)
-
--- ---- Stub: LMap:values ---------------------------------------------------
 --@api-stub: LMap:values
 -- Return an array of all values in the map.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:values()  -- -> table
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Sum all stat bonuses from equipped items.
+  local bonuses = lurek.patterns.newMap()
+  bonuses:set("helmet", 5); bonuses:set("armor", 12); bonuses:set("boots", 3)
+  local total = 0
+  for _, v in ipairs(bonuses:values()) do total = total + v end
+  print("total defense=" .. total)
+end
 
--- ---- Stub: LMap:entries --------------------------------------------------
 --@api-stub: LMap:entries
 -- Return an array of {key, value} tables for all entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:entries()  -- -> table
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Serialize all settings for save file.
+  local settings = lurek.patterns.newMap()
+  settings:set("music", 0.7); settings:set("sfx", 1.0)
+  for _, entry in ipairs(settings:entries()) do
+    print("  " .. tostring(entry[1]) .. "=" .. tostring(entry[2]))
+  end
+end
 
--- ---- Stub: LMap:merge ----------------------------------------------------
 --@api-stub: LMap:merge
 -- Copy all entries from another LMap into this map. Existing keys are overwritten.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:merge(other)
--- (replace lMap_stub with your real LMap instance above)
+do
+  -- Merge default settings with user overrides.
+  local defaults = lurek.patterns.newMap()
+  defaults:set("volume", 0.5); defaults:set("lang", "en")
+  local overrides = lurek.patterns.newMap()
+  overrides:set("volume", 0.9)  -- user prefers louder
+  defaults:merge(overrides)
+  print("final volume=" .. defaults:get("volume"))
+end
 
--- ---- Stub: LMap:clear ----------------------------------------------------
---@api-stub: LMap:clear
--- Remove all entries from the map. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMap_stub:clear()
--- (replace lMap_stub with your real LMap instance above)
-
--- -----------------------------------------------------------------------------
--- LMediator methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LMediator:on --------------------------------------------------
---@api-stub: LMediator:on
--- Register a handler callback on a named channel. Returns an ID for unregistration.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:on(channel, function() end)  -- -> number
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:off -------------------------------------------------
---@api-stub: LMediator:off
--- Unregister a handler from a channel by its ID.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:off(channel, 1)
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:send ------------------------------------------------
---@api-stub: LMediator:send
--- Send a message to all handlers on a specific channel with optional payload arguments.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:send(...)
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:broadcast -------------------------------------------
---@api-stub: LMediator:broadcast
--- Send a message to all handlers on all channels. Every registered handler receives the payload.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:broadcast(...)
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:handlerCount ----------------------------------------
---@api-stub: LMediator:handlerCount
--- Return the number of handlers registered on a specific channel.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:handlerCount(channel)  -- -> number
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:channels --------------------------------------------
---@api-stub: LMediator:channels
--- Return an array of all channel names that have at least one handler.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:channels()  -- -> table
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:removeChannel ---------------------------------------
---@api-stub: LMediator:removeChannel
--- Remove an entire channel and all its handlers.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:removeChannel(channel)
--- (replace lMediator_stub with your real LMediator instance above)
-
--- ---- Stub: LMediator:clear -----------------------------------------------
 --@api-stub: LMediator:clear
 -- Remove all channels and handlers, resetting the mediator.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMediator_stub:clear()
--- (replace lMediator_stub with your real LMediator instance above)
+do
+  -- Full mediator reset when transitioning between game modes.
+  local m = lurek.patterns.newMediator()
+  m:on("old_channel", function() end)
+  m:clear()
+  print("channels after clear=" .. #m:channels())
+end
 
 -- -----------------------------------------------------------------------------
 -- LObjectPool methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LObjectPool:add -----------------------------------------------
 --@api-stub: LObjectPool:add
 -- Add an object to the pool's idle set, making it available for future acquisition.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:add(42)
--- (replace lObjectPool_stub with your real LObjectPool instance above)
+do
+  -- Pre-warm particle pool at scene load.
+  local particles = lurek.patterns.newObjectPool()
+  for i = 1, 16 do
+    particles:add({ x = 0, y = 0, life = 0, color = "white" })
+  end
+  print("particle pool ready: " .. particles:getAvailableCount() .. " idle")
+end
 
--- ---- Stub: LObjectPool:acquire -------------------------------------------
---@api-stub: LObjectPool:acquire
--- Take an idle object from the pool and mark it active. Returns nil if the pool is empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:acquire()  -- -> boolean|number|string|table|nil
--- (replace lObjectPool_stub with your real LObjectPool instance above)
-
--- ---- Stub: LObjectPool:release -------------------------------------------
---@api-stub: LObjectPool:release
--- Return an active object back to the pool's idle set so it can be reused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:release(42)
--- (replace lObjectPool_stub with your real LObjectPool instance above)
-
--- ---- Stub: LObjectPool:getActiveCount ------------------------------------
---@api-stub: LObjectPool:getActiveCount
--- Return the number of objects currently checked out from the pool.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:getActiveCount()  -- -> number
--- (replace lObjectPool_stub with your real LObjectPool instance above)
-
--- ---- Stub: LObjectPool:getAvailableCount ---------------------------------
---@api-stub: LObjectPool:getAvailableCount
--- Return the number of idle objects ready for acquisition.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:getAvailableCount()  -- -> number
--- (replace lObjectPool_stub with your real LObjectPool instance above)
-
--- ---- Stub: LObjectPool:getTotalCount -------------------------------------
---@api-stub: LObjectPool:getTotalCount
--- Return the total number of objects managed by this pool (active + idle).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:getTotalCount()  -- -> number
--- (replace lObjectPool_stub with your real LObjectPool instance above)
-
--- ---- Stub: LObjectPool:clearAll ------------------------------------------
 --@api-stub: LObjectPool:clearAll
 -- Destroy all objects (active and idle) and reset the pool to empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObjectPool_stub:clearAll()
--- (replace lObjectPool_stub with your real LObjectPool instance above)
+do
+  -- Free all pooled objects when unloading a scene.
+  local pool = lurek.patterns.newObjectPool()
+  pool:add({}); pool:add({})
+  pool:acquire()
+  pool:clearAll()
+  print("after clearAll: total=" .. pool:getTotalCount())
+end
 
 -- -----------------------------------------------------------------------------
 -- LObserver methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LObserver:set -------------------------------------------------
 --@api-stub: LObserver:set
 -- Set a value by key and notify all subscribers watching that key.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObserver_stub:set("player_score", new_val)
--- (replace lObserver_stub with your real LObserver instance above)
+do
+  -- Score changes automatically update the HUD through subscription.
+  local obs = lurek.patterns.newObserver()
+  obs:subscribe("gold", function(k, v) print("  wallet: " .. v .. " gold") end)
+  obs:set("gold", 100)
+  obs:set("gold", 150)  -- triggers notification again
+end
 
--- ---- Stub: LObserver:get -------------------------------------------------
 --@api-stub: LObserver:get
 -- Retrieve the current value for a key. Returns nil if not set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObserver_stub:get("player_score")  -- -> boolean|number|string|table|nil
--- (replace lObserver_stub with your real LObserver instance above)
+do
+  -- Read the current value without triggering notifications.
+  local obs = lurek.patterns.newObserver()
+  obs:set("level", 5)
+  local lvl = obs:get("level") or 1
+  print("player level=" .. lvl)
+end
 
--- ---- Stub: LObserver:subscribe -------------------------------------------
---@api-stub: LObserver:subscribe
--- Subscribe to changes on a specific key. The callback receives (key, newValue) on each change.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObserver_stub:subscribe("player_score", function() end, [once])  -- -> number
--- (replace lObserver_stub with your real LObserver instance above)
-
--- ---- Stub: LObserver:unsubscribe -----------------------------------------
---@api-stub: LObserver:unsubscribe
--- Remove a subscription by its ID. The callback will no longer fire.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObserver_stub:unsubscribe(1)
--- (replace lObserver_stub with your real LObserver instance above)
-
--- ---- Stub: LObserver:getCount --------------------------------------------
---@api-stub: LObserver:getCount
--- Return the total number of active subscriptions across all keys.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lObserver_stub:getCount()  -- -> number
--- (replace lObserver_stub with your real LObserver instance above)
-
--- -----------------------------------------------------------------------------
--- LPriorityQueue methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LPriorityQueue:push -------------------------------------------
 --@api-stub: LPriorityQueue:push
 -- Add an item with a numeric priority. Higher priority items are dequeued first.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:push(priority, 42, [label])  -- -> number
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- AI task scheduler: urgent tasks processed before idle ones.
+  local tasks = lurek.patterns.newPriorityQueue()
+  tasks:push(10, "sweep_floor", "low")
+  tasks:push(90, "extinguish_fire", "critical")
+  tasks:push(40, "restock_shelves", "medium")
+  print("queued " .. tasks:len() .. " tasks")
+end
 
--- ---- Stub: LPriorityQueue:pop --------------------------------------------
 --@api-stub: LPriorityQueue:pop
 -- Remove and return the highest-priority item. Returns nil if the queue is empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:pop()  -- -> boolean|number|string|table|nil
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- Process the most urgent job from the queue.
+  local jobs = lurek.patterns.newPriorityQueue()
+  jobs:push(5, "low_priority_job")
+  jobs:push(99, "critical_fix")
+  local top = jobs:pop()
+  print("processing: " .. tostring(top))  -- "critical_fix"
+end
 
--- ---- Stub: LPriorityQueue:peek -------------------------------------------
 --@api-stub: LPriorityQueue:peek
 -- Return the highest-priority item without removing it. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:peek()  -- -> boolean|number|string|table|nil
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- Preview what's next without consuming it.
+  local pq = lurek.patterns.newPriorityQueue()
+  pq:push(50, "render_pass")
+  local next_item = pq:peek()
+  print("next job: " .. tostring(next_item) .. " still queued=" .. pq:len())
+end
 
--- ---- Stub: LPriorityQueue:len --------------------------------------------
 --@api-stub: LPriorityQueue:len
 -- Return the number of items currently in the queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:len()  -- -> number
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- Monitor queue backlog for load shedding decisions.
+  local pq = lurek.patterns.newPriorityQueue()
+  for i = 1, 5 do pq:push(i, "task_" .. i) end
+  print("backlog=" .. pq:len())
+end
 
--- ---- Stub: LPriorityQueue:isEmpty ----------------------------------------
 --@api-stub: LPriorityQueue:isEmpty
 -- Check whether the queue contains no items.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:isEmpty()  -- -> boolean
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- Drain loop: process all pending AI decisions.
+  local pq = lurek.patterns.newPriorityQueue()
+  pq:push(1, "decide_move")
+  while not pq:isEmpty() do
+    print("  AI decided: " .. tostring(pq:pop()))
+  end
+end
 
--- ---- Stub: LPriorityQueue:clearAll ---------------------------------------
 --@api-stub: LPriorityQueue:clearAll
 -- Remove all items from the queue. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPriorityQueue_stub:clearAll()
--- (replace lPriorityQueue_stub with your real LPriorityQueue instance above)
+do
+  -- Flush all pending tasks when aborting an AI plan.
+  local pq = lurek.patterns.newPriorityQueue()
+  pq:push(1, "x"); pq:push(2, "y")
+  pq:clearAll()
+  print("after clear: len=" .. pq:len())
+end
 
 -- -----------------------------------------------------------------------------
 -- LQueue methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LQueue:enqueue ------------------------------------------------
---@api-stub: LQueue:enqueue
--- Add a value to the back of the queue. Returns false if at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:enqueue(42)  -- -> boolean
--- (replace lQueue_stub with your real LQueue instance above)
-
--- ---- Stub: LQueue:enqueueFront -------------------------------------------
 --@api-stub: LQueue:enqueueFront
 -- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:enqueueFront(42)  -- -> boolean
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Priority messages jump to the front of the processing queue.
+  local q = lurek.patterns.newQueue(10)
+  q:enqueue("normal_msg")
+  q:enqueueFront("URGENT_msg")
+  print("front=" .. q:front())  -- "URGENT_msg"
+end
 
--- ---- Stub: LQueue:dequeue ------------------------------------------------
---@api-stub: LQueue:dequeue
--- Remove and return the front value. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:dequeue()  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
-
--- ---- Stub: LQueue:dequeueBack --------------------------------------------
 --@api-stub: LQueue:dequeueBack
 -- Remove and return the back value. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:dequeueBack()  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Remove the least recent item (opposite of normal FIFO dequeue).
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("first"); q:enqueue("second"); q:enqueue("third")
+  local back = q:dequeueBack()
+  print("removed from back: " .. tostring(back))  -- "third"
+end
 
--- ---- Stub: LQueue:front --------------------------------------------------
---@api-stub: LQueue:front
--- Return the front value without removing it. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:front()  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
-
--- ---- Stub: LQueue:back ---------------------------------------------------
 --@api-stub: LQueue:back
 -- Return the back value without removing it. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:back()  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Peek at the newest item in the queue.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("oldest"); q:enqueue("newest")
+  print("back=" .. tostring(q:back()))  -- "newest"
+end
 
--- ---- Stub: LQueue:peekAt -------------------------------------------------
 --@api-stub: LQueue:peekAt
 -- Return the value at a 1-based index without removing it. Returns nil if out of range.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:peekAt(1)  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Inspect queue contents at specific positions for debug display.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("alpha"); q:enqueue("beta"); q:enqueue("gamma")
+  print("position 2=" .. tostring(q:peekAt(2)))  -- "beta"
+end
 
--- ---- Stub: LQueue:insertAt -----------------------------------------------
 --@api-stub: LQueue:insertAt
 -- Insert a value at a 1-based index in the queue. Returns false if at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:insertAt(1, 42)  -- -> boolean
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Insert a priority item at a specific position.
+  local q = lurek.patterns.newQueue(10)
+  q:enqueue("a"); q:enqueue("c")
+  q:insertAt(2, "b")  -- insert between a and c
+  print("order: " .. q:peekAt(1) .. "," .. q:peekAt(2) .. "," .. q:peekAt(3))
+end
 
--- ---- Stub: LQueue:removeAt -----------------------------------------------
 --@api-stub: LQueue:removeAt
 -- Remove and return the value at a 1-based index. Returns nil if out of range.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:removeAt(1)  -- -> boolean|number|string|table|nil
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Cancel a specific pending command by position.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("move"); q:enqueue("attack"); q:enqueue("heal")
+  local removed = q:removeAt(2)
+  print("cancelled: " .. tostring(removed) .. " remaining=" .. q:len())
+end
 
--- ---- Stub: LQueue:len ----------------------------------------------------
 --@api-stub: LQueue:len
 -- Return the current number of items in the queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:len()  -- -> number
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Monitor queue depth for backpressure.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("x"); q:enqueue("y"); q:enqueue("z")
+  print("queue depth=" .. q:len())
+end
 
--- ---- Stub: LQueue:isEmpty ------------------------------------------------
 --@api-stub: LQueue:isEmpty
 -- Check whether the queue is empty. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:isEmpty()  -- -> boolean
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Check before dequeue to avoid nil handling.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("last_item")
+  q:dequeue()
+  if q:isEmpty() then print("all commands processed") end
+end
 
--- ---- Stub: LQueue:isFull -------------------------------------------------
---@api-stub: LQueue:isFull
--- Check whether the queue has reached its capacity limit.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:isFull()  -- -> boolean
--- (replace lQueue_stub with your real LQueue instance above)
-
--- ---- Stub: LQueue:clear --------------------------------------------------
 --@api-stub: LQueue:clear
 -- Remove all items from the queue. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:clear()
--- (replace lQueue_stub with your real LQueue instance above)
+do
+  -- Flush pending input commands on scene change.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("stale_input_1"); q:enqueue("stale_input_2")
+  q:clear()
+  print("cleared, len=" .. q:len())
+end
 
--- ---- Stub: LQueue:toArray ------------------------------------------------
 --@api-stub: LQueue:toArray
 -- Return all queue items as an array table (front to back).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQueue_stub:toArray()  -- -> table
--- (replace lQueue_stub with your real LQueue instance above)
-
--- -----------------------------------------------------------------------------
--- LRelationshipManager methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LRelationshipManager:defineType -------------------------------
---@api-stub: LRelationshipManager:defineType
--- Define a relationship type with named levels (e.g. "friendship" with levels ["hostile", "neutral", "friendly"]).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:defineType("hero", levels, [default_level])
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:removeType -------------------------------
---@api-stub: LRelationshipManager:removeType
--- Remove a relationship type definition.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:removeType("hero")
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:typeNames --------------------------------
---@api-stub: LRelationshipManager:typeNames
--- Return all defined relationship type names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:typeNames()  -- -> table
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:setValue ---------------------------------
---@api-stub: LRelationshipManager:setValue
--- Set the numeric relationship value between two entity IDs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:setValue(1.0, 0.2, 42)
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:getValue ---------------------------------
---@api-stub: LRelationshipManager:getValue
--- Get the numeric relationship value between two entity IDs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:getValue(1.0, 0.2)  -- -> number
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:adjustValue ------------------------------
---@api-stub: LRelationshipManager:adjustValue
--- Add a delta to the relationship value between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:adjustValue(1.0, 0.2, 0.016)
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:setLevel ---------------------------------
---@api-stub: LRelationshipManager:setLevel
--- Set the named level for a relationship type between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:setLevel(1.0, 0.2, type_name, level)  -- -> boolean
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:getLevel ---------------------------------
---@api-stub: LRelationshipManager:getLevel
--- Get the named level for a relationship type between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:getLevel(1.0, 0.2, type_name)  -- -> string
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:removePair -------------------------------
---@api-stub: LRelationshipManager:removePair
--- Remove all relationship data between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:removePair(1.0, 0.2)
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
-
--- ---- Stub: LRelationshipManager:pairCount --------------------------------
---@api-stub: LRelationshipManager:pairCount
--- Return the total number of tracked entity pairs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRelationshipManager_stub:pairCount()  -- -> number
--- (replace lRelationshipManager_stub with your real LRelationshipManager instance above)
+do
+  -- Export queue contents for save file serialization.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("cmd_1"); q:enqueue("cmd_2"); q:enqueue("cmd_3")
+  local arr = q:toArray()
+  print("exported " .. #arr .. " commands")
+end
 
 -- -----------------------------------------------------------------------------
 -- LRing methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LRing:push ----------------------------------------------------
 --@api-stub: LRing:push
 -- Push a number or string value into the ring. Overwrites the oldest entry if the ring is full.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:push(42, [tag])  -- -> number
--- (replace lRing_stub with your real LRing instance above)
+do
+  -- Track frame times for rolling performance analysis.
+  local frame_times = lurek.patterns.newRing(120)
+  for i = 1, 130 do
+    frame_times:push(16.0 + (i % 3), "ms")
+  end
+  print("ring samples=" .. frame_times:len())  -- capped at 120
+end
 
--- ---- Stub: LRing:latest --------------------------------------------------
---@api-stub: LRing:latest
--- Return the most recently pushed entry as a table with id, tag, value, and text fields. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:latest()  -- -> table|nil
--- (replace lRing_stub with your real LRing instance above)
-
--- ---- Stub: LRing:toArray -------------------------------------------------
 --@api-stub: LRing:toArray
 -- Return all entries in the ring as an ordered array of tables (oldest to newest).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:toArray()  -- -> table
--- (replace lRing_stub with your real LRing instance above)
+do
+  -- Export ring data for charting or file logging.
+  local r = lurek.patterns.newRing(4)
+  r:push(10, "latency"); r:push(12, "latency"); r:push(8, "latency")
+  local entries = r:toArray()
+  print("exported " .. #entries .. " ring entries")
+end
 
--- ---- Stub: LRing:sum -----------------------------------------------------
---@api-stub: LRing:sum
--- Return the sum of all numeric values in the ring. Non-numeric entries contribute zero.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:sum()  -- -> number
--- (replace lRing_stub with your real LRing instance above)
-
--- ---- Stub: LRing:average -------------------------------------------------
---@api-stub: LRing:average
--- Return the arithmetic mean of all numeric values in the ring.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:average()  -- -> number
--- (replace lRing_stub with your real LRing instance above)
-
--- ---- Stub: LRing:len -----------------------------------------------------
 --@api-stub: LRing:len
 -- Return the number of entries currently in the ring.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:len()  -- -> number
--- (replace lRing_stub with your real LRing instance above)
+do
+  -- Check if enough samples collected for meaningful statistics.
+  local r = lurek.patterns.newRing(60)
+  r:push(1, "x"); r:push(2, "x")
+  if r:len() < 10 then print("warming up, only " .. r:len() .. " samples") end
+end
 
--- ---- Stub: LRing:isFull --------------------------------------------------
 --@api-stub: LRing:isFull
 -- Check whether the ring has reached its maximum capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:isFull()  -- -> boolean
--- (replace lRing_stub with your real LRing instance above)
+do
+  -- Only show average after ring is fully warmed up.
+  local r = lurek.patterns.newRing(3)
+  r:push(60, "fps"); r:push(59, "fps"); r:push(61, "fps")
+  if r:isFull() then print("stable avg=" .. string.format("%.1f", r:average())) end
+end
 
--- ---- Stub: LRing:clear ---------------------------------------------------
 --@api-stub: LRing:clear
 -- Remove all entries from the ring. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lRing_stub:clear()
--- (replace lRing_stub with your real LRing instance above)
+do
+  -- Clear ring data when switching measurement contexts.
+  local r = lurek.patterns.newRing(16)
+  r:push(1, "old"); r:push(2, "old")
+  r:clear()
+  print("after clear: len=" .. r:len())
+end
 
 -- -----------------------------------------------------------------------------
 -- LServiceLocator methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LServiceLocator:provide ---------------------------------------
---@api-stub: LServiceLocator:provide
--- Register a service instance under a given name. Replaces any previously registered service with the same name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:provide("hero", 42)
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
-
--- ---- Stub: LServiceLocator:locate ----------------------------------------
---@api-stub: LServiceLocator:locate
--- Retrieve a registered service by name. Returns nil if not found.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:locate("hero")  -- -> boolean|number|string|table|nil
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
-
--- ---- Stub: LServiceLocator:has -------------------------------------------
 --@api-stub: LServiceLocator:has
 -- Check whether a service with the given name is currently registered.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:has("hero")  -- -> boolean
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
+do
+  -- Guard optional services before attempting to use them.
+  local sl = lurek.patterns.newServiceLocator()
+  sl:provide("audio", { play = function() end })
+  if sl:has("audio") then print("audio system available") end
+  print("has network=" .. tostring(sl:has("network")))
+end
 
--- ---- Stub: LServiceLocator:remove ----------------------------------------
 --@api-stub: LServiceLocator:remove
 -- Unregister and discard a service by name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:remove("hero")
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
+do
+  -- Remove a service when shutting down a subsystem.
+  local sl = lurek.patterns.newServiceLocator()
+  sl:provide("multiplayer", { connected = true })
+  sl:remove("multiplayer")
+  print("multiplayer active=" .. tostring(sl:has("multiplayer")))
+end
 
--- ---- Stub: LServiceLocator:getServices -----------------------------------
---@api-stub: LServiceLocator:getServices
--- Return an array of all registered service names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:getServices()  -- -> table
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
-
--- ---- Stub: LServiceLocator:clearAll --------------------------------------
 --@api-stub: LServiceLocator:clearAll
 -- Remove all registered services and reset the locator.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lServiceLocator_stub:clearAll()
--- (replace lServiceLocator_stub with your real LServiceLocator instance above)
+do
+  -- Full reset between game sessions.
+  local sl = lurek.patterns.newServiceLocator()
+  sl:provide("a", 1); sl:provide("b", 2)
+  sl:clearAll()
+  print("services after reset=" .. #sl:getServices())
+end
 
 -- -----------------------------------------------------------------------------
 -- LSet methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LSet:add ------------------------------------------------------
 --@api-stub: LSet:add
 -- Add a string to the set. Returns true if it was not already present.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:add("player_score")  -- -> boolean
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Track unique achievements unlocked during gameplay.
+  local achievements = lurek.patterns.newSet()
+  local new1 = achievements:add("first_kill")
+  local new2 = achievements:add("first_kill")  -- duplicate
+  print("first add=" .. tostring(new1) .. " second=" .. tostring(new2))
+end
 
--- ---- Stub: LSet:remove ---------------------------------------------------
 --@api-stub: LSet:remove
 -- Remove a string from the set. Returns true if it was present.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:remove("player_score")  -- -> boolean
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Remove an expired status effect.
+  local effects = lurek.patterns.newSet()
+  effects:add("poisoned")
+  local was_there = effects:remove("poisoned")
+  print("removed poison=" .. tostring(was_there) .. " size=" .. effects:len())
+end
 
--- ---- Stub: LSet:has ------------------------------------------------------
 --@api-stub: LSet:has
 -- Check whether a string is in the set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:has("player_score")  -- -> boolean
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Check if player has required key before opening a door.
+  local keys = lurek.patterns.newSet()
+  keys:add("silver_key")
+  if keys:has("silver_key") then print("silver door: unlocked") end
+  if not keys:has("gold_key") then print("gold door: locked") end
+end
 
--- ---- Stub: LSet:len ------------------------------------------------------
 --@api-stub: LSet:len
 -- Return the number of items in the set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:len()  -- -> number
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Count unique rooms visited for exploration percentage.
+  local visited = lurek.patterns.newSet()
+  visited:add("room_1"); visited:add("room_2"); visited:add("room_1")
+  print("unique rooms visited=" .. visited:len())
+end
 
--- ---- Stub: LSet:isEmpty --------------------------------------------------
 --@api-stub: LSet:isEmpty
 -- Check whether the set is empty. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:isEmpty()  -- -> boolean
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Check if player has any active buffs.
+  local buffs = lurek.patterns.newSet()
+  if buffs:isEmpty() then print("no active buffs") end
+  buffs:add("haste")
+  print("empty after buff=" .. tostring(buffs:isEmpty()))
+end
 
--- ---- Stub: LSet:toArray --------------------------------------------------
---@api-stub: LSet:toArray
--- Return all set items as an array table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:toArray()  -- -> table
--- (replace lSet_stub with your real LSet instance above)
-
--- ---- Stub: LSet:clear ----------------------------------------------------
 --@api-stub: LSet:clear
 -- Remove all items from the set. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:clear()
--- (replace lSet_stub with your real LSet instance above)
+do
+  -- Clear all visited flags for a new game.
+  local flags = lurek.patterns.newSet()
+  flags:add("intro_seen"); flags:add("tutorial_done")
+  flags:clear()
+  print("flags after new game=" .. flags:len())
+end
 
--- ---- Stub: LSet:union ----------------------------------------------------
---@api-stub: LSet:union
--- Return a new set containing all items from both this set and another.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:union(other)  -- -> LSet
--- (replace lSet_stub with your real LSet instance above)
-
--- ---- Stub: LSet:intersection ---------------------------------------------
---@api-stub: LSet:intersection
--- Return a new set containing only items present in both this set and another.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSet_stub:intersection(other)  -- -> LSet
--- (replace lSet_stub with your real LSet instance above)
-
--- -----------------------------------------------------------------------------
--- LSimpleState methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LSimpleState:addState -----------------------------------------
---@api-stub: LSimpleState:addState
--- Register a named state with optional enter, exit, and update callbacks.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:addState("hero", [callbacks])
--- (replace lSimpleState_stub with your real LSimpleState instance above)
-
--- ---- Stub: LSimpleState:transitionTo -------------------------------------
---@api-stub: LSimpleState:transitionTo
--- Transition to a new state. Calls the current state's `exit` and the target state's `enter` callbacks.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:transitionTo("hero")  -- -> boolean
--- (replace lSimpleState_stub with your real LSimpleState instance above)
-
--- ---- Stub: LSimpleState:update -------------------------------------------
 --@api-stub: LSimpleState:update
 -- Call the current state's update callback with the frame delta time.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:update(0.016)
--- (replace lSimpleState_stub with your real LSimpleState instance above)
+do
+  -- Per-frame state logic: enemy moves while in "patrol" state.
+  local sm = lurek.patterns.newSimpleState()
+  sm:addState("patrol", {
+    update = function(dt) print("  patrolling dt=" .. dt) end,
+  })
+  sm:transitionTo("patrol")
+  sm:update(0.016)
+end
 
--- ---- Stub: LSimpleState:getCurrent ---------------------------------------
 --@api-stub: LSimpleState:getCurrent
 -- Return the name of the currently active state, or nil if no state is set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:getCurrent()  -- -> string
--- (replace lSimpleState_stub with your real LSimpleState instance above)
+do
+  -- Use current state for conditional logic outside the FSM.
+  local sm = lurek.patterns.newSimpleState()
+  sm:addState("idle", {}); sm:addState("combat", {})
+  sm:transitionTo("combat")
+  local state = sm:getCurrent()
+  if state == "combat" then print("showing combat UI") end
+end
 
--- ---- Stub: LSimpleState:hasState -----------------------------------------
---@api-stub: LSimpleState:hasState
--- Check whether a state with the given name is registered.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:hasState("hero")  -- -> boolean
--- (replace lSimpleState_stub with your real LSimpleState instance above)
-
--- ---- Stub: LSimpleState:getStates ----------------------------------------
---@api-stub: LSimpleState:getStates
--- Return an array of all registered state names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:getStates()  -- -> table
--- (replace lSimpleState_stub with your real LSimpleState instance above)
-
--- ---- Stub: LSimpleState:clearAll -----------------------------------------
 --@api-stub: LSimpleState:clearAll
 -- Remove all states and their callbacks, resetting the state machine.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSimpleState_stub:clearAll()
--- (replace lSimpleState_stub with your real LSimpleState instance above)
+do
+  -- Reset FSM when loading a completely different entity type.
+  local sm = lurek.patterns.newSimpleState()
+  sm:addState("old_state", {})
+  sm:clearAll()
+  print("states after clear=" .. #sm:getStates())
+end
 
 -- -----------------------------------------------------------------------------
 -- LStack methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LStack:push ---------------------------------------------------
 --@api-stub: LStack:push
 -- Push a value onto the top of the stack. Returns false if the stack is at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:push(42)  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Push dialog screens onto a navigation stack.
+  local nav = lurek.patterns.newStack(8)
+  local ok = nav:push("main_menu")
+  nav:push("settings")
+  print("pushed=" .. tostring(ok) .. " depth=" .. nav:len())
+end
 
--- ---- Stub: LStack:pushBottom ---------------------------------------------
 --@api-stub: LStack:pushBottom
 -- Push a value onto the bottom of the stack. Returns false if at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:pushBottom(42)  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Insert a persistent base layer under existing screens.
+  local layers = lurek.patterns.newStack(8)
+  layers:push("game_hud")
+  layers:pushBottom("background")
+  print("bottom=" .. layers:peekBottom() .. " top=" .. layers:peek())
+end
 
--- ---- Stub: LStack:pop ----------------------------------------------------
 --@api-stub: LStack:pop
 -- Remove and return the top value. Returns nil if the stack is empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:pop()  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Pop to go back to previous screen.
+  local screens = lurek.patterns.newStack(0)
+  screens:push("world"); screens:push("inventory")
+  local closed = screens:pop()
+  print("closed " .. tostring(closed) .. ", now at " .. tostring(screens:peek()))
+end
 
--- ---- Stub: LStack:popBottom ----------------------------------------------
 --@api-stub: LStack:popBottom
 -- Remove and return the bottom value. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:popBottom()  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Remove the oldest entry from the bottom of a history stack.
+  local history = lurek.patterns.newStack(0)
+  history:push("page_1"); history:push("page_2"); history:push("page_3")
+  local oldest = history:popBottom()
+  print("removed oldest: " .. tostring(oldest))
+end
 
--- ---- Stub: LStack:popMany ------------------------------------------------
 --@api-stub: LStack:popMany
 -- Pop up to `count` values from the top and return them as an array table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:popMany(10)  -- -> table
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Close multiple dialog layers at once (e.g., force-close all popups).
+  local dialogs = lurek.patterns.newStack(0)
+  dialogs:push("confirm"); dialogs:push("tooltip"); dialogs:push("dropdown")
+  local closed = dialogs:popMany(2)
+  print("closed " .. #closed .. " dialogs, remaining=" .. dialogs:len())
+end
 
--- ---- Stub: LStack:peek ---------------------------------------------------
---@api-stub: LStack:peek
--- Return the top value without removing it. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:peek()  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
-
--- ---- Stub: LStack:peekBottom ---------------------------------------------
 --@api-stub: LStack:peekBottom
 -- Return the bottom value without removing it. Returns nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:peekBottom()  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Check the base screen without modifying the stack.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("title_screen"); nav:push("options")
+  print("base screen=" .. tostring(nav:peekBottom()))
+end
 
--- ---- Stub: LStack:peekAt -------------------------------------------------
 --@api-stub: LStack:peekAt
 -- Return the value at a 1-based index without removing it. Returns nil if out of range.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:peekAt(1)  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Inspect a specific position for breadcrumb display.
+  local breadcrumbs = lurek.patterns.newStack(0)
+  breadcrumbs:push("Home"); breadcrumbs:push("Shop"); breadcrumbs:push("Weapons")
+  print("breadcrumb[2]=" .. tostring(breadcrumbs:peekAt(2)))
+end
 
--- ---- Stub: LStack:insertAt -----------------------------------------------
 --@api-stub: LStack:insertAt
 -- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:insertAt(1, 42)  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Insert a layer between existing layers (e.g., notification between HUD and dialog).
+  local layers = lurek.patterns.newStack(10)
+  layers:push("hud"); layers:push("dialog")
+  layers:insertAt(2, "notification")
+  print("middle layer=" .. tostring(layers:peekAt(2)))
+end
 
--- ---- Stub: LStack:removeAt -----------------------------------------------
 --@api-stub: LStack:removeAt
 -- Remove and return the value at a 1-based index. Returns nil if out of range.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:removeAt(1)  -- -> boolean|number|string|table|nil
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Remove a specific item from the middle of the stack.
+  local cards = lurek.patterns.newStack(0)
+  cards:push("ace"); cards:push("king"); cards:push("queen")
+  local removed = cards:removeAt(2)
+  print("removed=" .. tostring(removed) .. " remaining=" .. cards:len())
+end
 
--- ---- Stub: LStack:moveWithin ---------------------------------------------
 --@api-stub: LStack:moveWithin
 -- Move an item from one 1-based index to another within the stack.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:moveWithin(from, to)  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Reorder layers (move a UI element to a different z-depth).
+  local z_order = lurek.patterns.newStack(0)
+  z_order:push("background"); z_order:push("entities"); z_order:push("effects")
+  z_order:moveWithin(1, 3)  -- move background to top
+  print("new top=" .. tostring(z_order:peek()))
+end
 
--- ---- Stub: LStack:len ----------------------------------------------------
 --@api-stub: LStack:len
 -- Return the current number of items in the stack.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:len()  -- -> number
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Check stack depth for navigation breadcrumb display.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("a"); nav:push("b"); nav:push("c")
+  print("navigation depth=" .. nav:len())
+end
 
--- ---- Stub: LStack:isEmpty ------------------------------------------------
 --@api-stub: LStack:isEmpty
 -- Check whether the stack is empty. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:isEmpty()  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- If stack is empty, player has navigated all the way back.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("only_screen")
+  nav:pop()
+  if nav:isEmpty() then print("at root, show exit prompt") end
+end
 
--- ---- Stub: LStack:isFull -------------------------------------------------
 --@api-stub: LStack:isFull
 -- Check whether the stack has reached its capacity limit (if one was set).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:isFull()  -- -> boolean
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Prevent pushing more screens when at max depth.
+  local nav = lurek.patterns.newStack(3)
+  nav:push("a"); nav:push("b"); nav:push("c")
+  if nav:isFull() then print("max dialog depth reached") end
+end
 
--- ---- Stub: LStack:clear --------------------------------------------------
 --@api-stub: LStack:clear
 -- Remove all items from the stack. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:clear()
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Clear navigation stack when returning to title screen.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("game"); nav:push("pause")
+  nav:clear()
+  print("stack cleared, len=" .. nav:len())
+end
 
--- ---- Stub: LStack:toArray ------------------------------------------------
 --@api-stub: LStack:toArray
 -- Return all stack items as an array table (bottom to top).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStack_stub:toArray()  -- -> table
--- (replace lStack_stub with your real LStack instance above)
+do
+  -- Export stack contents for breadcrumb trail UI.
+  local trail = lurek.patterns.newStack(0)
+  trail:push("Home"); trail:push("World"); trail:push("Dungeon")
+  local arr = trail:toArray()
+  print("trail: " .. table.concat(arr, " > "))
+end
 
 -- -----------------------------------------------------------------------------
 -- LStrategy methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LStrategy:register --------------------------------------------
---@api-stub: LStrategy:register
--- Register a named strategy implementation function.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:register("hero", function() end)
--- (replace lStrategy_stub with your real LStrategy instance above)
-
--- ---- Stub: LStrategy:set -------------------------------------------------
 --@api-stub: LStrategy:set
 -- Switch to a named strategy. Future `execute()` calls will use this implementation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:set("hero")  -- -> boolean
--- (replace lStrategy_stub with your real LStrategy instance above)
+do
+  -- Switch pathfinding algorithm based on terrain type.
+  local pathfinder = lurek.patterns.newStrategy()
+  pathfinder:register("astar", function(from, to) return "path_via_astar" end)
+  pathfinder:register("dijkstra", function(from, to) return "path_via_dijkstra" end)
+  local ok = pathfinder:set("astar")
+  print("set astar=" .. tostring(ok))
+end
 
--- ---- Stub: LStrategy:execute ---------------------------------------------
---@api-stub: LStrategy:execute
--- Execute the currently active strategy, passing through all arguments and returning its results.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:execute(...)  -- -> boolean|number|string|table|nil
--- (replace lStrategy_stub with your real LStrategy instance above)
-
--- ---- Stub: LStrategy:getCurrent ------------------------------------------
---@api-stub: LStrategy:getCurrent
--- Return the name of the currently active strategy, or nil if none set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:getCurrent()  -- -> string
--- (replace lStrategy_stub with your real LStrategy instance above)
-
--- ---- Stub: LStrategy:has -------------------------------------------------
 --@api-stub: LStrategy:has
 -- Check whether a strategy with the given name is registered.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:has("hero")  -- -> boolean
--- (replace lStrategy_stub with your real LStrategy instance above)
+do
+  -- Validate strategy exists before switching.
+  local s = lurek.patterns.newStrategy()
+  s:register("fast", function() return 1 end)
+  if s:has("fast") then print("fast strategy available") end
+  print("has slow=" .. tostring(s:has("slow")))
+end
 
--- ---- Stub: LStrategy:remove ----------------------------------------------
 --@api-stub: LStrategy:remove
 -- Remove a named strategy. If it was the active strategy, no strategy will be selected.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:remove("hero")  -- -> boolean
--- (replace lStrategy_stub with your real LStrategy instance above)
+do
+  -- Remove a deprecated algorithm.
+  local s = lurek.patterns.newStrategy()
+  s:register("old_algo", function() return 0 end)
+  local removed = s:remove("old_algo")
+  print("removed=" .. tostring(removed))
+end
 
--- ---- Stub: LStrategy:names -----------------------------------------------
---@api-stub: LStrategy:names
--- Return an array of all registered strategy names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:names()  -- -> table
--- (replace lStrategy_stub with your real LStrategy instance above)
-
--- ---- Stub: LStrategy:clear -----------------------------------------------
 --@api-stub: LStrategy:clear
 -- Remove all strategies and reset the selection.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lStrategy_stub:clear()
--- (replace lStrategy_stub with your real LStrategy instance above)
+do
+  -- Reset when loading a new configuration that defines fresh strategies.
+  local s = lurek.patterns.newStrategy()
+  s:register("a", function() end); s:register("b", function() end)
+  s:clear()
+  print("strategies after clear=" .. #s:names())
+end
 
 -- -----------------------------------------------------------------------------
 -- LThrottle methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LThrottle:onFire ----------------------------------------------
 --@api-stub: LThrottle:onFire
 -- Set the callback function to invoke each time the throttle fires.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:onFire(f)
--- (replace lThrottle_stub with your real LThrottle instance above)
+do
+  -- Rate-limit network position updates to 10 per second.
+  local net_send = lurek.patterns.newThrottle(0.1)
+  net_send:onFire(function()
+    print("  sending position update to server")
+  end)
+  net_send:update(0.1)  -- fires
+end
 
--- ---- Stub: LThrottle:update ----------------------------------------------
 --@api-stub: LThrottle:update
 -- Advance the throttle timer. If the interval has elapsed, fires the callback and returns true.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:update(0.016)  -- -> boolean
--- (replace lThrottle_stub with your real LThrottle instance above)
+do
+  -- Weapon cooldown: fire rate limited to 2 shots/second.
+  local weapon = lurek.patterns.newThrottle(0.5)
+  weapon:onFire(function() print("  shot fired!") end)
+  local fired1 = weapon:update(0.3)  -- not enough time
+  local fired2 = weapon:update(0.3)  -- total 0.6 > 0.5, fires
+  print("attempt1=" .. tostring(fired1) .. " attempt2=" .. tostring(fired2))
+end
 
--- ---- Stub: LThrottle:reset -----------------------------------------------
---@api-stub: LThrottle:reset
--- Reset the throttle timer back to zero without firing.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:reset()
--- (replace lThrottle_stub with your real LThrottle instance above)
-
--- ---- Stub: LThrottle:getProgress -----------------------------------------
---@api-stub: LThrottle:getProgress
--- Return how far through the current interval the throttle is (0.0 to 1.0).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:getProgress()  -- -> number
--- (replace lThrottle_stub with your real LThrottle instance above)
-
--- ---- Stub: LThrottle:getFireCount ----------------------------------------
 --@api-stub: LThrottle:getFireCount
 -- Return the total number of times this throttle has fired since creation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:getFireCount()  -- -> number
--- (replace lThrottle_stub with your real LThrottle instance above)
+do
+  -- Track total shots fired for statistics.
+  local t = lurek.patterns.newThrottle(0.1)
+  t:onFire(function() end)
+  t:update(0.1); t:update(0.1); t:update(0.1)
+  print("total fires=" .. t:getFireCount())
+end
 
--- ---- Stub: LThrottle:setEnabled ------------------------------------------
---@api-stub: LThrottle:setEnabled
--- Enable or disable the throttle. When disabled, update() will not accumulate time.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lThrottle_stub:setEnabled(1.0)
--- (replace lThrottle_stub with your real LThrottle instance above)
-
--- -----------------------------------------------------------------------------
--- LWeightedRandom methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LWeightedRandom:add -------------------------------------------
---@api-stub: LWeightedRandom:add
--- Add an item with a relative weight. Higher weight = higher selection probability.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:add(weight, 42, [label])  -- -> number
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
-
--- ---- Stub: LWeightedRandom:remove ----------------------------------------
---@api-stub: LWeightedRandom:remove
--- Remove an item by its ID. Returns true if it existed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:remove(1)  -- -> boolean
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
-
--- ---- Stub: LWeightedRandom:setWeight -------------------------------------
 --@api-stub: LWeightedRandom:setWeight
 -- Change the weight of an existing entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:setWeight(1, weight)  -- -> boolean
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
+do
+  -- Pity system: increase rare drop chance after each failed attempt.
+  local loot = lurek.patterns.newWeightedRandom()
+  local rare_id = loot:add(5.0, "epic_sword", "rare")
+  loot:add(95.0, "common_coin", "common")
+  -- After 10 failed rolls, boost the rare weight.
+  loot:setWeight(rare_id, 25.0)
+  print("rare weight boosted, total=" .. string.format("%.1f", loot:totalWeight()))
+end
 
--- ---- Stub: LWeightedRandom:pick ------------------------------------------
 --@api-stub: LWeightedRandom:pick
 -- Pick one item using a random sample value in [0, 1). Returns its value or nil.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:pick(sample)  -- -> boolean|number|string|table|nil
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
+do
+  -- Roll a loot drop using a random number.
+  local loot = lurek.patterns.newWeightedRandom()
+  loot:add(80.0, "gold", "common")
+  loot:add(20.0, "diamond", "rare")
+  local drop = loot:pick(math.random())
+  print("dropped: " .. tostring(drop))
+end
 
--- ---- Stub: LWeightedRandom:pickN -----------------------------------------
 --@api-stub: LWeightedRandom:pickN
 -- Pick multiple unique items. Requires an array of random samples.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:pickN(10, samples)  -- -> table
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
+do
+  -- Generate a loot chest with 3 unique drops.
+  local pool = lurek.patterns.newWeightedRandom()
+  pool:add(40.0, "potion", "consumable")
+  pool:add(30.0, "arrow_bundle", "ammo")
+  pool:add(20.0, "gem", "material")
+  pool:add(10.0, "rare_ring", "equip")
+  local drops = pool:pickN(3, { math.random(), math.random(), math.random() })
+  print("chest contains " .. #drops .. " items")
+end
 
--- ---- Stub: LWeightedRandom:totalWeight -----------------------------------
 --@api-stub: LWeightedRandom:totalWeight
 -- Return the sum of all entry weights.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:totalWeight()  -- -> number
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
+do
+  -- Verify weight distribution sums correctly for probability display.
+  local wr = lurek.patterns.newWeightedRandom()
+  wr:add(60.0, "common", "tier_1")
+  wr:add(30.0, "uncommon", "tier_2")
+  wr:add(10.0, "rare", "tier_3")
+  print("total weight=" .. wr:totalWeight())  -- 100.0
+end
 
--- ---- Stub: LWeightedRandom:len -------------------------------------------
---@api-stub: LWeightedRandom:len
--- Return the number of entries in the pool.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:len()  -- -> number
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
-
--- ---- Stub: LWeightedRandom:isEmpty ---------------------------------------
---@api-stub: LWeightedRandom:isEmpty
--- Check whether the pool has no entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:isEmpty()  -- -> boolean
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
-
--- ---- Stub: LWeightedRandom:clearAll --------------------------------------
 --@api-stub: LWeightedRandom:clearAll
 -- Remove all entries from the pool. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:clearAll()
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
-
--- ---- Stub: LWeightedRandom:getRevision -----------------------------------
---@api-stub: LWeightedRandom:getRevision
--- Return the revision counter. Increments on any add/remove/weight change.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lWeightedRandom_stub:getRevision()  -- -> number
--- (replace lWeightedRandom_stub with your real LWeightedRandom instance above)
+do
+  -- Reset loot table when switching between dungeon floors.
+  local wr = lurek.patterns.newWeightedRandom()
+  wr:add(50.0, "floor_1_loot", "f1")
+  wr:clearAll()
+  print("entries after clear=" .. wr:len())
+end

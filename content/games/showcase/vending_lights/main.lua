@@ -63,7 +63,7 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.01, 0.02, 0.03)
 
     -- Input
-    lurek.input.bind("quit", { "escape" })
+    lurek.input.bind("quit", "escape")
 
     -- Enable lighting — very dark ambient (almost pitch black)
     lurek.light.setEnabled(true)

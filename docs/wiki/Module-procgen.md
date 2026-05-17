@@ -238,6 +238,7 @@ do
     { width = 60, height = 40, max_depth = 4, seed = 9 },
     prefabs
   )
+  ---@diagnostic disable-next-line: undefined-field
   lurek.log.info("bsp+prefabs: " .. #dungeon.rooms .. " rooms", "procgen")
   for _, p in ipairs(placements) do
     lurek.log.debug("  placed '" .. p.name .. "' at (" .. p.x .. "," .. p.y .. ")", "procgen")
@@ -786,6 +787,7 @@ do
   for i = 1, #dungeon.grid do
     if dungeon.grid[i] == 1 then floors = floors + 1 else walls = walls + 1 end
   end
+  ---@diagnostic disable-next-line: undefined-field
   lurek.log.info("rooms dungeon: " .. #dungeon.rooms .. " rooms, " .. floors .. " floor tiles", "procgen")
 end
 ```
@@ -827,6 +829,7 @@ do
     prefabs,
     3  -- stampValue: prefab cells become tile 3 in the grid
   )
+  ---@diagnostic disable-next-line: undefined-field
   lurek.log.info("prefab dungeon: " .. #dungeon.rooms .. " rooms, " .. #placements .. " prefabs placed", "procgen")
 end
 ```

@@ -81,7 +81,7 @@ end
 -- Skeleton: building the bone hierarchy
 -- =============================================================================
 
---@api-stub: Skeleton:addBone
+--@api-stub: LSkeleton:addBone
 -- Adds a root-level bone to this skeleton with optional transform properties
 do
   -- addBone creates a root-level bone (no parent). Use it for the rig
@@ -98,7 +98,7 @@ do
   lurek.log.info("base=" .. base .. " flash=" .. flash, "spine")
 end
 
---@api-stub: Skeleton:addChildBone
+--@api-stub: LSkeleton:addChildBone
 -- Adds a child bone that inherits its parent's world transform
 do
   -- Child bones form the skeleton hierarchy. Their local x/y/rotation
@@ -118,7 +118,7 @@ do
   lurek.log.info("arm chain: " .. sk:boneCount() .. " bones", "spine")
 end
 
---@api-stub: Skeleton:addSlot
+--@api-stub: LSkeleton:addSlot
 -- Adds an attachment slot to a specific bone
 do
   -- Slots are named attachment points on bones. Each slot can hold one
@@ -140,7 +140,7 @@ end
 -- Skeleton: querying bones and slots
 -- =============================================================================
 
---@api-stub: Skeleton:findBone
+--@api-stub: LSkeleton:findBone
 -- Searches for a bone by name and returns its zero-based index, or nil
 do
   -- Use findBone to look up bone indices by name at runtime.
@@ -158,7 +158,7 @@ do
   if not missing then lurek.log.info("missing bone returns nil as expected", "spine") end
 end
 
---@api-stub: Skeleton:findSlot
+--@api-stub: LSkeleton:findSlot
 -- Searches for a slot by name and returns its zero-based index, or nil
 do
   -- Like findBone, but for slots. Useful for runtime attachment swaps
@@ -174,7 +174,7 @@ do
   end
 end
 
---@api-stub: Skeleton:boneCount
+--@api-stub: LSkeleton:boneCount
 -- Returns the total number of bones in this skeleton
 do
   -- Useful for validation: assert your rig has the expected bone count
@@ -190,7 +190,7 @@ do
   lurek.log.info("vehicle bones: " .. rig:boneCount(), "spine")
 end
 
---@api-stub: Skeleton:slotCount
+--@api-stub: LSkeleton:slotCount
 -- Returns the total number of slots in this skeleton
 do
   -- Track how many visual attachment points the rig exposes.
@@ -209,7 +209,7 @@ end
 -- Skeleton: world transforms and positioning
 -- =============================================================================
 
---@api-stub: Skeleton:setPosition
+--@api-stub: LSkeleton:setPosition
 -- Sets the root bone world position, shifting the entire skeleton
 do
   -- setPosition moves the skeleton's root to the given world coordinates.
@@ -228,7 +228,7 @@ do
   end
 end
 
---@api-stub: Skeleton:updateWorldTransforms
+--@api-stub: LSkeleton:updateWorldTransforms
 -- Recomputes world transforms for all bones in hierarchy order
 do
   -- You must call updateWorldTransforms after any change to bone
@@ -250,7 +250,7 @@ do
   end
 end
 
---@api-stub: Skeleton:getBoneWorld
+--@api-stub: LSkeleton:getBoneWorld
 -- Returns the world-space transform of a bone after hierarchy resolution
 do
   -- After updateWorldTransforms, getBoneWorld gives you the final
@@ -277,7 +277,7 @@ end
 -- Skeleton: animation playback
 -- =============================================================================
 
---@api-stub: Skeleton:addAnimation
+--@api-stub: LSkeleton:addAnimation
 -- Registers a SkeletonAnimation so it can be played by name
 do
   -- You must register animations with addAnimation before calling
@@ -302,7 +302,7 @@ do
   lurek.log.info("guard has idle + alert animations registered", "spine")
 end
 
---@api-stub: Skeleton:playAnimation
+--@api-stub: LSkeleton:playAnimation
 -- Starts playing a named animation, optionally looping
 do
   -- playAnimation starts a registered clip. Pass true for looping
@@ -327,7 +327,7 @@ do
   lurek.log.info("play 'fly' result: " .. tostring(bad), "spine")
 end
 
---@api-stub: Skeleton:updateAnimation
+--@api-stub: LSkeleton:updateAnimation
 -- Advances the current animation by delta time, applying bone transforms
 do
   -- Call updateAnimation every frame in lurek.process to advance playback.
@@ -350,7 +350,7 @@ do
   end
 end
 
---@api-stub: Skeleton:getAnimationTime
+--@api-stub: LSkeleton:getAnimationTime
 -- Returns the current playback time of the active animation in seconds
 do
   -- Use getAnimationTime to trigger gameplay events at specific frames.
@@ -376,7 +376,7 @@ do
   end
 end
 
---@api-stub: Skeleton:stopAnimation
+--@api-stub: LSkeleton:stopAnimation
 -- Stops the currently playing animation and resets playback state
 do
   -- stopAnimation halts playback immediately. The skeleton keeps its
@@ -398,7 +398,7 @@ do
   end
 end
 
---@api-stub: Skeleton:blendAnimation
+--@api-stub: LSkeleton:blendAnimation
 -- Blends an animation pose onto the skeleton with a weight factor
 do
   -- blendAnimation samples an animation at a given time and mixes it
@@ -430,7 +430,7 @@ end
 -- Skeleton: skins (visual equipment variants)
 -- =============================================================================
 
---@api-stub: Skeleton:addSkin
+--@api-stub: LSkeleton:addSkin
 -- Registers a new named skin for slot-attachment remapping
 do
   -- Skins let you swap the visual appearance of slots without changing
@@ -448,7 +448,7 @@ do
   lurek.log.info("3 skins registered on hero", "spine")
 end
 
---@api-stub: Skeleton:setSkinMapping
+--@api-stub: LSkeleton:setSkinMapping
 -- Maps a slot to a specific attachment within a skin
 do
   -- setSkinMapping tells the engine: "when skin X is active, slot Y
@@ -473,7 +473,7 @@ do
   lurek.log.info("skin mappings configured for warrior and mage", "spine")
 end
 
---@api-stub: Skeleton:setSkin
+--@api-stub: LSkeleton:setSkin
 -- Activates a named skin, applying its slot-attachment mappings
 do
   -- setSkin switches the active costume. All slots immediately update
@@ -498,7 +498,7 @@ do
   lurek.log.info("set unknown skin: " .. tostring(bad), "spine")
 end
 
---@api-stub: Skeleton:getSkin
+--@api-stub: LSkeleton:getSkin
 -- Returns the name of the currently active skin, or nil
 do
   -- getSkin lets you check which costume is active, for example to
@@ -520,7 +520,7 @@ end
 -- Skeleton: inverse kinematics
 -- =============================================================================
 
---@api-stub: Skeleton:addIKConstraint
+--@api-stub: LSkeleton:addIKConstraint
 -- Adds an IK constraint controlling a chain of bones toward a target
 do
   -- IK constraints make a chain of bones reach toward a target point.
@@ -536,7 +536,7 @@ do
   lurek.log.info("IK constraint index: " .. ik_idx, "spine")
 end
 
---@api-stub: Skeleton:setIKTarget
+--@api-stub: LSkeleton:setIKTarget
 -- Sets the world-space target for a named IK constraint
 do
   -- After adding an IK constraint, call setIKTarget to tell it where
@@ -565,7 +565,7 @@ end
 -- Skeleton: rendering
 -- =============================================================================
 
---@api-stub: Skeleton:drawToImage
+--@api-stub: LSkeleton:drawToImage
 -- Renders the skeleton into an in-memory image for debug or UI preview
 do
   -- drawToImage rasterizes the skeleton rig into a pixel buffer.
@@ -591,7 +591,7 @@ end
 -- SkeletonAnimation: keyframes and timelines
 -- =============================================================================
 
---@api-stub: SkeletonAnimation:addKeyframe
+--@api-stub: LSkeletonAnimation:addKeyframe
 -- Adds a keyframe to a bone property timeline with value and easing
 do
   -- Keyframes define the motion curve for one bone property over time.
@@ -613,7 +613,7 @@ do
   lurek.log.info("jump clip: " .. anim:getTimelineCount() .. " timelines", "spine")
 end
 
---@api-stub: SkeletonAnimation:getTimelineCount
+--@api-stub: LSkeletonAnimation:getTimelineCount
 -- Returns the number of bone-property timelines in this animation
 do
   -- Each unique (bone_idx, property) pair gets its own timeline.
@@ -636,7 +636,7 @@ do
   lurek.log.info("run timelines: " .. run:getTimelineCount(), "spine")
 end
 
---@api-stub: SkeletonAnimation:getDuration
+--@api-stub: LSkeletonAnimation:getDuration
 -- Returns the total duration of this animation in seconds
 do
   -- getDuration returns what you passed to newSkeletonAnimation.
@@ -655,7 +655,7 @@ end
 -- SkeletonAnimation: events
 -- =============================================================================
 
---@api-stub: SkeletonAnimation:addEventKey
+--@api-stub: LSkeletonAnimation:addEventKey
 -- Inserts an event trigger at a specific time in the animation
 do
   -- Events are named triggers embedded in the timeline. They fire when
@@ -679,7 +679,7 @@ do
   lurek.log.info("walk has footstep events; attack has damage event", "spine")
 end
 
---@api-stub: SkeletonAnimation:getEvents
+--@api-stub: LSkeletonAnimation:getEvents
 -- Collects all events that fire within a time range
 do
   -- Call getEvents(from, to) each frame with previous and current time.
@@ -762,7 +762,7 @@ end
 -- Type introspection
 -- =============================================================================
 
---@api-stub: LSkeleton:type
+--@api-stub: LSkeletonAnimation:type
 -- Returns the type name of this userdata object
 do
   -- type() returns "LSkeleton" — useful for generic object handling
@@ -771,7 +771,7 @@ do
   lurek.log.info("LSkeleton:type() = " .. sk:type(), "spine")
 end
 
---@api-stub: LSkeleton:typeOf
+--@api-stub: LSkeletonAnimation:typeOf
 -- Checks whether this object is of the given type name
 do
   -- typeOf checks identity. Supports "LSkeleton" and the base "Object".
@@ -815,203 +815,3 @@ print("content/examples/spine.lua")
 -- -----------------------------------------------------------------------------
 -- LSkeleton methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LSkeleton:addBone ---------------------------------------------
---@api-stub: LSkeleton:addBone
--- Adds a root-level bone to the skeleton with optional transform properties.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addBone("hero", [opts])  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:addChildBone ----------------------------------------
---@api-stub: LSkeleton:addChildBone
--- Adds a bone as a child of an existing bone, inheriting its parent's world transform.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addChildBone("hero", parent_idx, [opts])  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:addSlot ---------------------------------------------
---@api-stub: LSkeleton:addSlot
--- Adds a slot attached to a specific bone, optionally assigning a default attachment name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addSlot("hero", bone_idx, [attachment])  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:findBone --------------------------------------------
---@api-stub: LSkeleton:findBone
--- Searches for a bone by name and returns its zero-based index, or nil if not found.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:findBone("hero")  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:findSlot --------------------------------------------
---@api-stub: LSkeleton:findSlot
--- Searches for a slot by name and returns its zero-based index, or nil if not found.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:findSlot("hero")  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:updateWorldTransforms -------------------------------
---@api-stub: LSkeleton:updateWorldTransforms
--- Recomputes world transforms for all bones in hierarchy order. Call after modifying bone locals or IK targets.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:updateWorldTransforms()
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:getBoneWorld ----------------------------------------
---@api-stub: LSkeleton:getBoneWorld
--- Returns the final world-space transform of a bone after hierarchy resolution.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:getBoneWorld(1)  -- -> table
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:setPosition -----------------------------------------
---@api-stub: LSkeleton:setPosition
--- Sets the root bone world position, shifting the entire skeleton.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:setPosition(0.0, 0.0)
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:boneCount -------------------------------------------
---@api-stub: LSkeleton:boneCount
--- Returns the total number of bones in the skeleton.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:boneCount()  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:slotCount -------------------------------------------
---@api-stub: LSkeleton:slotCount
--- Returns the total number of slots in the skeleton.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:slotCount()  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:drawToImage -----------------------------------------
---@api-stub: LSkeleton:drawToImage
--- Renders the skeleton into an in-memory image of the given dimensions and returns it as LImageData userdata.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:drawToImage(64.0, 64.0)  -- -> LImageData
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:playAnimation ---------------------------------------
---@api-stub: LSkeleton:playAnimation
--- Starts playing a named animation on this skeleton. Optionally loops.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:playAnimation("hero", [looping])  -- -> boolean
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:stopAnimation ---------------------------------------
---@api-stub: LSkeleton:stopAnimation
--- Stops the currently playing animation and resets playback state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:stopAnimation()
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:updateAnimation -------------------------------------
---@api-stub: LSkeleton:updateAnimation
--- Advances the current animation by a delta time, applying bone transforms to the skeleton.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:updateAnimation(0.016)
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:getAnimationTime ------------------------------------
---@api-stub: LSkeleton:getAnimationTime
--- Returns the current playback time of the active animation in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:getAnimationTime()  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:addAnimation ----------------------------------------
---@api-stub: LSkeleton:addAnimation
--- Registers a SkeletonAnimation object with this skeleton so it can be played by name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addAnimation(anim_ud)
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:addIKConstraint -------------------------------------
---@api-stub: LSkeleton:addIKConstraint
--- Adds an inverse-kinematics constraint that controls a chain of bones to reach a target position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addIKConstraint("hero", chain_tbl, [bend_positive])  -- -> number
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:setIKTarget -----------------------------------------
---@api-stub: LSkeleton:setIKTarget
--- Sets the world-space target position for a named IK constraint. Call updateWorldTransforms after.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:setIKTarget("hero", 0.0, 0.0)  -- -> boolean
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:addSkin ---------------------------------------------
---@api-stub: LSkeleton:addSkin
--- Registers a new named skin on this skeleton. Skins remap slot attachments for visual variants.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:addSkin("hero")
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:setSkin ---------------------------------------------
---@api-stub: LSkeleton:setSkin
--- Activates a named skin, applying its slot-attachment mappings to the skeleton.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:setSkin("hero")  -- -> boolean
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:getSkin ---------------------------------------------
---@api-stub: LSkeleton:getSkin
--- Returns the name of the currently active skin, or nil if no skin is set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:getSkin()  -- -> string
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:setSkinMapping --------------------------------------
---@api-stub: LSkeleton:setSkinMapping
--- Maps a slot to a specific attachment name within a skin. When that skin is active, the slot shows this attachment.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:setSkinMapping(skin, "slot1", attachment)
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- ---- Stub: LSkeleton:blendAnimation --------------------------------------
---@api-stub: LSkeleton:blendAnimation
--- Blends an animation pose onto the skeleton at a given time with a weight factor for smooth transitions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeleton_stub:blendAnimation(anim_ud, time, [blend_weight])
--- (replace lSkeleton_stub with your real LSkeleton instance above)
-
--- -----------------------------------------------------------------------------
--- LSkeletonAnimation methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LSkeletonAnimation:addKeyframe --------------------------------
---@api-stub: LSkeletonAnimation:addKeyframe
--- Adds a keyframe to a bone's property timeline at a specific time with a value and easing curve.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeletonAnimation_stub:addKeyframe()
--- (replace lSkeletonAnimation_stub with your real LSkeletonAnimation instance above)
-
--- ---- Stub: LSkeletonAnimation:getDuration --------------------------------
---@api-stub: LSkeletonAnimation:getDuration
--- Returns the total duration of this animation in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeletonAnimation_stub:getDuration()  -- -> number
--- (replace lSkeletonAnimation_stub with your real LSkeletonAnimation instance above)
-
--- ---- Stub: LSkeletonAnimation:addEventKey --------------------------------
---@api-stub: LSkeletonAnimation:addEventKey
--- Inserts an event trigger at a specific time within the animation timeline.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeletonAnimation_stub:addEventKey(time, "hero", [value])
--- (replace lSkeletonAnimation_stub with your real LSkeletonAnimation instance above)
-
--- ---- Stub: LSkeletonAnimation:getEvents ----------------------------------
---@api-stub: LSkeletonAnimation:getEvents
--- Collects all events that fire within a time range. Useful for triggering sound effects or gameplay actions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeletonAnimation_stub:getEvents(from, to)  -- -> table
--- (replace lSkeletonAnimation_stub with your real LSkeletonAnimation instance above)
-
--- ---- Stub: LSkeletonAnimation:getTimelineCount ---------------------------
---@api-stub: LSkeletonAnimation:getTimelineCount
--- Returns the number of bone-property timelines in this animation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSkeletonAnimation_stub:getTimelineCount()  -- -> number
--- (replace lSkeletonAnimation_stub with your real LSkeletonAnimation instance above)

@@ -598,16 +598,16 @@ describe("lurek.audio newSoundData guard", function()
     -- @covers lurek.audio.newSoundData
     it("newSoundData_invalid_sample_rate_string_errors", function()
         expect_error(function()
-            ---@diagnostic disable-next-line: param-type-mismatch
-            lurek.audio.newSoundData(64, "invalid")
+            local chunk = assert(load("return function() lurek.audio.newSoundData(64, 'invalid') end"))()
+            chunk()
         end)
     end)
 
     -- @covers lurek.audio.newSoundData
     it("newSoundData_boolean_sample_rate_errors", function()
         expect_error(function()
-            ---@diagnostic disable-next-line: param-type-mismatch
-            lurek.audio.newSoundData(64, true)
+            local chunk = assert(load("return function() lurek.audio.newSoundData(64, true) end"))()
+            chunk()
         end)
     end)
 

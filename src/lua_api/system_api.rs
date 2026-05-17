@@ -587,10 +587,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Executes a table of named task functions sequentially, collecting pass/fail results and elapsed time for each.
     /// @param | tasks | table | Table mapping task names (string) to task functions (function).
     /// @param | opts | table? | Options table. Set `stopOnError = true` to skip remaining tasks after the first failure.
-    /// @return | table | Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
-    /// @field | status | string | Task status: passed, failed, or skipped.
+    /// @return | table | Table mapping each task name to a result table.
+    /// @field | status | string | Task status: `passed`, `failed`, or `skipped`.
     /// @field | time | number | Elapsed time in seconds.
-    /// @field | error | string? | Error message when status is failed.
+    /// @field | error | string? | Error message when status is `failed`.
     system.set(
         "runBatch",
         lua.create_function(|lua, (tasks, opts): (LuaTable, Option<LuaTable>)| {

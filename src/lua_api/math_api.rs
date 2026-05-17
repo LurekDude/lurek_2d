@@ -2049,7 +2049,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Triangulates a flat polygon point table.
     /// @param | pts | table | Flat numeric table `{x1, y1, x2, y2, ...}` with at least three points.
     /// @return | table | Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
-    /// @field | 1 | number | Point component (interleaved x,y pairs).
+    /// @field | [1] | number | Point component (interleaved x,y pairs).
     tbl.set(
         "triangulate",
         lua.create_function(|lua, pts: LuaTable| {
@@ -2262,9 +2262,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Computes Delaunay triangles for a flat point table.
     /// @param | pts | table | Flat numeric point table.
     /// @return | table | Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
-    /// @field | 1 | integer | First vertex index.
-    /// @field | 2 | integer | Second vertex index.
-    /// @field | 3 | integer | Third vertex index.
+    /// @field | [1] | integer | First vertex index.
+    /// @field | [2] | integer | Second vertex index.
+    /// @field | [3] | integer | Third vertex index.
     tbl.set(
         "delaunayTriangulate",
         lua.create_function(|lua, pts: LuaTable| {

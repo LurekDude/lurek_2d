@@ -142,12 +142,17 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.04, 0.06, 0.04)
 
     -- Action-based input
-    lurek.input.bind("up",      { "w", "up"    })
-    lurek.input.bind("down",    { "s", "down"  })
-    lurek.input.bind("left",    { "a", "left"  })
-    lurek.input.bind("right",   { "d", "right" })
-    lurek.input.bind("confirm", { "return", "kp_enter" })
-    lurek.input.bind("quit",    { "escape" })
+    lurek.input.bind("up",      "w");
+	lurek.input.bind("up",      "up")
+    lurek.input.bind("down",    "s");
+	lurek.input.bind("down",    "down")
+    lurek.input.bind("left",    "a");
+	lurek.input.bind("left",    "left")
+    lurek.input.bind("right",   "d");
+	lurek.input.bind("right",   "right")
+    lurek.input.bind("confirm", "return");
+	lurek.input.bind("confirm", "kp_enter")
+    lurek.input.bind("quit",    "escape")
 
     -- Camera (static, but good practice)
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)

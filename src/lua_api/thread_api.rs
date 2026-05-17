@@ -32,7 +32,7 @@ impl LuaUserData for LuaThreadHandle {
         });
         // -- start --
         /// Launches the worker thread, executing the Lua code string supplied at creation time.
-        /// @param | ... | table | Zero or more arguments forwarded to the worker as the `arg` table.
+        /// @param | ... | any | Zero or more arguments forwarded to the worker as the `arg` table.
         methods.add_method("start", |_, this, args: LuaMultiValue| {
             let channel_args: Vec<_> = args
                 .into_iter()
@@ -85,7 +85,7 @@ impl LuaUserData for LuaThreadPool {
         });
         // -- submit --
         /// Pushes a value into the pool's input channel for processing by a worker thread.
-        /// @param | value | table | The message table to send.
+        /// @param | value | any | The message value to send.
         methods.add_method("submit", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
             this.inner.lock().unwrap().submit(cv);
@@ -181,7 +181,7 @@ impl LuaUserData for LuaPromise {
         // -- chain --
         /// Creates a new promise that runs the given code with the parent promise's result as its first argument.
         /// @param | code | string | Lua source code to execute in the chained worker thread.
-        /// @param | ... | table | Additional arguments forwarded after the parent result.
+        /// @param | ... | any | Additional arguments forwarded after the parent result.
         /// @return | LPromise | A new promise representing the chained computation.
         methods.add_method("chain", |_, this, (code, rest): (String, LuaMultiValue)| {
             let parent_result = {
@@ -283,7 +283,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- async --
     /// Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
     /// @param | codeOrFunc | string|function | Lua source code or a dumpable Lua function to execute.
-    /// @param | ... | table | Additional arguments forwarded to the worker.
+    /// @param | ... | any | Additional arguments forwarded to the worker.
     /// @return | LPromise | A promise that resolves to the worker's return value.
     tbl.set(
         "async",
@@ -370,7 +370,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- push --
         /// Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
-        /// @param | value | table | The message table to send.
+        /// @param | value | any | The message value to send.
         /// @return | integer | The message sequence ID assigned to this push.
         methods.add_method("push", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -418,7 +418,7 @@ impl LuaUserData for LuaChannel {
         methods.add_method("isBounded", |_, this, ()| Ok(this.inner.is_bounded()));
         // -- tryPush --
         /// Attempts to push a value onto a bounded channel without blocking.
-        /// @param | value | table | The message table to send.
+        /// @param | value | any | The message value to send.
         /// @return | boolean | true if the value was enqueued, false if the channel is full.
         methods.add_method("tryPush", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;
@@ -432,7 +432,7 @@ impl LuaUserData for LuaChannel {
         });
         // -- supply --
         /// Pushes a value and blocks until a consumer pops it (synchronous handoff).
-        /// @param | value | table | The message table to send.
+        /// @param | value | any | The message value to send.
         /// @return | boolean | true when the value has been consumed.
         methods.add_method("supply", |_, this, value: LuaValue| {
             let cv = lua_to_channel_value(value)?;

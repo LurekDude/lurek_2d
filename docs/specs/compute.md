@@ -15,6 +15,8 @@ Dense N-dimensional numerical array library for CPU-only matrix, signal, and spa
 
 The module provides FFT/IFFT via Cooley-Tukey, LU decomposition for linear system solving, Gaussian kernels for image filtering, and spatial helpers for 2D rotation and affine transforms. Analytics functions compute mean, variance, standard deviation, min, max, sum, percentiles, and histograms over array data. Exposed as `lurek.compute.*`. Pure Foundations tier — no engine dependencies.
 
+Lua API doc contract: all Lua-visible params, returns, and fields for `lurek.compute` must be declared in `src/lua_api/compute_api.rs` and then generated into `docs/api/lurek.lua`. Do not add Lua-side cast workarounds in tests or examples to compensate for missing or wrong binding docs. For polymorphic compute methods that accept either an `LArray` or a scalar, document the source parameter type as `any`. For methods whose return type changes with arguments, keep the base `@return` precise and add a source `@overload` marker so the generated stub stays authoritative without Lua-side narrowing hacks.
+
 ## Source Documentation
 
 ### `analytics.rs`

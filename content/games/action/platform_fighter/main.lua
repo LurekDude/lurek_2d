@@ -463,20 +463,20 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- Input actions — P1
-    lurek.input.bind("p1_left",    {"a"})
-    lurek.input.bind("p1_right",   {"d"})
-    lurek.input.bind("p1_jump",    {"w"})
-    lurek.input.bind("p1_attack",  {"f"})
-    lurek.input.bind("p1_special", {"g"})
+    lurek.input.bind("p1_left",    "a")
+    lurek.input.bind("p1_right",   "d")
+    lurek.input.bind("p1_jump",    "w")
+    lurek.input.bind("p1_attack",  "f")
+    lurek.input.bind("p1_special", "g")
     -- Input actions — P2
-    lurek.input.bind("p2_left",    {"left"})
-    lurek.input.bind("p2_right",   {"right"})
-    lurek.input.bind("p2_jump",    {"up"})
-    lurek.input.bind("p2_attack",  {"k"})
-    lurek.input.bind("p2_special", {"l"})
+    lurek.input.bind("p2_left",    "left")
+    lurek.input.bind("p2_right",   "right")
+    lurek.input.bind("p2_jump",    "up")
+    lurek.input.bind("p2_attack",  "k")
+    lurek.input.bind("p2_special", "l")
     -- Global
-    lurek.input.bind("quit",  {"escape"})
-    lurek.input.bind("start", {"return"})
+    lurek.input.bind("quit",  "escape")
+    lurek.input.bind("start", "return")
 
     -- Particle systems
     hit_burst_ps = lurek.particle.newSystem({

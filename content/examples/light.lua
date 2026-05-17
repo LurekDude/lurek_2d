@@ -59,7 +59,7 @@ do
   end
 end
 
---@api-stub: lurek.light.setEnabled
+--@api-stub: LOccluder:setEnabled
 -- Enables or disables the shared light world
 do
   -- When disabled, no lighting is rendered — the scene uses flat colors only.
@@ -68,7 +68,7 @@ do
   lurek.light.setEnabled(not cinematic_mode)
 end
 
---@api-stub: lurek.light.isEnabled
+--@api-stub: LOccluder:isEnabled
 -- Returns whether the shared light world is enabled
 do
   -- Check before performing expensive light operations to avoid wasted work
@@ -203,7 +203,7 @@ end
 
 -- Light methods
 
---@api-stub: Light:setPosition
+--@api-stub: LOccluder:setPosition
 -- Sets the position of this light.
 do
   -- Move a light to follow the player's lantern in world coordinates.
@@ -213,7 +213,7 @@ do
   lamp:setPosition(player_x, player_y)
 end
 
---@api-stub: Light:getPosition
+--@api-stub: LOccluder:getPosition
 -- Returns the position of this light.
 do
   -- Returns x, y — use to check distance from player or other objects.
@@ -222,7 +222,7 @@ do
   lurek.log.info("lamp at (" .. x .. "," .. y .. ")", "light")
 end
 
---@api-stub: Light:setRadius
+--@api-stub: LLight:setRadius
 -- Sets the radius of this light.
 do
   -- Radius controls how far the light reaches. Animate it to simulate
@@ -232,7 +232,7 @@ do
   lantern:setRadius(40 + 80 * battery_pct)  -- range shrinks as battery dies
 end
 
---@api-stub: Light:getRadius
+--@api-stub: LLight:getRadius
 -- Returns the radius of this light.
 do
   -- Use to enforce minimum visibility radius for gameplay fairness
@@ -242,7 +242,7 @@ do
   end
 end
 
---@api-stub: Light:getColor
+--@api-stub: LLight:getColor
 -- Returns the color of this light.
 do
   -- Returns r, g, b, a. Use to sample the light color for tinting particles
@@ -252,7 +252,7 @@ do
   lurek.log.debug("lamp color=(" .. r .. "," .. g .. "," .. b .. "," .. a .. ")", "light")
 end
 
---@api-stub: Light:setIntensity
+--@api-stub: LLight:setIntensity
 -- Sets the intensity of this light.
 do
   -- Intensity multiplies the light's contribution. Values above 1.0 create
@@ -261,7 +261,7 @@ do
   torch:setIntensity(1.4)  -- 40% brighter than default
 end
 
---@api-stub: Light:getIntensity
+--@api-stub: LLight:getIntensity
 -- Returns the intensity of this light.
 do
   -- Use to warn about dim lights that players might not notice
@@ -271,7 +271,7 @@ do
   end
 end
 
---@api-stub: Light:setEnergy
+--@api-stub: LLight:setEnergy
 -- Sets the energy of this light.
 do
   -- Energy is a secondary brightness control separate from intensity.
@@ -280,7 +280,7 @@ do
   sun:setEnergy(2.5)  -- high energy for a bright sunbeam shaft
 end
 
---@api-stub: Light:getEnergy
+--@api-stub: LLight:getEnergy
 -- Returns the energy of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -288,7 +288,7 @@ do
   lurek.log.debug("lamp energy=" .. e, "light")
 end
 
---@api-stub: Light:setBlendMode
+--@api-stub: LLight:setBlendMode
 -- Sets the blend mode of this light.
 do
   -- "add" = additive (fire, neon, glowing objects)
@@ -298,7 +298,7 @@ do
   glow:setBlendMode("add")  -- neon sign glow added on top of scene
 end
 
---@api-stub: Light:getBlendMode
+--@api-stub: LLight:getBlendMode
 -- Returns the blend mode of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -307,7 +307,7 @@ do
   end
 end
 
---@api-stub: Light:setFalloff
+--@api-stub: LLight:setFalloff
 -- Sets the falloff of this light.
 do
   -- "linear" = brightness decreases linearly with distance (sharp edge)
@@ -317,7 +317,7 @@ do
   lamp:setFalloff("smooth")  -- best default for indoor scenes
 end
 
---@api-stub: Light:getFalloff
+--@api-stub: LLight:getFalloff
 -- Returns the falloff of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -325,7 +325,7 @@ do
   lurek.log.debug("falloff=" .. mode, "light")
 end
 
---@api-stub: Light:setShadowEnabled
+--@api-stub: LLight:setShadowEnabled
 -- Enables or disables shadow casting for this light.
 do
   -- Shadow casting is expensive. Enable only for key lights where shadows
@@ -334,7 +334,7 @@ do
   torch:setShadowEnabled(true)  -- this is the player's main light
 end
 
---@api-stub: Light:isShadowEnabled
+--@api-stub: LLight:isShadowEnabled
 -- Returns whether this light casts shadows.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -344,7 +344,7 @@ do
   end
 end
 
---@api-stub: Light:getShadowColor
+--@api-stub: LLight:getShadowColor
 -- Returns the shadow color of this light.
 do
   -- Shadow color tints the shadowed area. Dark blue shadows feel cold and eerie;
@@ -354,7 +354,7 @@ do
   lurek.log.debug("shadow alpha=" .. a, "light")
 end
 
---@api-stub: Light:setShadowFilter
+--@api-stub: LLight:setShadowFilter
 -- Sets the shadow filter of this light.
 do
   -- "none" = hard pixel shadows (retro style, cheapest)
@@ -364,7 +364,7 @@ do
   lamp:setShadowFilter("pcf13")  -- high quality for hero light
 end
 
---@api-stub: Light:getShadowFilter
+--@api-stub: LLight:getShadowFilter
 -- Returns the shadow filter of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -373,7 +373,7 @@ do
   end
 end
 
---@api-stub: Light:setShadowSmooth
+--@api-stub: LLight:setShadowSmooth
 -- Sets the shadow smooth value of this light.
 do
   -- Shadow smooth controls the blur radius applied to shadow edges.
@@ -382,7 +382,7 @@ do
   lamp:setShadowSmooth(2.5)  -- moderate softening
 end
 
---@api-stub: Light:getShadowSmooth
+--@api-stub: LLight:getShadowSmooth
 -- Returns the shadow smooth value of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -390,7 +390,7 @@ do
   lurek.log.debug("shadow smooth=" .. s, "light")
 end
 
---@api-stub: Light:setShadowSoftness
+--@api-stub: LLight:setShadowSoftness
 -- Sets the shadow softness of this light.
 do
   -- Softness works with smooth to control penumbra width.
@@ -399,14 +399,14 @@ do
   lamp:setShadowSoftness(1.8)
 end
 
---@api-stub: Light:getShadowSoftness
+--@api-stub: LLight:getShadowSoftness
 -- Returns the shadow softness of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
   lurek.log.debug("shadow softness=" .. lamp:getShadowSoftness(), "light")
 end
 
---@api-stub: Light:setLightMask
+--@api-stub: LOccluder:setLightMask
 -- Sets the light mask of this light.
 do
   -- Light masks control which layers this light illuminates.
@@ -416,7 +416,7 @@ do
   lamp:setLightMask(PLAYER_LAYER)  -- only lights the player layer
 end
 
---@api-stub: Light:getLightMask
+--@api-stub: LOccluder:getLightMask
 -- Returns the light mask of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -424,7 +424,7 @@ do
   lurek.log.debug("lamp mask=" .. mask, "light")
 end
 
---@api-stub: Light:setShadowMask
+--@api-stub: LLight:setShadowMask
 -- Sets the shadow mask of this light.
 do
   -- Shadow mask controls which occluder layers cast shadows for this light.
@@ -434,7 +434,7 @@ do
   lamp:setShadowMask(WALLS_ONLY)
 end
 
---@api-stub: Light:getShadowMask
+--@api-stub: LLight:getShadowMask
 -- Returns the shadow mask of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -443,7 +443,7 @@ do
   end
 end
 
---@api-stub: Light:setEnabled
+--@api-stub: LOccluder:setEnabled
 -- Enables or disables this light.
 do
   -- Disabled lights consume no GPU time. Toggle for on/off switches,
@@ -453,7 +453,7 @@ do
   lamp:setEnabled(power_on)  -- light is off until player flips the switch
 end
 
---@api-stub: Light:isEnabled
+--@api-stub: LOccluder:isEnabled
 -- Returns whether this light is enabled.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -462,7 +462,7 @@ do
   end
 end
 
---@api-stub: Light:setLightType
+--@api-stub: LLight:setLightType
 -- Sets the light type of this light.
 do
   -- "point" = omnidirectional (torches, lamps, campfires)
@@ -473,7 +473,7 @@ do
   sun:setDirection(math.pi * 0.25)  -- sun angle: 45 degrees from right
 end
 
---@api-stub: Light:getLightType
+--@api-stub: LLight:getLightType
 -- Returns the light type of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -482,7 +482,7 @@ do
   end
 end
 
---@api-stub: Light:setDirection
+--@api-stub: LLight:setDirection
 -- Sets the direction of this light.
 do
   -- Direction is an angle in radians. Used by spot and directional lights.
@@ -492,7 +492,7 @@ do
   flashlight:setDirection(math.pi / 2)  -- pointing straight down
 end
 
---@api-stub: Light:getDirection
+--@api-stub: LLight:getDirection
 -- Returns the direction of this light.
 do
   local sun = lurek.light.newLight(0, 0, 500)
@@ -501,7 +501,7 @@ do
   lurek.log.debug("sun angle=" .. angle .. " rad", "light")
 end
 
---@api-stub: Light:setInnerAngle
+--@api-stub: LLight:setInnerAngle
 -- Sets the inner angle of this light.
 do
   -- Inner angle defines the fully-lit central cone of a spotlight.
@@ -511,7 +511,7 @@ do
   spot:setInnerAngle(math.pi / 8)  -- narrow bright center
 end
 
---@api-stub: Light:getInnerAngle
+--@api-stub: LLight:getInnerAngle
 -- Returns the inner angle of this light.
 do
   local spot = lurek.light.newLight(0, 0, 200)
@@ -519,7 +519,7 @@ do
   lurek.log.debug("inner=" .. spot:getInnerAngle(), "light")
 end
 
---@api-stub: Light:setOuterAngle
+--@api-stub: LLight:setOuterAngle
 -- Sets the outer angle of this light.
 do
   -- Outer angle defines where the spotlight fades to zero.
@@ -529,7 +529,7 @@ do
   spot:setOuterAngle(math.pi / 4)  -- wider falloff edge
 end
 
---@api-stub: Light:getOuterAngle
+--@api-stub: LLight:getOuterAngle
 -- Returns the outer angle of this light.
 do
   local spot = lurek.light.newLight(0, 0, 200)
@@ -539,7 +539,7 @@ do
   end
 end
 
---@api-stub: Light:setAttenuation
+--@api-stub: LLight:setAttenuation
 -- Sets the attenuation of this light.
 do
   -- Attenuation uses the classic formula: 1 / (constant + linear*d + quadratic*d^2)
@@ -549,7 +549,7 @@ do
   lamp:setAttenuation(1.0, 0.09, 0.032)
 end
 
---@api-stub: Light:getAttenuation
+--@api-stub: LLight:getAttenuation
 -- Returns the attenuation of this light.
 do
   -- Returns constant, linear, quadratic coefficients
@@ -558,7 +558,7 @@ do
   lurek.log.debug("att c=" .. c .. " l=" .. l .. " q=" .. q, "light")
 end
 
---@api-stub: Light:setFlicker
+--@api-stub: LLight:setFlicker
 -- Sets the flicker parameters of this light.
 do
   -- Flicker modulates intensity over time using a noise function.
@@ -568,7 +568,7 @@ do
   torch:setFlicker(8.0, 0.15)  -- fast candle-like flicker, 15% variance
 end
 
---@api-stub: Light:getFlicker
+--@api-stub: LLight:getFlicker
 -- Returns the flicker parameters of this light.
 do
   -- Returns speed, strength — use to verify flicker was configured correctly
@@ -578,7 +578,7 @@ do
   lurek.log.debug("flicker speed=" .. speed .. " strength=" .. strength, "light")
 end
 
---@api-stub: Light:setFlickerEnabled
+--@api-stub: LLight:setFlickerEnabled
 -- Enables or disables this light's flicker animation.
 do
   -- You can configure flicker parameters but keep it disabled until triggered.
@@ -588,7 +588,7 @@ do
   torch:setFlickerEnabled(true)  -- activate the flicker
 end
 
---@api-stub: Light:isFlickerEnabled
+--@api-stub: LLight:isFlickerEnabled
 -- Returns whether this light's flicker is enabled.
 do
   local torch = lurek.light.newLight(0, 0, 120)
@@ -598,7 +598,7 @@ do
   end
 end
 
---@api-stub: Light:setGroupId
+--@api-stub: LLight:setGroupId
 -- Sets the group id of this light.
 do
   -- Group IDs let you batch-control related lights without storing each handle.
@@ -608,7 +608,7 @@ do
   lamp:setGroupId(TORCHES)
 end
 
---@api-stub: Light:getGroupId
+--@api-stub: LLight:getGroupId
 -- Returns the group id of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -618,7 +618,7 @@ do
   end
 end
 
---@api-stub: Light:setVolumetric
+--@api-stub: LLight:setVolumetric
 -- Enables or disables volumetric behavior for this light.
 do
   -- Volumetric lights produce hints for god-ray post-processing.
@@ -627,7 +627,7 @@ do
   headlamp:setVolumetric(true)
 end
 
---@api-stub: Light:isVolumetric
+--@api-stub: LLight:isVolumetric
 -- Returns whether this light is volumetric.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -636,7 +636,7 @@ do
   end
 end
 
---@api-stub: Light:remove
+--@api-stub: LOccluder:remove
 -- Removes this light from the light world.
 do
   -- Removed lights free their slot immediately. Use for temporary effects:
@@ -646,7 +646,7 @@ do
   muzzle_flash:remove()
 end
 
---@api-stub: Light:isValid
+--@api-stub: LOccluder:isValid
 -- Returns whether this light handle still references a live light.
 do
   -- After remove(), the handle becomes invalid. Always check isValid()
@@ -658,7 +658,7 @@ do
   end
 end
 
---@api-stub: Light:addFlicker
+--@api-stub: LLight:addFlicker
 -- Adds a flicker using min/max intensity range and frequency in Hz.
 do
   -- Convenience alternative to setFlicker(). Specify the visible intensity range
@@ -668,7 +668,7 @@ do
   torch:addFlicker(0.8, 1.2, 5.0)  -- 80%-120% intensity at 5 Hz
 end
 
---@api-stub: Light:updateTransition
+--@api-stub: LLight:updateTransition
 -- Advances this light's transition by the given delta time.
 do
   -- Call each frame to smoothly interpolate between start and target values.
@@ -677,7 +677,7 @@ do
   function lurek.process(dt) lamp:updateTransition(dt) end
 end
 
---@api-stub: Light:stopTransition
+--@api-stub: LLight:stopTransition
 -- Stops and clears the active transition on this light.
 do
   -- Use when gameplay interrupts a transition (e.g., player extinguishes the torch
@@ -686,7 +686,7 @@ do
   lamp:stopTransition()
 end
 
---@api-stub: Light:transitionProgress
+--@api-stub: LLight:transitionProgress
 -- Returns the current transition progress (0.0 to 1.0).
 do
   -- Returns 1.0 when no transition is active (considered "complete").
@@ -697,7 +697,7 @@ do
   end
 end
 
---@api-stub: Light:setCookie
+--@api-stub: LLight:setCookie
 -- Sets a cookie texture path on this light.
 do
   -- Cookie textures project a pattern through the light, like window blinds
@@ -706,7 +706,7 @@ do
   projector:setCookie("textures/window_pattern.png")
 end
 
---@api-stub: Light:getCookie
+--@api-stub: LLight:getCookie
 -- Returns the cookie texture path of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -715,7 +715,7 @@ do
   lurek.log.debug("cookie=" .. tostring(path), "light")
 end
 
---@api-stub: Light:clearCookie
+--@api-stub: LLight:clearCookie
 -- Clears the cookie texture from this light.
 do
   -- Remove the cookie to revert to a plain circular light shape
@@ -724,7 +724,7 @@ do
   lamp:clearCookie()  -- now just a normal point light again
 end
 
---@api-stub: Light:setNormalMap
+--@api-stub: LLight:setNormalMap
 -- Sets the normal map path for this light.
 do
   -- Normal maps add per-pixel depth illusion to lit surfaces.
@@ -733,14 +733,14 @@ do
   lamp:setNormalMap("assets/textures/normals/brick.png")
 end
 
---@api-stub: Light:getNormalMap
+--@api-stub: LLight:getNormalMap
 -- Returns the normal map path of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
   lurek.log.debug("normal map=" .. tostring(lamp:getNormalMap()), "light")
 end
 
---@api-stub: Light:clearNormalMap
+--@api-stub: LLight:clearNormalMap
 -- Clears the normal map from this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -748,7 +748,7 @@ do
   lamp:clearNormalMap()  -- revert to flat lighting
 end
 
---@api-stub: Light:setNormalStrength
+--@api-stub: LLight:setNormalStrength
 -- Sets the normal map strength for this light.
 do
   -- Strength controls how pronounced the normal-mapped bumps appear.
@@ -757,7 +757,7 @@ do
   lamp:setNormalStrength(1.3)  -- slightly exaggerated for stylized look
 end
 
---@api-stub: Light:getNormalStrength
+--@api-stub: LLight:getNormalStrength
 -- Returns the normal map strength of this light.
 do
   local lamp = lurek.light.newLight(0, 0, 100)
@@ -766,7 +766,7 @@ end
 
 -- Occluder methods
 
---@api-stub: Occluder:setVertices
+--@api-stub: LOccluder:setVertices
 -- Sets the vertices of this occluder.
 do
   -- Replace occluder geometry at runtime — useful for destructible walls
@@ -776,7 +776,7 @@ do
   wall:setVertices({ 0, 0, 200, 0, 200, 20, 0, 20 })
 end
 
---@api-stub: Occluder:getVertices
+--@api-stub: LOccluder:getVertices
 -- Returns the vertices of this occluder.
 do
   -- Returns a flat {x1,y1, x2,y2, ...} table. Divide length by 2 for vertex count.
@@ -785,7 +785,7 @@ do
   lurek.log.debug("crate has " .. (#v / 2) .. " vertices", "light")
 end
 
---@api-stub: Occluder:setPosition
+--@api-stub: LOccluder:setPosition
 -- Sets the position offset of this occluder.
 do
   -- Position offsets all vertices. Use to move an occluder with a physics body
@@ -794,7 +794,7 @@ do
   crate:setPosition(200, 150)  -- move crate shadow to match sprite position
 end
 
---@api-stub: Occluder:getPosition
+--@api-stub: LOccluder:getPosition
 -- Returns the position offset of this occluder.
 do
   local crate = lurek.light.newOccluder({ 0, 0, 64, 0, 64, 64, 0, 64 })
@@ -803,7 +803,7 @@ do
   lurek.log.debug("crate at (" .. x .. "," .. y .. ")", "light")
 end
 
---@api-stub: Occluder:setOpacity
+--@api-stub: LOccluder:setOpacity
 -- Sets the opacity of this occluder.
 do
   -- Opacity 1.0 = fully opaque (hard shadow), 0.0 = invisible (no shadow).
@@ -812,7 +812,7 @@ do
   fence:setOpacity(0.4)  -- chain-link fence lets most light through
 end
 
---@api-stub: Occluder:getOpacity
+--@api-stub: LOccluder:getOpacity
 -- Returns the opacity of this occluder.
 do
   local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
@@ -821,7 +821,7 @@ do
   end
 end
 
---@api-stub: Occluder:setLightMask
+--@api-stub: LOccluder:setLightMask
 -- Sets the light mask of this occluder.
 do
   -- An occluder only blocks lights whose mask bits overlap with its own mask.
@@ -831,7 +831,7 @@ do
   wall:setLightMask(FOREGROUND_LIGHTS)
 end
 
---@api-stub: Occluder:getLightMask
+--@api-stub: LOccluder:getLightMask
 -- Returns the light mask of this occluder.
 do
   local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
@@ -839,7 +839,7 @@ do
   lurek.log.debug("wall mask=" .. mask, "light")
 end
 
---@api-stub: Occluder:setEnabled
+--@api-stub: LOccluder:setEnabled
 -- Enables or disables this occluder.
 do
   -- Disabled occluders stop casting shadows but stay in memory for quick reactivation.
@@ -849,7 +849,7 @@ do
   door:setEnabled(not door_open)  -- shadows only when door is closed
 end
 
---@api-stub: Occluder:isEnabled
+--@api-stub: LOccluder:isEnabled
 -- Returns whether this occluder is currently casting shadows.
 do
   local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
@@ -858,7 +858,7 @@ do
   end
 end
 
---@api-stub: Occluder:remove
+--@api-stub: LOccluder:remove
 -- Removes this occluder from the light world.
 do
   -- Permanently remove destroyed objects (exploded barrels, broken walls).
@@ -866,7 +866,7 @@ do
   debris:remove()  -- rubble no longer blocks light
 end
 
---@api-stub: Occluder:isValid
+--@api-stub: LOccluder:isValid
 -- Returns whether this occluder handle is still valid.
 do
   -- After remove(), the handle becomes stale. Check before any method call
@@ -878,7 +878,7 @@ do
   end
 end
 
---@api-stub: Light:setColor
+--@api-stub: LLight:setColor
 -- Sets the color of this light.
 do
   -- setColor(r, g, b) or setColor(r, g, b, a) — alpha defaults to 1.0.
@@ -888,7 +888,7 @@ do
   lurek.log.info("light colour set to warm gold", "light")
 end
 
---@api-stub: Light:setShadowColor
+--@api-stub: LLight:setShadowColor
 -- Sets the shadow color of this light.
 do
   -- Shadow color tints the shadowed region instead of pure black.
@@ -899,7 +899,7 @@ do
   lurek.log.info("shadow colour set to deep blue", "light")
 end
 
---@api-stub: Light:transitionTo
+--@api-stub: LLight:transitionTo
 -- Starts a smooth transition toward target values.
 do
   -- transitionTo(target, duration) interpolates color, intensity, and radius
@@ -918,7 +918,7 @@ end
 -- Light methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: Light:type
+--@api-stub: LOccluder:type
 -- Returns the Lua-visible type name string for this light handle.
 do
   -- type() returns "LLight" — use for runtime type introspection
@@ -927,7 +927,7 @@ do
   local t = lamp:type()
   lurek.log.info("Light:type = " .. t, "light")
 end
---@api-stub: Light:typeOf
+--@api-stub: LOccluder:typeOf
 -- Returns true if this light handle matches the given type name string.
 do
   -- typeOf("LLight") and typeOf("Object") both return true
@@ -941,14 +941,14 @@ end
 -- LLight methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LLight:type
+--@api-stub: LOccluder:type
 -- Returns the Lua-visible type name for this light handle
 do
   local light_obj = lurek.light.newLight(0, 0, 80)
   local t = light_obj:type()
   lurek.log.info("LLight:type = " .. t, "light")
 end
---@api-stub: LLight:typeOf
+--@api-stub: LOccluder:typeOf
 -- Returns whether this light handle matches a supported type name
 do
   local light_obj = lurek.light.newLight(0, 0, 80)
@@ -974,7 +974,7 @@ end
 -- LLight methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LLight:setPosition
+--@api-stub: LOccluder:setPosition
 -- Sets this light position
 do
   -- Move a spotlight to track enemy patrol routes
@@ -983,7 +983,7 @@ do
   local x, y = lt:getPosition()
   lurek.log.info("position=" .. x .. "," .. y, "light")
 end
---@api-stub: LLight:getPosition
+--@api-stub: LOccluder:getPosition
 -- Returns this light position
 do
   local lt = lurek.light.newLight(100, 200, 150)
@@ -1143,7 +1143,7 @@ do
   lt:setShadowSmooth(1.5)
   lurek.log.info("shadow_smooth=" .. lt:getShadowSmooth(), "light")
 end
---@api-stub: LLight:setLightMask
+--@api-stub: LOccluder:setLightMask
 -- Sets this light's inclusion mask
 do
   -- Bit masks let you selectively light specific layers
@@ -1151,7 +1151,7 @@ do
   lt:setLightMask(0b00000011)   -- illuminate layers 1 and 2 only
   lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
 end
---@api-stub: LLight:getLightMask
+--@api-stub: LOccluder:getLightMask
 -- Returns this light's inclusion mask
 do
   local lt = lurek.light.newLight(400, 300, 200)
@@ -1174,7 +1174,7 @@ do
   lt:setShadowMask(0b11111111)
   lurek.log.info("shadow_mask=" .. lt:getShadowMask(), "light")
 end
---@api-stub: LLight:setEnabled
+--@api-stub: LOccluder:setEnabled
 -- Enables or disables this light
 do
   -- Toggle lights with player interaction (light switches, circuit breakers)
@@ -1184,7 +1184,7 @@ do
   lt:setEnabled(true)
   lurek.log.info("re-enabled=" .. tostring(lt:isEnabled()), "light")
 end
---@api-stub: LLight:isEnabled
+--@api-stub: LOccluder:isEnabled
 -- Returns whether this light is enabled
 do
   local lt = lurek.light.newLight(400, 300, 200)
@@ -1340,7 +1340,7 @@ do
   lt:setVolumetric(false)
   lurek.log.info("volumetric=" .. tostring(lt:isVolumetric()), "light")
 end
---@api-stub: LLight:remove
+--@api-stub: LOccluder:remove
 -- Removes this light from the shared light world
 do
   -- After remove(), the handle is stale — isValid() returns false
@@ -1349,7 +1349,7 @@ do
   lt:remove()
   lurek.log.info("valid after remove=" .. tostring(lt:isValid()), "light")
 end
---@api-stub: LLight:isValid
+--@api-stub: LOccluder:isValid
 -- Returns whether this light handle still points to a live light
 do
   local lt = lurek.light.newLight(400, 300, 200)
@@ -1495,87 +1495,3 @@ print("content/examples/light.lua")
 -- -----------------------------------------------------------------------------
 -- LOccluder methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LOccluder:setVertices -----------------------------------------
---@api-stub: LOccluder:setVertices
--- Replaces this occluder's flat vertex coordinate list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:setVertices(tbl)
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:getVertices -----------------------------------------
---@api-stub: LOccluder:getVertices
--- Returns this occluder's flat vertex coordinate list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:getVertices()  -- -> table
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:setPosition -----------------------------------------
---@api-stub: LOccluder:setPosition
--- Sets this occluder position offset.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:setPosition(0.0, 0.0)
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:getPosition -----------------------------------------
---@api-stub: LOccluder:getPosition
--- Returns this occluder position offset.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:getPosition()  -- -> number
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:setOpacity ------------------------------------------
---@api-stub: LOccluder:setOpacity
--- Sets this occluder opacity. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:setOpacity(o)
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:getOpacity ------------------------------------------
---@api-stub: LOccluder:getOpacity
--- Returns this occluder opacity. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:getOpacity()  -- -> number
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:setLightMask ----------------------------------------
---@api-stub: LOccluder:setLightMask
--- Sets this occluder's light mask. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:setLightMask(mask)
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:getLightMask ----------------------------------------
---@api-stub: LOccluder:getLightMask
--- Returns this occluder's light mask.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:getLightMask()  -- -> integer
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:setEnabled ------------------------------------------
---@api-stub: LOccluder:setEnabled
--- Enables or disables this occluder.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:setEnabled(0.2)
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:isEnabled -------------------------------------------
---@api-stub: LOccluder:isEnabled
--- Returns whether this occluder is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:isEnabled()  -- -> boolean
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:remove ----------------------------------------------
---@api-stub: LOccluder:remove
--- Removes this occluder from the shared light world.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:remove()
--- (replace lOccluder_stub with your real LOccluder instance above)
-
--- ---- Stub: LOccluder:isValid ---------------------------------------------
---@api-stub: LOccluder:isValid
--- Returns whether this occluder handle still points to a live occluder.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lOccluder_stub:isValid()  -- -> boolean
--- (replace lOccluder_stub with your real LOccluder instance above)

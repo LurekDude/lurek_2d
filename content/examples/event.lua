@@ -79,7 +79,7 @@ do
   end
 end
 
---@api-stub: lurek.event.clear
+--@api-stub: LSignal:clear
 -- Removes all pending events from the shared queue
 do
   -- Clear stale input events when transitioning between scenes

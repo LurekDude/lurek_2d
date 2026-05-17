@@ -134,7 +134,7 @@ do
   pcall(function() doc:mousepressed(20, 20, 1) end)
 end
 
---@api-stub: LHtmlDocument:setHtml
+--@api-stub: LHtmlElement:setHtml
 -- Replaces the document markup and invalidates existing element handles
 do
   -- setHtml completely replaces the document content.
@@ -154,7 +154,7 @@ do
   lurek.log.info("setHtml replaced entire markup for scene transition", "html")
 end
 
---@api-stub: LHtmlDocument:getHtml
+--@api-stub: LHtmlElement:getHtml
 -- Returns the current document markup string
 do
   -- getHtml retrieves the full document source.
@@ -376,7 +376,7 @@ do
   lurek.log.info("missing element is nil: " .. tostring(missing == nil), "html")
 end
 
---@api-stub: LHtmlDocument:query
+--@api-stub: LHtmlElement:query
 -- Looks up the first element matching a selector
 do
   -- query() uses CSS selectors to find the first matching element.
@@ -399,7 +399,7 @@ do
   end
 end
 
---@api-stub: LHtmlDocument:queryAll
+--@api-stub: LHtmlElement:queryAll
 -- Returns all elements matching a selector
 do
   -- queryAll() returns an array of all matching elements.
@@ -424,7 +424,7 @@ do
   end
 end
 
---@api-stub: LHtmlDocument:on
+--@api-stub: LHtmlElement:on
 -- Registers a document-level event listener
 do
   -- on() registers a callback for document-wide events.
@@ -445,7 +445,7 @@ do
   lurek.log.info("on() returned handle=" .. tostring(handle), "html")
 end
 
---@api-stub: LHtmlDocument:off
+--@api-stub: LHtmlElement:off
 -- Removes a document-level event listener by handle
 do
   -- off() unregisters a listener. Pass the handle returned by on().
@@ -567,7 +567,7 @@ do
   lurek.log.info("textinput sent 'Hero' character by character", "html")
 end
 
---@api-stub: LHtmlDocument:type
+--@api-stub: LHtmlElement:type
 -- Returns the Lua-visible type name for this HTML document handle
 do
   -- type() returns the string "LHtmlDocument". Used for runtime type checking.
@@ -576,7 +576,7 @@ do
   lurek.log.info("doc:type() = " .. t, "html")
 end
 
---@api-stub: LHtmlDocument:typeOf
+--@api-stub: LHtmlElement:typeOf
 -- Returns whether this document handle matches a supported type name
 do
   -- typeOf() checks if this handle is a specific type.

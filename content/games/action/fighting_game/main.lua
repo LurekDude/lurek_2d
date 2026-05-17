@@ -346,14 +346,14 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.08, 0.05, 0.15)
 
     -- Input actions
-    lurek.input.bind("left",  {"a", "left"})
-    lurek.input.bind("right", {"d", "right"})
-    lurek.input.bind("jump",  {"w", "up"})
-    lurek.input.bind("punch", {"f"})
-    lurek.input.bind("kick",  {"g"})
-    lurek.input.bind("block", {"h"})
-    lurek.input.bind("super", {"q"})
-    lurek.input.bind("quit",  {"escape"})
+    lurek.input.bind("left",  "a");   lurek.input.bind("left",  "left")
+    lurek.input.bind("right", "d");   lurek.input.bind("right", "right")
+    lurek.input.bind("jump",  "w");   lurek.input.bind("jump",  "up")
+    lurek.input.bind("punch", "f")
+    lurek.input.bind("kick",  "g")
+    lurek.input.bind("block", "h")
+    lurek.input.bind("super", "q")
+    lurek.input.bind("quit",  "escape")
 
     -- Particles — hit sparks (orange)
     hit_sparks = lurek.particle.newSystem({

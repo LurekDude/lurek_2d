@@ -296,6 +296,7 @@ do
   local room = lurek.network.createRoom("casual", "hostB", 3)
   local joined = lurek.network.joinRoom(room.id)
   if joined then
+    ---@diagnostic disable-next-line: undefined-field
     lurek.log.debug("joined room=" .. joined.id .. " count=" .. joined.player_count, "match")
   end
 end
@@ -322,6 +323,7 @@ do
   local room = lurek.network.createRoom("coop", "hostC", 3)
   local _ = lurek.network.joinRoom(room.id)
   local left = lurek.network.leaveRoom(room.id)
+  ---@diagnostic disable-next-line: undefined-field
   if left then lurek.log.debug("left room=" .. left.id, "match") end
 end
 ```

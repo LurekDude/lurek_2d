@@ -191,7 +191,7 @@ end
 
 -- Array methods
 
---@api-stub: Array:getShape
+--@api-stub: LArray:getShape
 -- Returns the shape of this array
 do
   -- getShape() returns a table of dimension sizes.
@@ -202,7 +202,7 @@ do
   lurek.log.info("grid is " .. shape[1] .. "x" .. shape[2], "compute")
 end
 
---@api-stub: Array:getDimensions
+--@api-stub: LArray:getDimensions
 -- Returns the number of dimensions of this array
 do
   -- getDimensions() returns 1 for vectors, 2 for matrices, etc.
@@ -213,7 +213,7 @@ do
   end
 end
 
---@api-stub: Array:getSize
+--@api-stub: LArray:getSize
 -- Returns the total number of elements in this array
 do
   -- getSize() returns the product of all dimensions.
@@ -223,7 +223,7 @@ do
   lurek.log.info("img has " .. n .. " pixels", "compute")
 end
 
---@api-stub: Array:getDataType
+--@api-stub: LArray:getDataType
 -- Returns the data type of this array
 do
   -- getDataType() returns "float32", "int32", etc.
@@ -234,7 +234,7 @@ do
   if dt == "int32" then lurek.log.info("ready for bitwise ops", "compute") end
 end
 
---@api-stub: Array:isOnGPU
+--@api-stub: LArray:isOnGPU
 -- Returns true if this array is stored on the GPU
 do
   -- isOnGPU() lets you check whether data lives on CPU or GPU memory.
@@ -246,7 +246,7 @@ do
   end
 end
 
---@api-stub: Array:get
+--@api-stub: LArray:get
 -- Returns the element value at the given indices
 do
   pcall(function()
@@ -260,7 +260,7 @@ do
   end)
 end
 
---@api-stub: Array:set
+--@api-stub: LArray:set
 -- Sets the element value at the given indices
 do
   -- set(i, j, ..., value) writes a single element.
@@ -272,7 +272,7 @@ do
   lurek.log.info("centre = " .. board:get(2, 2), "compute")
 end
 
---@api-stub: Array:toTable
+--@api-stub: LArray:toTable
 -- Converts this array to a flat Lua table
 do
   -- toTable() extracts all values as a flat Lua table in storage order.
@@ -283,7 +283,7 @@ do
   lurek.log.info("flat[3] = " .. flat[3] .. ", count=" .. #flat, "compute")
 end
 
---@api-stub: Array:reshape
+--@api-stub: LArray:reshape
 -- Returns a reshaped copy of this array
 do
   -- reshape(shape) reinterprets the flat data with new dimensions.
@@ -296,7 +296,7 @@ do
   lurek.log.info("grid[2,3] = " .. grid:get(2, 3), "compute")
 end
 
---@api-stub: Array:clone
+--@api-stub: LArray:clone
 -- Returns a deep copy of this array
 do
   -- clone() creates an independent copy. Mutations to the clone
@@ -310,7 +310,7 @@ do
   lurek.log.info("orig sum=" .. original:sum() .. " copy sum=" .. copy:sum(), "compute")
 end
 
---@api-stub: Array:transpose
+--@api-stub: LArray:transpose
 -- Returns a transposed copy of this 2D array
 do
   -- transpose() swaps rows and columns of a 2D array.
@@ -321,7 +321,7 @@ do
   lurek.log.info("t shape: " .. t:getShape()[1] .. "x" .. t:getShape()[2], "compute")
 end
 
---@api-stub: Array:fill
+--@api-stub: LArray:fill
 -- Fills all elements of this array with a single value (in place)
 do
   -- fill(val) overwrites every element. Use to reset a scratch buffer
@@ -333,7 +333,7 @@ do
   lurek.log.info("scratch sum after fill: " .. scratch:sum(), "compute")
 end
 
---@api-stub: Array:pow
+--@api-stub: LArray:pow
 -- Returns a new array with each element raised to an exponent
 do
   -- pow(exp) applies element-wise exponentiation.
@@ -344,7 +344,7 @@ do
   lurek.log.info("4^2 = " .. sq:get(4), "compute")
 end
 
---@api-stub: Array:sqrt
+--@api-stub: LArray:sqrt
 -- Returns a new array with element-wise square roots
 do
   -- sqrt() computes the square root of each element.
@@ -354,7 +354,7 @@ do
   lurek.log.info("sqrt(16) = " .. roots:get(4), "compute")
 end
 
---@api-stub: Array:abs
+--@api-stub: LArray:abs
 -- Returns a new array with element-wise absolute values
 do
   -- abs() removes sign from each element.
@@ -364,7 +364,7 @@ do
   lurek.log.info("abs sum = " .. mag:sum(), "compute")
 end
 
---@api-stub: Array:neg
+--@api-stub: LArray:neg
 -- Returns a new array with each element negated
 do
   -- neg() flips the sign of every element.
@@ -374,7 +374,7 @@ do
   lurek.log.info("counter[1] = " .. counter:get(1), "compute")
 end
 
---@api-stub: Array:clamp
+--@api-stub: LArray:clamp
 -- Returns a new array with values clamped between min and max
 do
   -- clamp(min, max) bounds every element.
@@ -386,7 +386,7 @@ do
   lurek.log.info("clamped max = " .. clamped:max(), "compute")
 end
 
---@api-stub: Array:threshold
+--@api-stub: LArray:threshold
 -- Returns a mask array where values above the threshold become 1, else 0
 do
   -- threshold(val) creates a binary mask: 1 where element > val, else 0.
@@ -398,7 +398,7 @@ do
   lurek.log.info("cells visible: " .. visible:sum(), "compute")
 end
 
---@api-stub: Array:countNonZero
+--@api-stub: LArray:countNonZero
 -- Returns the count of non-zero elements
 do
   -- countNonZero() counts elements that are not exactly 0.
@@ -408,7 +408,7 @@ do
   lurek.log.info("occupied tiles: " .. live, "compute")
 end
 
---@api-stub: Array:argmin
+--@api-stub: LArray:argmin
 -- Returns the 1-based flat index of the minimum element
 do
   -- argmin() finds WHERE the minimum is, not what it is.
@@ -418,7 +418,7 @@ do
   lurek.log.info("nearest enemy index: " .. nearest, "ai")
 end
 
---@api-stub: Array:argmax
+--@api-stub: LArray:argmax
 -- Returns the 1-based flat index of the maximum element
 do
   -- argmax() finds WHERE the maximum is.
@@ -428,7 +428,7 @@ do
   lurek.log.info("AI picks action " .. choice, "ai")
 end
 
---@api-stub: Array:any
+--@api-stub: LArray:any
 -- Returns true if any element is non-zero
 do
   -- any() is a fast existence check.
@@ -439,7 +439,7 @@ do
   end
 end
 
---@api-stub: Array:all
+--@api-stub: LArray:all
 -- Returns true if all elements are non-zero
 do
   -- all() checks that every element passes.
@@ -450,7 +450,7 @@ do
   end
 end
 
---@api-stub: Array:sum
+--@api-stub: LArray:sum
 -- Returns the total sum of all elements (or sum along an axis)
 do
   -- sum() with no argument reduces the entire array to a scalar.
@@ -460,7 +460,7 @@ do
   lurek.log.info("total damage: " .. total, "compute")
 end
 
---@api-stub: Array:mean
+--@api-stub: LArray:mean
 -- Returns the arithmetic mean of all elements (or mean along an axis)
 do
   -- mean() computes the average. Use for frame time monitoring,
@@ -470,7 +470,7 @@ do
   lurek.log.info("avg frame ms: " .. avg, "perf")
 end
 
---@api-stub: Array:min
+--@api-stub: LArray:min
 -- Returns the minimum element value (or minimum along an axis)
 do
   -- min() finds the smallest value across the array.
@@ -480,7 +480,7 @@ do
   lurek.log.info("cheapest cost: " .. cheapest, "compute")
 end
 
---@api-stub: Array:max
+--@api-stub: LArray:max
 -- Returns the maximum element value (or maximum along an axis)
 do
   -- max() finds the largest value.
@@ -490,7 +490,7 @@ do
   lurek.log.info("worst latency: " .. worst .. "ms", "net")
 end
 
---@api-stub: Array:matmul
+--@api-stub: LArray:matmul
 -- Performs matrix multiplication with another 2D array
 do
   -- matmul(other) computes the standard matrix product (A * B).
@@ -504,7 +504,7 @@ do
   lurek.log.info("c[1,1] = " .. c:get(1, 1), "compute")
 end
 
---@api-stub: Array:dot
+--@api-stub: LArray:dot
 -- Computes the dot product with another 1D array
 do
   -- dot(other) computes the scalar dot product of two vectors.
@@ -517,7 +517,7 @@ do
   lurek.log.info("alignment: " .. alignment, "ai")
 end
 
---@api-stub: Array:bitwiseAnd
+--@api-stub: LArray:bitwiseAnd
 -- Returns element-wise bitwise AND with another int32 array
 do
   -- bitwiseAnd(other) combines bit flags between two mask arrays.
@@ -530,7 +530,7 @@ do
   lurek.log.info("walkable AND lit count: " .. both:countNonZero(), "tiles")
 end
 
---@api-stub: Array:bitwiseOr
+--@api-stub: LArray:bitwiseOr
 -- Returns element-wise bitwise OR with another int32 array
 do
   -- bitwiseOr(other) merges bit flags. Use to combine visibility layers.
@@ -542,7 +542,7 @@ do
   lurek.log.info("seen-tile count: " .. seen:countNonZero(), "fov")
 end
 
---@api-stub: Array:bitwiseXor
+--@api-stub: LArray:bitwiseXor
 -- Returns element-wise bitwise XOR with another int32 array
 do
   -- bitwiseXor(other) finds bits that differ between frames.
@@ -555,7 +555,7 @@ do
   lurek.log.info("cells changed: " .. changed:countNonZero(), "tiles")
 end
 
---@api-stub: Array:bitwiseNot
+--@api-stub: LArray:bitwiseNot
 -- Returns element-wise bitwise NOT of this int32 array
 do
   -- bitwiseNot() inverts all bits. For simple 0/1 masks, this flips the mask.
@@ -565,7 +565,7 @@ do
   lurek.log.info("free mask[2] = " .. free:get(2), "tiles")
 end
 
---@api-stub: Array:bitwiseLShift
+--@api-stub: LArray:bitwiseLShift
 -- Returns element-wise left bit shift by a given amount
 do
   -- bitwiseLShift(amount) shifts each int32 element left.
@@ -577,7 +577,7 @@ do
   lurek.log.info("packed[2] = " .. packed:get(2), "compute")
 end
 
---@api-stub: Array:bitwiseRShift
+--@api-stub: LArray:bitwiseRShift
 -- Returns element-wise right bit shift by a given amount
 do
   -- bitwiseRShift(amount) shifts each int32 element right.
@@ -589,7 +589,7 @@ do
   lurek.log.info("high[3] = " .. high:get(3), "compute")
 end
 
---@api-stub: Array:convolve2D
+--@api-stub: LArray:convolve2D
 -- Applies a 2D convolution kernel to this array
 do
   -- convolve2D(kernel) slides a kernel over the 2D array.
@@ -603,7 +603,7 @@ do
   lurek.log.info("blurred mean = " .. blurred:mean(), "compute")
 end
 
---@api-stub: Array:dilate
+--@api-stub: LArray:dilate
 -- Applies morphological dilation with a given radius
 do
   -- dilate(radius) expands non-zero regions outward.
@@ -617,7 +617,7 @@ do
   lurek.log.info("grown nonzero: " .. grown:countNonZero(), "compute")
 end
 
---@api-stub: Array:erode
+--@api-stub: LArray:erode
 -- Applies morphological erosion with a given radius
 do
   -- erode(radius) shrinks non-zero regions inward.
@@ -630,7 +630,7 @@ do
   lurek.log.info("interior cells: " .. interior:countNonZero(), "compute")
 end
 
---@api-stub: Array:cumsum
+--@api-stub: LArray:cumsum
 -- Returns the cumulative sum (prefix sum) of this array
 do
   -- cumsum() computes running totals. Element i = sum of elements 1..i.
@@ -642,7 +642,7 @@ do
   lurek.log.info("score after 3rd round = " .. running:get(3), "score")
 end
 
---@api-stub: Array:diff
+--@api-stub: LArray:diff
 -- Returns finite differences (velocity from position, acceleration from velocity)
 do
   -- diff(order?) computes element-to-element differences.
@@ -655,7 +655,7 @@ do
   lurek.log.info("vel[2] = " .. vel:get(2), "compute")
 end
 
---@api-stub: Array:percentile
+--@api-stub: LArray:percentile
 -- Returns a percentile value from the array data
 do
   -- percentile(p) finds the value below which p% of data falls.
@@ -667,7 +667,7 @@ do
   lurek.log.info("frame p95 = " .. p95 .. "ms", "perf")
 end
 
---@api-stub: Array:covariance
+--@api-stub: LArray:covariance
 -- Computes covariance with another array
 do
   -- covariance(other) measures how two variables change together.
@@ -680,7 +680,7 @@ do
   lurek.log.info("cov(x,y) = " .. cov, "compute")
 end
 
---@api-stub: Array:pearsonCorr
+--@api-stub: LArray:pearsonCorr
 -- Computes Pearson correlation coefficient with another array
 do
   -- pearsonCorr(other) returns a value in [-1, 1].
@@ -694,7 +694,7 @@ do
   lurek.log.info("fps vs entity correlation: " .. r, "perf")
 end
 
---@api-stub: Array:normalizeRange
+--@api-stub: LArray:normalizeRange
 -- Returns values rescaled to a target [lo, hi] range
 do
   -- normalizeRange(lo, hi) maps the array's min to lo and max to hi.
@@ -707,7 +707,7 @@ do
   lurek.log.info("unit min=" .. unit:min() .. " max=" .. unit:max(), "compute")
 end
 
---@api-stub: Array:zscore
+--@api-stub: LArray:zscore
 -- Returns z-score normalized values (mean=0, std=1)
 do
   -- zscore() standardizes data: (value - mean) / std_deviation.
@@ -720,7 +720,7 @@ do
   lurek.log.info("z[1] = " .. z:get(1), "compute")
 end
 
---@api-stub: Array:convolve1d
+--@api-stub: LArray:convolve1d
 -- Applies a 1D convolution kernel to this array
 do
   -- convolve1d(kernel) slides a 1D kernel along the array.
@@ -733,7 +733,7 @@ do
   lurek.log.info("smoothed length: " .. smoothed:getSize(), "compute")
 end
 
---@api-stub: Array:correlate1d
+--@api-stub: LArray:correlate1d
 -- Computes 1D cross-correlation with a template array
 do
   -- correlate1d(template) measures how well the template matches at each position.
@@ -746,7 +746,7 @@ do
   lurek.log.info("best match index: " .. match:argmax(), "compute")
 end
 
---@api-stub: Array:normalizeVec
+--@api-stub: LArray:normalizeVec
 -- Returns this vector normalized to unit length
 do
   -- normalizeVec() divides by the vector's magnitude so length becomes 1.
@@ -758,7 +758,7 @@ do
   lurek.log.info("unit[1]^2 + unit[2]^2 = " .. unit:pow(2):sum(), "compute")
 end
 
---@api-stub: Array:outer
+--@api-stub: LArray:outer
 -- Computes the outer product of two vectors (result is a matrix)
 do
   -- outer(other) produces a matrix where result[i,j] = self[i] * other[j].
@@ -771,7 +771,7 @@ do
   lurek.log.info("outer[2,2] = " .. mat:get(2, 2), "compute")
 end
 
---@api-stub: Array:cross2d
+--@api-stub: LArray:cross2d
 -- Computes the 2D cross product (scalar) with another 2D vector
 do
   -- cross2d(other) returns the z-component of the 3D cross product.
@@ -785,7 +785,7 @@ do
   lurek.log.info("turn direction: " .. (cross > 0 and "left" or "right"), "ai")
 end
 
---@api-stub: Array:transformPoints
+--@api-stub: LArray:transformPoints
 -- Transforms point rows by this matrix (rotation, affine, etc.)
 do
   pcall(function()
@@ -801,7 +801,7 @@ do
   end)
 end
 
---@api-stub: Array:sobel
+--@api-stub: LArray:sobel
 -- Computes Sobel edge-detection gradients (returns {gx, gy} table)
 do
   -- sobel() returns a table with .gx and .gy gradient arrays.
@@ -812,7 +812,7 @@ do
   lurek.log.info("gx[2,2] = " .. g.gx:get(2, 2) .. " gy[2,2] = " .. g.gy:get(2, 2), "compute")
 end
 
---@api-stub: Array:linsolve
+--@api-stub: LArray:linsolve
 -- Solves the linear system Ax = b for x
 do
   -- linsolve(b) solves the equation self*x = b using LU decomposition.
@@ -826,7 +826,7 @@ do
   lurek.log.info("x[1] = " .. x:get(1) .. " x[2] = " .. x:get(2), "compute")
 end
 
---@api-stub: Array:luDecompose
+--@api-stub: LArray:luDecompose
 -- Returns LU decomposition data for this square matrix
 do
   -- luDecompose() factorizes a square matrix into L and U factors.
@@ -837,7 +837,7 @@ do
   lurek.log.info("LU n=" .. lu.n .. " det_sign=" .. lu.det_sign, "compute")
 end
 
---@api-stub: Array:type
+--@api-stub: LArray:type
 -- Returns the Lua-visible type name string for this array handle
 do
   -- type() returns the string "LArray" for any compute array.
@@ -847,7 +847,7 @@ do
   if kind == "LArray" then lurek.log.debug("got an Array", "compute") end
 end
 
---@api-stub: Array:typeOf
+--@api-stub: LArray:typeOf
 -- Returns true if this array handle matches the given type name string
 do
   -- typeOf(name) accepts "LArray", "Array", or "Object" — all return true.
@@ -858,7 +858,7 @@ do
   end
 end
 
---@api-stub: Array:map
+--@api-stub: LArray:map
 -- Applies a Lua function to each element, returning a new array
 do
   -- map(func) calls func(element) for every value and stores the result.
@@ -869,7 +869,7 @@ do
   lurek.log.debug("map sqrt: " .. tostring(b:toTable()[1]), "compute")
 end
 
---@api-stub: Array:eval
+--@api-stub: LArray:eval
 -- Evaluates a Lua expression string on each element (x = current value)
 do
   -- eval(expr) compiles the expression once and applies it per element.
@@ -882,7 +882,7 @@ do
   lurek.log.debug("eval x^2+1: " .. tostring(b:toTable()[2]), "compute")
 end
 
---@api-stub: Array:reduce
+--@api-stub: LArray:reduce
 -- Reduces all elements to a single value using an accumulator function
 do
   -- reduce(func, init) folds left: acc = func(acc, element) for each element.
@@ -894,7 +894,7 @@ do
   lurek.log.debug("reduce sum: " .. tostring(total), "compute")
 end
 
---@api-stub: Array:scan
+--@api-stub: LArray:scan
 -- Produces a prefix-scan array using an accumulator function
 do
   -- scan(func, init) is like reduce but keeps every intermediate accumulator value.
@@ -908,7 +908,7 @@ do
 end
 
 
---@api-stub: Array:eigenPower
+--@api-stub: LArray:eigenPower
 -- Estimates the dominant eigenvalue and eigenvector via power iteration
 do
   -- eigenPower(max_iter?, tol?) finds the largest eigenvalue of a square matrix.
@@ -921,7 +921,7 @@ do
   lurek.log.info("dominant eigenvalue: " .. result.value, "compute")
 end
 
---@api-stub: Array:floodFill
+--@api-stub: LArray:floodFill
 -- Fills connected cells from a start position with a replacement value
 do
   -- floodFill(row, col, val) fills connected cells that share the same value
@@ -938,7 +938,7 @@ do
   lurek.log.info("filled[3,3] = " .. tostring(filled:get(3, 3)), "compute")
 end
 
---@api-stub: Array:getRegion
+--@api-stub: LArray:getRegion
 -- Extracts a rectangular sub-region from this 2D array
 do
   -- getRegion(row, col, rows, cols) copies a rectangular patch.
@@ -951,7 +951,7 @@ do
   lurek.log.info("patch shape: " .. patch:getShape()[1] .. "x" .. patch:getShape()[2], "compute")
 end
 
---@api-stub: Array:histogram
+--@api-stub: LArray:histogram
 -- Computes a histogram of values across the given number of bins
 do
   -- histogram(bins, lo?, hi?) groups values into bins and counts occurrences.
@@ -964,7 +964,7 @@ do
   lurek.log.info("hist bins: " .. #hist .. ", first count: " .. hist[1].count, "compute")
 end
 
---@api-stub: Array:setRegion
+--@api-stub: LArray:setRegion
 -- Writes a source array into this array at a given position (in place)
 do
   -- setRegion(row, col, source) pastes a smaller array into this one.
@@ -978,7 +978,7 @@ do
   lurek.log.info("canvas[7,7] after stamp = " .. canvas:get(7, 7), "compute")
 end
 
---@api-stub: Array:where
+--@api-stub: LArray:where
 -- Selects values from this array or another based on a mask
 do
   -- where(mask, other) picks from self where mask is non-zero,
@@ -995,7 +995,7 @@ do
   lurek.log.info("where filtered sum: " .. result:sum(), "compute")
 end
 
---@api-stub: Array:add
+--@api-stub: LArray:add
 -- Returns element-wise addition with an array or scalar
 do
   -- add(value) adds either a scalar or another array element-wise.
@@ -1008,7 +1008,7 @@ do
   lurek.log.info("add row-broadcast [2,2] = " .. out:get(2, 2), "compute")
 end
 
---@api-stub: Array:sub
+--@api-stub: LArray:sub
 -- Returns element-wise subtraction with an array or scalar
 do
   -- sub(value) subtracts a scalar or array.
@@ -1019,7 +1019,7 @@ do
   lurek.log.info("sub result first = " .. after:get(1), "compute")
 end
 
---@api-stub: Array:mul
+--@api-stub: LArray:mul
 -- Returns element-wise multiplication with an array or scalar
 do
   -- mul(value) multiplies by a scalar or array.
@@ -1030,7 +1030,7 @@ do
   lurek.log.info("crit total = " .. crit:sum(), "compute")
 end
 
---@api-stub: Array:div
+--@api-stub: LArray:div
 -- Returns element-wise division with an array or scalar
 do
   -- div(value) divides by a scalar or array.
@@ -1041,7 +1041,7 @@ do
   lurek.log.info("sec[1] = " .. sec:get(1), "compute")
 end
 
---@api-stub: Array:eq
+--@api-stub: LArray:eq
 -- Returns a mask array where elements equal the given value
 do
   -- eq(value) returns 1 where elements match, 0 elsewhere.
@@ -1053,7 +1053,7 @@ do
   lurek.log.info("wall count = " .. walls:countNonZero(), "compute")
 end
 
---@api-stub: Array:neq
+--@api-stub: LArray:neq
 -- Returns a mask array where elements do not equal the given value
 do
   -- neq(value) is the inverse of eq(): 1 where elements differ from value.
@@ -1063,7 +1063,7 @@ do
   lurek.log.info("non-2 count = " .. non_two:countNonZero(), "compute")
 end
 
---@api-stub: Array:gt
+--@api-stub: LArray:gt
 -- Returns a mask array where elements are greater than the value
 do
   -- gt(value) creates a binary mask for "above threshold" queries.
@@ -1073,7 +1073,7 @@ do
   lurek.log.info("hot cells = " .. hot:countNonZero(), "compute")
 end
 
---@api-stub: Array:lt
+--@api-stub: LArray:lt
 -- Returns a mask array where elements are less than the value
 do
   -- lt(value) creates a binary mask for "below threshold" queries.
@@ -1083,7 +1083,7 @@ do
   lurek.log.info("low stamina count = " .. low:countNonZero(), "compute")
 end
 
---@api-stub: Array:gte
+--@api-stub: LArray:gte
 -- Returns a mask array where elements are greater than or equal to the value
 do
   -- gte(value) includes the boundary value in the mask.
@@ -1092,7 +1092,7 @@ do
   lurek.log.info("far targets = " .. far:countNonZero(), "compute")
 end
 
---@api-stub: Array:lte
+--@api-stub: LArray:lte
 -- Returns a mask array where elements are less than or equal to the value
 do
   -- lte(value) includes the boundary value in the mask.
@@ -1155,543 +1155,3 @@ do
 end
 
 print("content/examples/compute.lua")
-
--- ---- Stub: LArray:add -------------------------------------------------------
---@api-stub: LArray:add
--- Returns a new array with element-wise addition of self and other.
--- TODO: replace this stub with a real scenario.
--- local c = a:add(b)  -- -> LArray (new allocation, self unchanged)
-
--- ---- Stub: LArray:sub -------------------------------------------------------
---@api-stub: LArray:sub
--- Returns a new array with element-wise subtraction of other from self.
--- TODO: replace this stub with a real scenario.
--- local c = a:sub(b)  -- -> LArray (new allocation, self unchanged)
-
--- ---- Stub: LArray:mul -------------------------------------------------------
---@api-stub: LArray:mul
--- Returns a new array with element-wise multiplication of self and other.
--- TODO: replace this stub with a real scenario.
--- local c = a:mul(b)  -- -> LArray (new allocation, self unchanged)
-
--- ---- Stub: LArray:div -------------------------------------------------------
---@api-stub: LArray:div
--- Returns a new array with element-wise division of self by other.
--- TODO: replace this stub with a real scenario.
--- local c = a:div(b)  -- -> LArray (new allocation, self unchanged)
-
--- =============================================================================
--- STUBS: 72 uncovered lurek.compute API item(s)
--- Generated by tools/audit/example_add_missing.py
--- REQUIRED: replace every --@api-stub: block below with a real scenario.
--- Run .github/prompts/flesh-out-example.prompt.md for instructions.
--- The final committed file must contain ZERO --@api-stub: lines.
--- =============================================================================
-
--- -----------------------------------------------------------------------------
--- LArray methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LArray:getShape -----------------------------------------------
---@api-stub: LArray:getShape
--- Returns the array shape as one-based dimension table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:getShape()  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:getDimensions ------------------------------------------
---@api-stub: LArray:getDimensions
--- Returns the number of array dimensions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:getDimensions()  -- -> integer
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:getSize ------------------------------------------------
---@api-stub: LArray:getSize
--- Returns the total number of array elements.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:getSize()  -- -> integer
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:getDataType --------------------------------------------
---@api-stub: LArray:getDataType
--- Returns the array data type name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:getDataType()  -- -> string
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:isOnGPU ------------------------------------------------
---@api-stub: LArray:isOnGPU
--- Returns whether this array is currently stored on the GPU.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:isOnGPU()  -- -> boolean
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:get ----------------------------------------------------
---@api-stub: LArray:get
--- Reads an array element using one-based indices.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:get(...)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:set ----------------------------------------------------
---@api-stub: LArray:set
--- Writes an array element using one-based indices followed by the value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:set(...)
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:toTable ------------------------------------------------
---@api-stub: LArray:toTable
--- Returns array values flattened into a Lua table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:toTable()  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:reshape ------------------------------------------------
---@api-stub: LArray:reshape
--- Returns a reshaped copy of this array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:reshape(shape)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:clone --------------------------------------------------
---@api-stub: LArray:clone
--- Returns a copy of this array. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:clone()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:transpose ----------------------------------------------
---@api-stub: LArray:transpose
--- Returns a transposed copy of a two-dimensional array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:transpose()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:fill ---------------------------------------------------
---@api-stub: LArray:fill
--- Fills this array in place with one value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:fill(val)
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:pow ----------------------------------------------------
---@api-stub: LArray:pow
--- Returns this array raised element-wise to a scalar exponent.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:pow(exp)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:sqrt ---------------------------------------------------
---@api-stub: LArray:sqrt
--- Returns element-wise square roots.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:sqrt()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:abs ----------------------------------------------------
---@api-stub: LArray:abs
--- Returns element-wise absolute values.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:abs()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:neg ----------------------------------------------------
---@api-stub: LArray:neg
--- Returns element-wise negated values.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:neg()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:clamp --------------------------------------------------
---@api-stub: LArray:clamp
--- Returns values clamped between minimum and maximum bounds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:clamp(min, max)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:eq -----------------------------------------------------
---@api-stub: LArray:eq
--- Returns element-wise equality comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:eq()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:neq ----------------------------------------------------
---@api-stub: LArray:neq
--- Returns element-wise inequality comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:neq()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:gt -----------------------------------------------------
---@api-stub: LArray:gt
--- Returns element-wise greater-than comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:gt()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:lt -----------------------------------------------------
---@api-stub: LArray:lt
--- Returns element-wise less-than comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:lt()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:gte ----------------------------------------------------
---@api-stub: LArray:gte
--- Returns element-wise greater-or-equal comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:gte()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:lte ----------------------------------------------------
---@api-stub: LArray:lte
--- Returns element-wise less-or-equal comparison with an array or scalar.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:lte()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:threshold ----------------------------------------------
---@api-stub: LArray:threshold
--- Returns a mask array where values above a threshold are selected.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:threshold(val)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:where --------------------------------------------------
---@api-stub: LArray:where
--- Selects values from this array or another array using a mask array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:where(mask, other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:countNonZero -------------------------------------------
---@api-stub: LArray:countNonZero
--- Counts non-zero elements. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:countNonZero()  -- -> integer
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:argmin -------------------------------------------------
---@api-stub: LArray:argmin
--- Returns the one-based flat index of the minimum value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:argmin()  -- -> integer
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:argmax -------------------------------------------------
---@api-stub: LArray:argmax
--- Returns the one-based flat index of the maximum value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:argmax()  -- -> integer
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:any ----------------------------------------------------
---@api-stub: LArray:any
--- Returns whether any element is non-zero.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:any()  -- -> boolean
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:all ----------------------------------------------------
---@api-stub: LArray:all
--- Returns whether all elements are non-zero.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:all()  -- -> boolean
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:sum ----------------------------------------------------
---@api-stub: LArray:sum
--- Returns total sum or a summed array along a one-based axis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:sum([axis])  -- -> LuaValue
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:mean ---------------------------------------------------
---@api-stub: LArray:mean
--- Returns total mean or a mean array along a one-based axis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:mean([axis])  -- -> LuaValue
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:min ----------------------------------------------------
---@api-stub: LArray:min
--- Returns total minimum or a minimum array along a one-based axis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:min([axis])  -- -> LuaValue
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:max ----------------------------------------------------
---@api-stub: LArray:max
--- Returns total maximum or a maximum array along a one-based axis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:max([axis])  -- -> LuaValue
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:matmul -------------------------------------------------
---@api-stub: LArray:matmul
--- Returns matrix multiplication of this array and another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:matmul(other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:dot ----------------------------------------------------
---@api-stub: LArray:dot
--- Returns dot product with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:dot(other)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseAnd ---------------------------------------------
---@api-stub: LArray:bitwiseAnd
--- Returns element-wise bitwise AND with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseAnd(other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseOr ----------------------------------------------
---@api-stub: LArray:bitwiseOr
--- Returns element-wise bitwise OR with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseOr(other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseXor ---------------------------------------------
---@api-stub: LArray:bitwiseXor
--- Returns element-wise bitwise XOR with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseXor(other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseNot ---------------------------------------------
---@api-stub: LArray:bitwiseNot
--- Returns element-wise bitwise NOT.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseNot()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseLShift ------------------------------------------
---@api-stub: LArray:bitwiseLShift
--- Returns element-wise left shift by a bit count.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseLShift(amount)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:bitwiseRShift ------------------------------------------
---@api-stub: LArray:bitwiseRShift
--- Returns element-wise right shift by a bit count.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:bitwiseRShift(amount)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:convolve2D ---------------------------------------------
---@api-stub: LArray:convolve2D
--- Returns two-dimensional convolution with a kernel array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:convolve2D(kernel)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:dilate -------------------------------------------------
---@api-stub: LArray:dilate
--- Returns morphological dilation with a radius.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:dilate(24.0)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:erode --------------------------------------------------
---@api-stub: LArray:erode
--- Returns morphological erosion with a radius.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:erode(24.0)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:floodFill ----------------------------------------------
---@api-stub: LArray:floodFill
--- Returns a flood-filled copy starting at a one-based row and column.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:floodFill(row, col, val)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:getRegion ----------------------------------------------
---@api-stub: LArray:getRegion
--- Returns a rectangular region from this array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:getRegion(row, col, rows, cols)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:setRegion ----------------------------------------------
---@api-stub: LArray:setRegion
--- Writes a source array into this array at a one-based row and column.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:setRegion(row, col, source)
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:cumsum -------------------------------------------------
---@api-stub: LArray:cumsum
--- Returns cumulative sum over the flattened array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:cumsum()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:diff ---------------------------------------------------
---@api-stub: LArray:diff
--- Returns finite differences over the flattened array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:diff([order])  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:histogram ----------------------------------------------
---@api-stub: LArray:histogram
--- Returns histogram bins for the array values.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:histogram(bins, [lo], [hi])  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:percentile ---------------------------------------------
---@api-stub: LArray:percentile
--- Returns a percentile value from the array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:percentile(p)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:covariance ---------------------------------------------
---@api-stub: LArray:covariance
--- Returns covariance with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:covariance(other)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:pearsonCorr --------------------------------------------
---@api-stub: LArray:pearsonCorr
--- Returns Pearson correlation with another array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:pearsonCorr(other)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:normalizeRange -----------------------------------------
---@api-stub: LArray:normalizeRange
--- Returns array values normalized into a target range.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:normalizeRange(lo, hi)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:zscore -------------------------------------------------
---@api-stub: LArray:zscore
--- Returns z-score normalized array values.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:zscore()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:convolve1d ---------------------------------------------
---@api-stub: LArray:convolve1d
--- Returns one-dimensional convolution with a kernel array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:convolve1d(kernel)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:correlate1d --------------------------------------------
---@api-stub: LArray:correlate1d
--- Returns one-dimensional correlation with a template array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:correlate1d(template)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:normalizeVec -------------------------------------------
---@api-stub: LArray:normalizeVec
--- Returns this vector normalized to unit length.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:normalizeVec()  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:outer --------------------------------------------------
---@api-stub: LArray:outer
--- Returns outer product with another vector array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:outer(other)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:cross2d ------------------------------------------------
---@api-stub: LArray:cross2d
--- Returns two-dimensional cross product with another vector.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:cross2d(other)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:transformPoints ----------------------------------------
---@api-stub: LArray:transformPoints
--- Transforms a point array by this transform matrix.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:transformPoints(pts)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:sobel --------------------------------------------------
---@api-stub: LArray:sobel
--- Computes Sobel gradients for this array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:sobel()  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:linsolve -----------------------------------------------
---@api-stub: LArray:linsolve
--- Solves a linear system using this matrix and a right-hand side array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:linsolve(0.2)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:luDecompose --------------------------------------------
---@api-stub: LArray:luDecompose
--- Decomposes this matrix into LU data and permutation metadata.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:luDecompose()  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:eigenPower ---------------------------------------------
---@api-stub: LArray:eigenPower
--- Estimates dominant eigenvalue and eigenvector using power iteration.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:eigenPower([max_iter], [tol])  -- -> table
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:map ----------------------------------------------------
---@api-stub: LArray:map
--- Maps each element through a Lua function and returns a new array.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:map(func)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:eval ---------------------------------------------------
---@api-stub: LArray:eval
--- Maps each element through a Lua expression compiled as `function(x) return expression end`.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:eval(expr)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:reduce -------------------------------------------------
---@api-stub: LArray:reduce
--- Reduces array values with a Lua accumulator function.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:reduce(func, init)  -- -> number
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:scan ---------------------------------------------------
---@api-stub: LArray:scan
--- Produces prefix accumulator values with a Lua function.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:scan(func, init)  -- -> LArray
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:type ---------------------------------------------------
---@api-stub: LArray:type
--- Returns the Lua-visible type name for this array handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:type()  -- -> string
--- (replace lArray_stub with your real LArray instance above)
-
--- ---- Stub: LArray:typeOf -------------------------------------------------
---@api-stub: LArray:typeOf
--- Returns whether this array handle matches a supported type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lArray_stub:typeOf("hero")  -- -> boolean
--- (replace lArray_stub with your real LArray instance above)

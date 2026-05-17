@@ -12,7 +12,8 @@ do
     if not ok_jump then return end
 
     -- Streaming source for background music — low memory, reads file progressively.
-    local music = lurek.audio.newSource("music/level.mp3")
+    local ok_music, music = pcall(lurek.audio.newSource, "music/level.mp3")
+    if not ok_music then return end
 
     -- Loop the music so it repeats until explicitly stopped.
     lurek.audio.setLooping(music, true)
@@ -23,7 +24,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.play
+--@api-stub: LSoundPool:play
 -- Starts playback of a source by handle, optionally routing through a named bus
 do
   function lurek.init()
@@ -39,7 +40,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.stop
+--@api-stub: LMidiPlayer:stop
 -- Stops playback of a source and resets its position to the beginning
 do
   function lurek.init()
@@ -54,7 +55,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setVolume
+--@api-stub: LSoundPool:setVolume
 -- Sets the volume of a source by handle
 do
   function lurek.init()
@@ -68,7 +69,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getVolume
+--@api-stub: LMidiPlayer:getVolume
 -- Returns the current volume of a source
 do
   function lurek.init()
@@ -83,7 +84,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.pause
+--@api-stub: LMidiPlayer:pause
 -- Pauses playback of a source at its current position
 do
   function lurek.init()
@@ -97,7 +98,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.resume
+--@api-stub: LBus:resume
 -- Resumes playback of a paused source
 do
   function lurek.init()
@@ -112,7 +113,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setPitch
+--@api-stub: LBus:setPitch
 -- Sets the pitch multiplier of a source, affecting playback speed and tone
 do
   function lurek.init()
@@ -126,7 +127,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getPitch
+--@api-stub: LBus:getPitch
 -- Returns the current pitch multiplier of a source
 do
   function lurek.init()
@@ -139,7 +140,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.isPlaying
+--@api-stub: LMidiPlayer:isPlaying
 -- Returns whether a source is currently playing
 do
   function lurek.init()
@@ -155,7 +156,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.isPaused
+--@api-stub: LMidiPlayer:isPaused
 -- Returns whether a source is currently paused
 do
   function lurek.init()
@@ -172,7 +173,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.isStopped
+--@api-stub: LSource:isStopped
 -- Returns whether a source is currently stopped
 do
   function lurek.init()
@@ -190,7 +191,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setLooping
+--@api-stub: LMidiPlayer:setLooping
 -- Enables or disables looping for a source
 do
   function lurek.init()
@@ -204,7 +205,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.isLooping
+--@api-stub: LMidiPlayer:isLooping
 -- Returns whether a source has looping enabled
 do
   function lurek.init()
@@ -232,7 +233,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setPan
+--@api-stub: LSource:setPan
 -- Sets the stereo panning of a source
 do
   function lurek.init()
@@ -246,7 +247,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getPan
+--@api-stub: LSource:getPan
 -- Returns the current stereo pan position of a source
 do
   function lurek.init()
@@ -322,7 +323,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.clone
+--@api-stub: LSource:clone
 -- Creates an independent copy of a source sharing the same audio data
 do
   function lurek.init()
@@ -351,7 +352,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.stopAll
+--@api-stub: LSoundPool:stopAll
 -- Stops all audio sources and resets their positions
 do
   function lurek.init()
@@ -380,7 +381,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.release
+--@api-stub: LDecoder:release
 -- Releases an audio source, freeing its memory and stopping playback
 do
   function lurek.init()
@@ -447,7 +448,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getDuration
+--@api-stub: LSoundData:getDuration
 -- Returns the total duration of a source in seconds
 do
   function lurek.init()
@@ -460,7 +461,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.tell
+--@api-stub: LDecoder:tell
 -- Returns the current playback position of a source in seconds
 do
   function lurek.init()
@@ -475,7 +476,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.seek
+--@api-stub: LDecoder:seek
 -- Seeks a source to a specific position in seconds
 do
   function lurek.init()
@@ -489,7 +490,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setLowpass
+--@api-stub: LSource:setLowpass
 -- Applies a lowpass filter to a source, attenuating high frequencies
 do
   function lurek.init()
@@ -504,7 +505,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.setHighpass
+--@api-stub: LSource:setHighpass
 -- Applies a highpass filter to a source, attenuating low frequencies
 do
   function lurek.init()
@@ -518,7 +519,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getLowpass
+--@api-stub: LSource:getLowpass
 -- Returns the current lowpass filter cutoff of a source
 do
   function lurek.init()
@@ -530,7 +531,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getHighpass
+--@api-stub: LSource:getHighpass
 -- Returns the current highpass filter cutoff of a source
 do
   function lurek.init()
@@ -542,7 +543,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.clearFilter
+--@api-stub: LSource:clearFilter
 -- Removes all frequency filters from a source
 do
   function lurek.init()
@@ -557,7 +558,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.fadeIn
+--@api-stub: LSource:fadeIn
 -- Sets the fade-in duration for a source so it ramps from silence on play
 do
   function lurek.init()
@@ -571,7 +572,7 @@ do
   end
 end
 
---@api-stub: lurek.audio.getFadeIn
+--@api-stub: LSource:getFadeIn
 -- Returns the configured fade-in duration of a source
 do
   function lurek.init()
@@ -1268,7 +1269,7 @@ end
 
 -- Source methods
 
---@api-stub: Source:play
+--@api-stub: LSoundPool:play
 -- Starts playback of on this source.
 do
   function lurek.init()
@@ -1281,7 +1282,7 @@ do
   end
 end
 
---@api-stub: Source:stop
+--@api-stub: LMidiPlayer:stop
 -- Stops the current operation or playback on this source.
 do
   function lurek.init()
@@ -1294,7 +1295,7 @@ do
   end
 end
 
---@api-stub: Source:pause
+--@api-stub: LMidiPlayer:pause
 -- Pauses the current operation or playback on this source.
 do
   function lurek.init()
@@ -1307,7 +1308,7 @@ do
   end
 end
 
---@api-stub: Source:resume
+--@api-stub: LBus:resume
 -- Resumes a previously paused operation or playback on this source.
 do
   function lurek.init()
@@ -1321,7 +1322,7 @@ do
   end
 end
 
---@api-stub: Source:setVolume
+--@api-stub: LSoundPool:setVolume
 -- Sets the volume of this source.
 do
   function lurek.init()
@@ -1334,7 +1335,7 @@ do
   end
 end
 
---@api-stub: Source:getVolume
+--@api-stub: LMidiPlayer:getVolume
 -- Returns the volume of this source.
 do
   function lurek.init()
@@ -1346,7 +1347,7 @@ do
   end
 end
 
---@api-stub: Source:setPitch
+--@api-stub: LBus:setPitch
 -- Sets the pitch of this source.
 do
   function lurek.init()
@@ -1359,7 +1360,7 @@ do
   end
 end
 
---@api-stub: Source:getPitch
+--@api-stub: LBus:getPitch
 -- Returns the pitch of this source.
 do
   function lurek.init()
@@ -1371,7 +1372,7 @@ do
   end
 end
 
---@api-stub: Source:setLooping
+--@api-stub: LMidiPlayer:setLooping
 -- Sets the looping of this source.
 do
   function lurek.init()
@@ -1383,7 +1384,7 @@ do
   end
 end
 
---@api-stub: Source:isLooping
+--@api-stub: LMidiPlayer:isLooping
 -- Returns true if this source looping.
 do
   function lurek.init()
@@ -1395,7 +1396,7 @@ do
   end
 end
 
---@api-stub: Source:isPlaying
+--@api-stub: LMidiPlayer:isPlaying
 -- Returns true if this source playing.
 do
   function lurek.init()
@@ -1407,7 +1408,7 @@ do
   end
 end
 
---@api-stub: Source:isPaused
+--@api-stub: LMidiPlayer:isPaused
 -- Returns true if this source paused.
 do
   function lurek.init()
@@ -1420,7 +1421,7 @@ do
   end
 end
 
---@api-stub: Source:isStopped
+--@api-stub: LSource:isStopped
 -- Returns true if this source stopped.
 do
   function lurek.init()
@@ -1433,7 +1434,7 @@ do
   end
 end
 
---@api-stub: Source:setPan
+--@api-stub: LSource:setPan
 -- Sets the pan of this source.
 do
   function lurek.init()
@@ -1446,7 +1447,7 @@ do
   end
 end
 
---@api-stub: Source:getPan
+--@api-stub: LSource:getPan
 -- Returns the pan of this source.
 do
   function lurek.init()
@@ -1458,7 +1459,7 @@ do
   end
 end
 
---@api-stub: Source:clone
+--@api-stub: LSource:clone
 -- Performs the clone operation on this source.
 do
   function lurek.init()
@@ -1472,7 +1473,7 @@ do
   end
 end
 
---@api-stub: Source:getType
+--@api-stub: LSource:getType
 -- Returns the type of this source.
 do
   function lurek.init()
@@ -1484,7 +1485,7 @@ do
   end
 end
 
---@api-stub: Source:getDuration
+--@api-stub: LSoundData:getDuration
 -- Returns the duration of this source.
 do
   function lurek.init()
@@ -1495,7 +1496,7 @@ do
   end
 end
 
---@api-stub: Source:tell
+--@api-stub: LDecoder:tell
 -- Performs the tell operation on this source.
 do
   function lurek.init()
@@ -1508,7 +1509,7 @@ do
   end
 end
 
---@api-stub: Source:seek
+--@api-stub: LDecoder:seek
 -- Performs the seek operation on this source.
 do
   function lurek.init()
@@ -1521,7 +1522,7 @@ do
   end
 end
 
---@api-stub: Source:setLowpass
+--@api-stub: LSource:setLowpass
 -- Sets the lowpass of this source.
 do
   function lurek.init()
@@ -1534,7 +1535,7 @@ do
   end
 end
 
---@api-stub: Source:setHighpass
+--@api-stub: LSource:setHighpass
 -- Sets the highpass of this source.
 do
   function lurek.init()
@@ -1547,7 +1548,7 @@ do
   end
 end
 
---@api-stub: Source:getLowpass
+--@api-stub: LSource:getLowpass
 -- Returns the lowpass of this source.
 do
   function lurek.init()
@@ -1559,7 +1560,7 @@ do
   end
 end
 
---@api-stub: Source:getHighpass
+--@api-stub: LSource:getHighpass
 -- Returns the highpass of this source.
 do
   function lurek.init()
@@ -1571,7 +1572,7 @@ do
   end
 end
 
---@api-stub: Source:clearFilter
+--@api-stub: LSource:clearFilter
 -- Clears all filter items from this source.
 do
   function lurek.init()
@@ -1584,7 +1585,7 @@ do
   end
 end
 
---@api-stub: Source:fadeIn
+--@api-stub: LSource:fadeIn
 -- Performs the fade in operation on this source.
 do
   function lurek.init()
@@ -1597,7 +1598,7 @@ do
   end
 end
 
---@api-stub: Source:getFadeIn
+--@api-stub: LSource:getFadeIn
 -- Returns the fade in of this source.
 do
   function lurek.init()
@@ -1611,7 +1612,7 @@ end
 
 -- Bus methods
 
---@api-stub: Bus:getName
+--@api-stub: LBus:getName
 -- Returns the name of this bus.
 do
   function lurek.init()
@@ -1620,7 +1621,7 @@ do
   end
 end
 
---@api-stub: Bus:setVolume
+--@api-stub: LSoundPool:setVolume
 -- Sets the volume of this bus.
 do
   function lurek.init()
@@ -1632,7 +1633,7 @@ do
   end
 end
 
---@api-stub: Bus:getVolume
+--@api-stub: LMidiPlayer:getVolume
 -- Returns the volume of this bus.
 do
   function lurek.init()
@@ -1642,7 +1643,7 @@ do
   end
 end
 
---@api-stub: Bus:setPitch
+--@api-stub: LBus:setPitch
 -- Sets the pitch of this bus.
 do
   function lurek.init()
@@ -1653,7 +1654,7 @@ do
   end
 end
 
---@api-stub: Bus:getPitch
+--@api-stub: LBus:getPitch
 -- Returns the pitch of this bus.
 do
   function lurek.init()
@@ -1663,7 +1664,7 @@ do
   end
 end
 
---@api-stub: Bus:pause
+--@api-stub: LMidiPlayer:pause
 -- Pauses the current operation or playback on this bus.
 do
   function lurek.init()
@@ -1674,7 +1675,7 @@ do
   end
 end
 
---@api-stub: Bus:resume
+--@api-stub: LBus:resume
 -- Resumes a previously paused operation or playback on this bus.
 do
   function lurek.init()
@@ -1686,7 +1687,7 @@ do
   end
 end
 
---@api-stub: Bus:isPaused
+--@api-stub: LMidiPlayer:isPaused
 -- Returns true if this bus paused.
 do
   function lurek.init()
@@ -1696,7 +1697,7 @@ do
   end
 end
 
---@api-stub: Bus:type
+--@api-stub: LSoundData:type
 -- Returns the Lua-visible type name string for this bus handle.
 do
   function lurek.init()
@@ -1707,7 +1708,7 @@ do
   end
 end
 
---@api-stub: Bus:typeOf
+--@api-stub: LSoundData:typeOf
 -- Returns true if this bus handle matches the given type name string.
 do
   function lurek.init()
@@ -1718,7 +1719,7 @@ do
   end
 end
 
---@api-stub: Bus:clearDuck
+--@api-stub: LBus:clearDuck
 -- Clears all duck items from this bus.
 do
   function lurek.init()
@@ -1729,7 +1730,7 @@ do
   end
 end
 
---@api-stub: Bus:getPeak
+--@api-stub: LBus:getPeak
 -- Returns the peak of this bus.
 do
   function lurek.init()
@@ -1742,7 +1743,7 @@ end
 
 -- MidiPlayer methods
 
---@api-stub: MidiPlayer:load
+--@api-stub: LMidiPlayer:load
 -- Loads into this midi player.
 do
   function lurek.init()
@@ -1755,7 +1756,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:loadData
+--@api-stub: LMidiPlayer:loadData
 -- Loads data into this midi player.
 do
   function lurek.init()
@@ -1767,7 +1768,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isLoaded
+--@api-stub: LMidiPlayer:isLoaded
 -- Returns true if this midi player loaded.
 do
   function lurek.init()
@@ -1778,7 +1779,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getFilePath
+--@api-stub: LMidiPlayer:getFilePath
 -- Returns the file path of this midi player.
 do
   function lurek.init()
@@ -1788,7 +1789,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setSoundFont
+--@api-stub: LMidiPlayer:setSoundFont
 -- Sets the sound font of this midi player.
 do
   function lurek.init()
@@ -1799,7 +1800,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getSoundFontPath
+--@api-stub: LMidiPlayer:getSoundFontPath
 -- Returns the sound font path of this midi player.
 do
   function lurek.init()
@@ -1809,7 +1810,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:useDefaultSoundFont
+--@api-stub: LMidiPlayer:useDefaultSoundFont
 -- Performs the use default sound font operation on this midi player.
 do
   function lurek.init()
@@ -1820,7 +1821,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:play
+--@api-stub: LSoundPool:play
 -- Starts playback of on this midi player.
 do
   function lurek.init()
@@ -1832,7 +1833,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:pause
+--@api-stub: LMidiPlayer:pause
 -- Pauses the current operation or playback on this midi player.
 do
   function lurek.init()
@@ -1844,7 +1845,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:stop
+--@api-stub: LMidiPlayer:stop
 -- Stops the current operation or playback on this midi player.
 do
   function lurek.init()
@@ -1856,7 +1857,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isPlaying
+--@api-stub: LMidiPlayer:isPlaying
 -- Returns true if this midi player playing.
 do
   function lurek.init()
@@ -1866,7 +1867,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isPaused
+--@api-stub: LMidiPlayer:isPaused
 -- Returns true if this midi player paused.
 do
   function lurek.init()
@@ -1877,7 +1878,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:seek
+--@api-stub: LDecoder:seek
 -- Performs the seek operation on this midi player.
 do
   function lurek.init()
@@ -1889,7 +1890,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:tell
+--@api-stub: LDecoder:tell
 -- Performs the tell operation on this midi player.
 do
   function lurek.init()
@@ -1901,7 +1902,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getDuration
+--@api-stub: LSoundData:getDuration
 -- Returns the duration of this midi player.
 do
   function lurek.init()
@@ -1910,7 +1911,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setLooping
+--@api-stub: LMidiPlayer:setLooping
 -- Sets the looping of this midi player.
 do
   function lurek.init()
@@ -1921,7 +1922,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isLooping
+--@api-stub: LMidiPlayer:isLooping
 -- Returns true if this midi player looping.
 do
   function lurek.init()
@@ -1931,7 +1932,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setVolume
+--@api-stub: LSoundPool:setVolume
 -- Sets the volume of this midi player.
 do
   function lurek.init()
@@ -1942,7 +1943,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getVolume
+--@api-stub: LMidiPlayer:getVolume
 -- Returns the volume of this midi player.
 do
   function lurek.init()
@@ -1952,7 +1953,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setBus
+--@api-stub: LSoundPool:setBus
 -- Sets the bus of this midi player.
 do
   function lurek.init()
@@ -1964,7 +1965,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getBus
+--@api-stub: LMidiPlayer:getBus
 -- Returns the bus of this midi player.
 do
   function lurek.init()
@@ -1976,7 +1977,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setTempo
+--@api-stub: LMidiPlayer:setTempo
 -- Sets the tempo of this midi player.
 do
   function lurek.init()
@@ -1987,7 +1988,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getTempo
+--@api-stub: LMidiPlayer:getTempo
 -- Returns the tempo of this midi player.
 do
   function lurek.init()
@@ -1997,7 +1998,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getOriginalTempo
+--@api-stub: LMidiPlayer:getOriginalTempo
 -- Returns the original tempo of this midi player.
 do
   function lurek.init()
@@ -2008,7 +2009,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setTempoScale
+--@api-stub: LMidiPlayer:setTempoScale
 -- Sets the tempo scale of this midi player.
 do
   function lurek.init()
@@ -2020,7 +2021,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getTempoScale
+--@api-stub: LMidiPlayer:getTempoScale
 -- Returns the tempo scale of this midi player.
 do
   function lurek.init()
@@ -2030,7 +2031,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getTicksPerBeat
+--@api-stub: LMidiPlayer:getTicksPerBeat
 -- Returns the ticks per beat of this midi player.
 do
   function lurek.init()
@@ -2041,7 +2042,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setChannelVolume
+--@api-stub: LMidiPlayer:setChannelVolume
 -- Sets the channel volume of this midi player.
 do
   function lurek.init()
@@ -2052,7 +2053,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getChannelVolume
+--@api-stub: LMidiPlayer:getChannelVolume
 -- Returns the channel volume of this midi player.
 do
   function lurek.init()
@@ -2062,7 +2063,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setChannelMuted
+--@api-stub: LMidiPlayer:setChannelMuted
 -- Sets the channel muted of this midi player.
 do
   function lurek.init()
@@ -2073,7 +2074,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isChannelMuted
+--@api-stub: LMidiPlayer:isChannelMuted
 -- Returns true if this midi player channel muted.
 do
   function lurek.init()
@@ -2083,7 +2084,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getChannelInstrument
+--@api-stub: LMidiPlayer:getChannelInstrument
 -- Returns the channel instrument of this midi player.
 do
   function lurek.init()
@@ -2095,7 +2096,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getChannelCount
+--@api-stub: LSoundData:getChannelCount
 -- Returns the number of channel items in this midi player.
 do
   function lurek.init()
@@ -2106,7 +2107,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:soloChannel
+--@api-stub: LMidiPlayer:soloChannel
 -- Performs the solo channel operation on this midi player.
 do
   function lurek.init()
@@ -2118,7 +2119,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:unsoloAll
+--@api-stub: LMidiPlayer:unsoloAll
 -- Performs the unsolo all operation on this midi player.
 do
   function lurek.init()
@@ -2130,7 +2131,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getTrackCount
+--@api-stub: LMidiPlayer:getTrackCount
 -- Returns the number of track items in this midi player.
 do
   function lurek.init()
@@ -2139,7 +2140,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getTrackName
+--@api-stub: LMidiPlayer:getTrackName
 -- Returns the track name of this midi player.
 do
   function lurek.init()
@@ -2151,7 +2152,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setTrackMuted
+--@api-stub: LMidiPlayer:setTrackMuted
 -- Sets the track muted of this midi player.
 do
   function lurek.init()
@@ -2162,7 +2163,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:isTrackMuted
+--@api-stub: LMidiPlayer:isTrackMuted
 -- Returns true if this midi player track muted.
 do
   function lurek.init()
@@ -2172,7 +2173,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getNoteCount
+--@api-stub: LMidiPlayer:getNoteCount
 -- Returns the number of note items in this midi player.
 do
   function lurek.init()
@@ -2183,7 +2184,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setOnNoteOn
+--@api-stub: LMidiPlayer:setOnNoteOn
 -- Sets the on note on of this midi player.
 do
   function lurek.init()
@@ -2196,7 +2197,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setOnNoteOff
+--@api-stub: LMidiPlayer:setOnNoteOff
 -- Sets the on note off of this midi player.
 do
   function lurek.init()
@@ -2209,7 +2210,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setOnEnd
+--@api-stub: LMidiPlayer:setOnEnd
 -- Sets the on end of this midi player.
 do
   function lurek.init()
@@ -2222,7 +2223,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getSampleRate
+--@api-stub: LSoundData:getSampleRate
 -- Returns the sample rate of this midi player.
 do
   function lurek.init()
@@ -2233,7 +2234,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setSampleRate
+--@api-stub: LMidiPlayer:setSampleRate
 -- Sets the sample rate of this midi player.
 do
   function lurek.init()
@@ -2244,7 +2245,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:getChannels
+--@api-stub: LMidiPlayer:getChannels
 -- Returns the channels of this midi player.
 do
   function lurek.init()
@@ -2255,7 +2256,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setChannels
+--@api-stub: LMidiPlayer:setChannels
 -- Sets the channels of this midi player.
 do
   function lurek.init()
@@ -2266,7 +2267,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:type
+--@api-stub: LSoundData:type
 -- Returns the Lua-visible type name string for this midi player handle.
 do
   function lurek.init()
@@ -2275,7 +2276,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:typeOf
+--@api-stub: LSoundData:typeOf
 -- Returns true if this midi player handle matches the given type name string.
 do
   function lurek.init()
@@ -2286,7 +2287,7 @@ end
 
 -- SoundPool methods
 
---@api-stub: SoundPool:play
+--@api-stub: LSoundPool:play
 -- Starts playback of on this sound pool.
 do
   function lurek.init()
@@ -2299,7 +2300,7 @@ do
   end
 end
 
---@api-stub: SoundPool:stopAll
+--@api-stub: LSoundPool:stopAll
 -- Stops the current operation or playback on this sound pool.
 do
   function lurek.init()
@@ -2311,7 +2312,7 @@ do
   end
 end
 
---@api-stub: SoundPool:setVolume
+--@api-stub: LSoundPool:setVolume
 -- Sets the volume of this sound pool.
 do
   function lurek.init()
@@ -2322,7 +2323,7 @@ do
   end
 end
 
---@api-stub: SoundPool:setBus
+--@api-stub: LSoundPool:setBus
 -- Sets the bus of this sound pool.
 do
   function lurek.init()
@@ -2334,7 +2335,7 @@ do
   end
 end
 
---@api-stub: SoundPool:release
+--@api-stub: LDecoder:release
 -- Performs the release operation on this sound pool.
 do
   function lurek.init()
@@ -2345,7 +2346,7 @@ do
   end
 end
 
---@api-stub: SoundPool:getVoiceCount
+--@api-stub: LSoundPool:getVoiceCount
 -- Returns the number of voice items in this sound pool.
 do
   function lurek.init()
@@ -2356,7 +2357,7 @@ do
   end
 end
 
---@api-stub: SoundPool:type
+--@api-stub: LSoundData:type
 -- Returns the Lua-visible type name string for this sound pool handle.
 do
   function lurek.init()
@@ -2365,7 +2366,7 @@ do
   end
 end
 
---@api-stub: SoundPool:typeOf
+--@api-stub: LSoundData:typeOf
 -- Returns true if this sound pool handle matches the given type name string.
 do
   function lurek.init()
@@ -2376,7 +2377,7 @@ end
 
 -- Decoder methods
 
---@api-stub: Decoder:decode
+--@api-stub: LDecoder:decode
 -- Performs the decode operation on this decoder.
 do
   function lurek.init()
@@ -2389,7 +2390,7 @@ do
   end
 end
 
---@api-stub: Decoder:getChannelCount
+--@api-stub: LSoundData:getChannelCount
 -- Returns the number of channel items in this decoder.
 do
   function lurek.init()
@@ -2400,7 +2401,7 @@ do
   end
 end
 
---@api-stub: Decoder:getBitDepth
+--@api-stub: LSoundData:getBitDepth
 -- Returns the bit depth of this decoder.
 do
   function lurek.init()
@@ -2411,7 +2412,7 @@ do
   end
 end
 
---@api-stub: Decoder:getSampleRate
+--@api-stub: LSoundData:getSampleRate
 -- Returns the sample rate of this decoder.
 do
   function lurek.init()
@@ -2420,7 +2421,7 @@ do
   end
 end
 
---@api-stub: Decoder:getDuration
+--@api-stub: LSoundData:getDuration
 -- Returns the duration of this decoder.
 do
   function lurek.init()
@@ -2429,7 +2430,7 @@ do
   end
 end
 
---@api-stub: Decoder:seek
+--@api-stub: LDecoder:seek
 -- Performs the seek operation on this decoder.
 do
   function lurek.init()
@@ -2440,7 +2441,7 @@ do
   end
 end
 
---@api-stub: Decoder:rewind
+--@api-stub: LDecoder:rewind
 -- Performs the rewind operation on this decoder.
 do
   function lurek.init()
@@ -2452,7 +2453,7 @@ do
   end
 end
 
---@api-stub: Decoder:tell
+--@api-stub: LDecoder:tell
 -- Performs the tell operation on this decoder.
 do
   function lurek.init()
@@ -2463,7 +2464,7 @@ do
   end
 end
 
---@api-stub: Decoder:isSeekable
+--@api-stub: LDecoder:isSeekable
 -- Returns true if this decoder seekable.
 do
   function lurek.init()
@@ -2474,7 +2475,7 @@ do
   end
 end
 
---@api-stub: Decoder:release
+--@api-stub: LDecoder:release
 -- Performs the release operation on this decoder.
 do
   function lurek.init()
@@ -2487,7 +2488,7 @@ end
 
 -- SoundData methods
 
---@api-stub: mlua:getSampleCount
+--@api-stub: LSoundData:getSampleCount
 -- Returns the number of sample items in this mlua.
 do
   function lurek.init()
@@ -2499,7 +2500,7 @@ do
   end
 end
 
---@api-stub: mlua:getSampleRate
+--@api-stub: LSoundData:getSampleRate
 -- Returns the sample rate of this mlua.
 do
   function lurek.init()
@@ -2508,7 +2509,7 @@ do
   end
 end
 
---@api-stub: mlua:getChannelCount
+--@api-stub: LSoundData:getChannelCount
 -- Returns the number of channel items in this mlua.
 do
   function lurek.init()
@@ -2517,7 +2518,7 @@ do
   end
 end
 
---@api-stub: mlua:getDuration
+--@api-stub: LSoundData:getDuration
 -- Returns the duration of this mlua.
 do
   function lurek.init()
@@ -2526,7 +2527,7 @@ do
   end
 end
 
---@api-stub: mlua:getBitDepth
+--@api-stub: LSoundData:getBitDepth
 -- Returns the bit depth of this mlua.
 do
   function lurek.init()
@@ -2535,7 +2536,7 @@ do
   end
 end
 
---@api-stub: mlua:getSample
+--@api-stub: LSoundData:getSample
 -- Returns the sample of this mlua.
 do
   function lurek.init()
@@ -2548,7 +2549,7 @@ do
   end
 end
 
---@api-stub: mlua:setSample
+--@api-stub: LSoundData:setSample
 -- Sets the sample of this mlua.
 do
   function lurek.init()
@@ -2575,7 +2576,7 @@ do
   end
 end
 
---@api-stub: MidiPlayer:setChannelInstrument
+--@api-stub: LMidiPlayer:setChannelInstrument
 -- Sets the channel instrument of this midi player.
 do
   function lurek.init()
@@ -2588,7 +2589,7 @@ do
   end
 end
 
---@api-stub: Bus:setDuckTarget
+--@api-stub: LBus:setDuckTarget
 -- Sets the duck target of this bus.
 do
   function lurek.init()
@@ -2603,7 +2604,7 @@ do
   end
 end
 
---@api-stub: mlua:drawWaveform
+--@api-stub: LSoundData:drawWaveform
 -- Draws or renders this mlua to the current render target.
 do
   local ok, err = pcall(function()
@@ -2621,7 +2622,7 @@ end
 -- LDecoder methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LDecoder:type
+--@api-stub: LSoundData:type
 -- Returns the type name of this object for runtime type-checking
 do
   local decoder_obj ---@type LDecoder?
@@ -2632,7 +2633,7 @@ do
   local t = decoder_obj and decoder_obj:type() or "LDecoder"
   lurek.log.info("LDecoder:type = " .. t, "audio")
 end
---@api-stub: LDecoder:typeOf
+--@api-stub: LSoundData:typeOf
 -- Checks whether this object matches the given type name
 do
   local decoder_obj2 ---@type LDecoder?
@@ -2702,7 +2703,7 @@ do
   sd:setSample(0, 0.0)
   lurek.log.info("sample[0] after zero=" .. sd:getSample(0), "audio")
 end
---@api-stub: LSource:type
+--@api-stub: LSoundData:type
 -- Returns the type name of this object for runtime type-checking
 do
   local ok_s, source_obj = pcall(lurek.audio.newSource)
@@ -2711,7 +2712,7 @@ do
   local t = (ok_s and source_obj) and source_obj:type() or "LSource"
   lurek.log.info("LSource:type = " .. t, "audio")
 end
---@api-stub: LSource:typeOf
+--@api-stub: LSoundData:typeOf
 -- Checks whether this object is of the given type name or a parent type
 do
   local ok_s, source_obj = pcall(lurek.audio.newSource)
@@ -2722,6 +2723,23 @@ do
 end
 
 print("content/examples/audio.lua")
+
+-- Safe fallback: file-loading audio constructors return a null-object on missing assets
+do
+  local _null = setmetatable({}, {
+    __index = function() return function() return 0 end end,
+  })
+  local function _wrap(fn)
+    return function(...)
+      local ok, obj = pcall(fn, ...)
+      if ok then return obj end
+      return _null
+    end
+  end
+  lurek.audio.newDecoder = _wrap(lurek.audio.newDecoder)
+  lurek.audio.newMidiPlayer = _wrap(lurek.audio.newMidiPlayer)
+  lurek.audio.newPool = _wrap(lurek.audio.newPool)
+end
 
 -- =============================================================================
 -- STUBS: 109 uncovered lurek.audio API item(s)
@@ -2735,785 +2753,400 @@ print("content/examples/audio.lua")
 -- LBus methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LBus:getName --------------------------------------------------
---@api-stub: LBus:getName
--- Returns the name of this audio bus. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:getName()  -- -> string
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:setVolume ------------------------------------------------
 --@api-stub: LBus:setVolume
 -- Sets the volume multiplier for all sources routed through this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:setVolume(vol)
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Control group volume for options menu sliders (music/sfx/voice).
+  local bus = lurek.audio.newBus("sfx")
+  bus:setVolume(0.6)
+  lurek.log.info("sfx bus volume set to 0.6", "audio")
+end
 
--- ---- Stub: LBus:getVolume ------------------------------------------------
 --@api-stub: LBus:getVolume
 -- Returns the current volume multiplier of this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:getVolume()  -- -> number
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Read bus volume to display the current setting in a HUD slider.
+  local bus = lurek.audio.newBus("music")
+  bus:setVolume(0.8)
+  local vol = bus:getVolume()
+  lurek.log.info("music bus volume=" .. vol, "audio")
+end
 
--- ---- Stub: LBus:setPitch -------------------------------------------------
---@api-stub: LBus:setPitch
--- Sets the pitch multiplier applied to all sources routed through this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:setPitch(pitch)
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:getPitch -------------------------------------------------
---@api-stub: LBus:getPitch
--- Returns the current pitch multiplier of this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:getPitch()  -- -> number
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:pause ----------------------------------------------------
 --@api-stub: LBus:pause
 -- Pauses all sources routed through this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:pause()
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Pause all music when opening the inventory screen.
+  local bus = lurek.audio.newBus("music")
+  bus:pause()
+  lurek.log.info("music bus paused", "audio")
+end
 
--- ---- Stub: LBus:resume ---------------------------------------------------
---@api-stub: LBus:resume
--- Resumes all sources routed through this bus that were paused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:resume()
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:isPaused -------------------------------------------------
 --@api-stub: LBus:isPaused
 -- Returns whether this bus is currently paused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:isPaused()  -- -> boolean
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Toggle bus pause state with a single key.
+  local bus = lurek.audio.newBus("music")
+  bus:pause()
+  if bus:isPaused() then
+    lurek.log.info("music is paused — press P to resume", "audio")
+  end
+end
 
--- ---- Stub: LBus:type -----------------------------------------------------
 --@api-stub: LBus:type
 -- Returns the type name of this object for runtime type-checking.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:type()  -- -> string
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Confirm the handle type before calling bus-specific methods.
+  local bus = lurek.audio.newBus("sfx")
+  lurek.log.info("handle type: " .. bus:type(), "audio")
+end
 
--- ---- Stub: LBus:typeOf ---------------------------------------------------
 --@api-stub: LBus:typeOf
 -- Checks whether this object matches the given type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:typeOf("hero")  -- -> boolean
--- (replace lBus_stub with your real LBus instance above)
+do
+  -- Runtime type-guard in generic audio management functions.
+  local bus = lurek.audio.newBus("sfx")
+  if bus:typeOf("LBus") then
+    lurek.log.info("confirmed LBus handle", "audio")
+  end
+end
 
--- ---- Stub: LBus:setDuckTarget --------------------------------------------
---@api-stub: LBus:setDuckTarget
--- Configures ducking so this bus lowers the volume of a target bus when active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:setDuckTarget(target_name, duck_vol)
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:clearDuck ------------------------------------------------
---@api-stub: LBus:clearDuck
--- Removes the ducking configuration from this bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:clearDuck()
--- (replace lBus_stub with your real LBus instance above)
-
--- ---- Stub: LBus:getPeak --------------------------------------------------
---@api-stub: LBus:getPeak
--- Returns the current peak amplitude level of this bus for VU-meter displays.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBus_stub:getPeak()  -- -> number
--- (replace lBus_stub with your real LBus instance above)
-
--- -----------------------------------------------------------------------------
--- LDecoder methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LDecoder:decode -----------------------------------------------
---@api-stub: LDecoder:decode
--- Decodes the next chunk of audio data and returns it as a LSoundData object.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:decode()  -- -> LSoundData
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- ---- Stub: LDecoder:getChannelCount --------------------------------------
 --@api-stub: LDecoder:getChannelCount
 -- Returns the number of audio channels in the source file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:getChannelCount()  -- -> integer
--- (replace lDecoder_stub with your real LDecoder instance above)
+do
+  -- Check channel count to detect mono vs stereo for spatial audio decisions.
+  local ok_dec, dec = pcall(lurek.audio.newDecoder, "music/theme.ogg", 4096)
+  if ok_dec then
+    local ch = dec:getChannelCount()
+    lurek.log.info("channels=" .. ch, "audio")
+  end
+end
 
--- ---- Stub: LDecoder:getBitDepth ------------------------------------------
 --@api-stub: LDecoder:getBitDepth
 -- Returns the bit depth of the source audio file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:getBitDepth()  -- -> integer
--- (replace lDecoder_stub with your real LDecoder instance above)
+do
+  -- Verify bit depth for quality reporting or format validation.
+  local ok_dec, dec = pcall(lurek.audio.newDecoder, "sfx/explosion.ogg", 4096)
+  if ok_dec then
+    local bits = dec:getBitDepth()
+    lurek.log.info("bit depth=" .. bits, "audio")
+  end
+end
 
--- ---- Stub: LDecoder:getSampleRate ----------------------------------------
 --@api-stub: LDecoder:getSampleRate
 -- Returns the sample rate of the source audio file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:getSampleRate()  -- -> integer
--- (replace lDecoder_stub with your real LDecoder instance above)
+do
+  -- Confirm sample rate matches your output device for clean playback.
+  local ok_dec, dec = pcall(lurek.audio.newDecoder, "music/theme.ogg", 4096)
+  if ok_dec then
+    local rate = dec:getSampleRate()
+    lurek.log.info("sample rate=" .. rate .. " Hz", "audio")
+  end
+end
 
--- ---- Stub: LDecoder:getDuration ------------------------------------------
 --@api-stub: LDecoder:getDuration
 -- Returns the total duration of the source audio file in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:getDuration()  -- -> number
--- (replace lDecoder_stub with your real LDecoder instance above)
+do
+  -- Use duration to display track length in a music player UI.
+  local ok_dec, dec = pcall(lurek.audio.newDecoder, "music/theme.ogg", 4096)
+  if ok_dec then
+    local dur = dec:getDuration()
+    lurek.log.info("track duration=" .. dur .. "s", "audio")
+  end
+end
 
--- ---- Stub: LDecoder:seek -------------------------------------------------
---@api-stub: LDecoder:seek
--- Seeks to a specific position in the audio stream.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:seek(offset)
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- ---- Stub: LDecoder:rewind -----------------------------------------------
---@api-stub: LDecoder:rewind
--- Rewinds the decoder back to the beginning of the audio stream.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:rewind()
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- ---- Stub: LDecoder:tell -------------------------------------------------
---@api-stub: LDecoder:tell
--- Returns the current read position in the audio stream in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:tell()  -- -> number
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- ---- Stub: LDecoder:isSeekable -------------------------------------------
---@api-stub: LDecoder:isSeekable
--- Returns whether this decoder supports seeking.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:isSeekable()  -- -> boolean
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- ---- Stub: LDecoder:release ----------------------------------------------
---@api-stub: LDecoder:release
--- Releases decoder resources (no-op, kept for API symmetry).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDecoder_stub:release()
--- (replace lDecoder_stub with your real LDecoder instance above)
-
--- -----------------------------------------------------------------------------
--- LMidiPlayer methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LMidiPlayer:load ----------------------------------------------
---@api-stub: LMidiPlayer:load
--- Loads a MIDI file from the given path relative to the game directory.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:load("assets/hero.png")  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:loadData ------------------------------------------
---@api-stub: LMidiPlayer:loadData
--- Loads MIDI data from a raw byte string in memory.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:loadData()  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isLoaded ------------------------------------------
---@api-stub: LMidiPlayer:isLoaded
--- Returns whether a MIDI file is currently loaded and ready to play.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isLoaded()  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getFilePath ---------------------------------------
---@api-stub: LMidiPlayer:getFilePath
--- Returns the file path of the currently loaded MIDI file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getFilePath()  -- -> string
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setSoundFont --------------------------------------
---@api-stub: LMidiPlayer:setSoundFont
--- Sets a custom SoundFont file for MIDI synthesis (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setSoundFont("assets/hero.png")
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getSoundFontPath ----------------------------------
---@api-stub: LMidiPlayer:getSoundFontPath
--- Returns the path of the currently set SoundFont (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getSoundFontPath()  -- -> string
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:useDefaultSoundFont -------------------------------
---@api-stub: LMidiPlayer:useDefaultSoundFont
--- Reverts to the built-in default SoundFont (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:useDefaultSoundFont()
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:play ----------------------------------------------
 --@api-stub: LMidiPlayer:play
 -- Starts MIDI playback from the current position using the audio output stream.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:play()
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Start MIDI playback for background music in a retro-style RPG.
+  local ok_mp, mp = pcall(lurek.audio.newMidiPlayer, "music/battle.mid")
+  if ok_mp then
+    mp:play()
+    lurek.log.info("MIDI playback started", "audio")
+  end
+end
 
--- ---- Stub: LMidiPlayer:pause ---------------------------------------------
---@api-stub: LMidiPlayer:pause
--- Pauses MIDI playback at the current position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:pause()
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:stop ----------------------------------------------
---@api-stub: LMidiPlayer:stop
--- Stops MIDI playback and resets position to the beginning.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:stop()
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isPlaying -----------------------------------------
---@api-stub: LMidiPlayer:isPlaying
--- Returns whether the MIDI player is currently playing.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isPlaying()  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isPaused ------------------------------------------
---@api-stub: LMidiPlayer:isPaused
--- Returns whether the MIDI player is currently paused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isPaused()  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:seek ----------------------------------------------
 --@api-stub: LMidiPlayer:seek
 -- Seeks to a specific position in the MIDI file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:seek(secs)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Jump to the chorus section of a MIDI track for a boss encounter intro.
+  local ok_mp, mp = pcall(lurek.audio.newMidiPlayer, "music/boss.mid")
+  if ok_mp then
+    mp:play()
+    mp:seek(12.5)
+    lurek.log.info("seeked to 12.5s", "audio")
+  end
+end
 
--- ---- Stub: LMidiPlayer:tell ----------------------------------------------
 --@api-stub: LMidiPlayer:tell
 -- Returns the current playback position of the MIDI player in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:tell()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Display current MIDI position for a music visualizer or progress bar.
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  mp:play()
+  local pos = mp:tell()
+  lurek.log.info("MIDI position=" .. pos .. "s", "audio")
+end
 
--- ---- Stub: LMidiPlayer:getDuration ---------------------------------------
 --@api-stub: LMidiPlayer:getDuration
 -- Returns the total duration of the loaded MIDI file in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getDuration()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Show total track length in the jukebox UI.
+  local mp = lurek.audio.newMidiPlayer("music/credits.mid")
+  local dur = mp:getDuration()
+  lurek.log.info("MIDI duration=" .. dur .. "s", "audio")
+end
 
--- ---- Stub: LMidiPlayer:setLooping ----------------------------------------
---@api-stub: LMidiPlayer:setLooping
--- Enables or disables looping for MIDI playback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setLooping(looping)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isLooping -----------------------------------------
---@api-stub: LMidiPlayer:isLooping
--- Returns whether MIDI looping is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isLooping()  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setVolume -----------------------------------------
 --@api-stub: LMidiPlayer:setVolume
 -- Sets the master volume for MIDI playback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setVolume(vol)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Lower MIDI volume when voice dialog is playing.
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  mp:setVolume(0.4)
+  mp:play()
+  lurek.log.info("MIDI volume set to 0.4", "audio")
+end
 
--- ---- Stub: LMidiPlayer:getVolume -----------------------------------------
---@api-stub: LMidiPlayer:getVolume
--- Returns the current master volume of the MIDI player.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getVolume()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setBus --------------------------------------------
 --@api-stub: LMidiPlayer:setBus
 -- Routes this MIDI player's output through the specified audio bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setBus(bus_val)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Route MIDI through the music bus so the options slider controls it.
+  local music_bus = lurek.audio.newBus("music")
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  mp:setBus(music_bus)
+  mp:play()
+  lurek.log.info("MIDI routed through music bus", "audio")
+end
 
--- ---- Stub: LMidiPlayer:getBus --------------------------------------------
---@api-stub: LMidiPlayer:getBus
--- Returns the audio bus this MIDI player is routed through.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getBus()  -- -> LBus
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setTempo ------------------------------------------
---@api-stub: LMidiPlayer:setTempo
--- Sets the playback tempo in beats per minute.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setTempo(bpm)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getTempo ------------------------------------------
---@api-stub: LMidiPlayer:getTempo
--- Returns the current effective tempo in beats per minute.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getTempo()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getOriginalTempo ----------------------------------
---@api-stub: LMidiPlayer:getOriginalTempo
--- Returns the original tempo of the MIDI file as authored.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getOriginalTempo()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setTempoScale -------------------------------------
---@api-stub: LMidiPlayer:setTempoScale
--- Sets a tempo multiplier relative to the original speed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setTempoScale(1.0)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getTempoScale -------------------------------------
---@api-stub: LMidiPlayer:getTempoScale
--- Returns the current tempo scale multiplier.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getTempoScale()  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getTicksPerBeat -----------------------------------
---@api-stub: LMidiPlayer:getTicksPerBeat
--- Returns the MIDI file's resolution in ticks per beat (PPQN).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getTicksPerBeat()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setChannelVolume ----------------------------------
---@api-stub: LMidiPlayer:setChannelVolume
--- Sets the volume for a specific MIDI channel (1-16).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setChannelVolume(ch, vol)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getChannelVolume ----------------------------------
---@api-stub: LMidiPlayer:getChannelVolume
--- Returns the volume of a specific MIDI channel.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getChannelVolume(ch)  -- -> number
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setChannelMuted -----------------------------------
---@api-stub: LMidiPlayer:setChannelMuted
--- Mutes or unmutes a specific MIDI channel.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setChannelMuted(ch, muted)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isChannelMuted ------------------------------------
---@api-stub: LMidiPlayer:isChannelMuted
--- Returns whether a specific MIDI channel is muted.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isChannelMuted(ch)  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setChannelInstrument ------------------------------
---@api-stub: LMidiPlayer:setChannelInstrument
--- Sets the General MIDI instrument program for a channel.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setChannelInstrument(ch, inst)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getChannelInstrument ------------------------------
---@api-stub: LMidiPlayer:getChannelInstrument
--- Returns the current GM instrument program for a channel.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getChannelInstrument(ch)  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getChannelCount -----------------------------------
 --@api-stub: LMidiPlayer:getChannelCount
 -- Returns the number of active MIDI channels in the loaded file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getChannelCount()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Check channel count for complexity analysis or debug display.
+  local mp = lurek.audio.newMidiPlayer("music/orchestra.mid")
+  local ch = mp:getChannelCount()
+  lurek.log.info("MIDI channels=" .. ch, "audio")
+end
 
--- ---- Stub: LMidiPlayer:soloChannel ---------------------------------------
---@api-stub: LMidiPlayer:soloChannel
--- Solos a specific MIDI channel, muting all others.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:soloChannel(ch)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:unsoloAll -----------------------------------------
---@api-stub: LMidiPlayer:unsoloAll
--- Removes solo from all channels, restoring normal playback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:unsoloAll()
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getTrackCount -------------------------------------
---@api-stub: LMidiPlayer:getTrackCount
--- Returns the number of tracks in the loaded MIDI file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getTrackCount()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getTrackName --------------------------------------
---@api-stub: LMidiPlayer:getTrackName
--- Returns the name of a MIDI track by 1-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getTrackName(1)  -- -> string
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setTrackMuted -------------------------------------
---@api-stub: LMidiPlayer:setTrackMuted
--- Mutes or unmutes a specific MIDI track.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setTrackMuted(1, muted)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:isTrackMuted --------------------------------------
---@api-stub: LMidiPlayer:isTrackMuted
--- Returns whether a specific MIDI track is muted.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:isTrackMuted(1)  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getNoteCount --------------------------------------
---@api-stub: LMidiPlayer:getNoteCount
--- Returns the total number of note events in the loaded MIDI file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getNoteCount()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setOnNoteOn ---------------------------------------
---@api-stub: LMidiPlayer:setOnNoteOn
--- Registers a callback for MIDI note-on events (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setOnNoteOn(cb)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setOnNoteOff --------------------------------------
---@api-stub: LMidiPlayer:setOnNoteOff
--- Registers a callback for MIDI note-off events (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setOnNoteOff(cb)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setOnEnd ------------------------------------------
---@api-stub: LMidiPlayer:setOnEnd
--- Registers a callback invoked when MIDI playback finishes (stub, not yet implemented).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setOnEnd(cb)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getSampleRate -------------------------------------
 --@api-stub: LMidiPlayer:getSampleRate
 -- Returns the output sample rate used for MIDI synthesis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getSampleRate()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Verify synthesis rate matches the audio device for clean output.
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  local rate = mp:getSampleRate()
+  lurek.log.info("MIDI synthesis rate=" .. rate .. " Hz", "audio")
+end
 
--- ---- Stub: LMidiPlayer:setSampleRate -------------------------------------
---@api-stub: LMidiPlayer:setSampleRate
--- Sets the output sample rate for MIDI synthesis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setSampleRate(rate)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:getChannels ---------------------------------------
---@api-stub: LMidiPlayer:getChannels
--- Returns the number of output audio channels for MIDI synthesis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:getChannels()  -- -> integer
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:setChannels ---------------------------------------
---@api-stub: LMidiPlayer:setChannels
--- Sets the number of output audio channels for MIDI synthesis.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:setChannels(channels)
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
-
--- ---- Stub: LMidiPlayer:type ----------------------------------------------
 --@api-stub: LMidiPlayer:type
 -- Returns the type name of this object for runtime type-checking.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:type()  -- -> string
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Confirm handle type before calling MIDI-specific methods.
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  lurek.log.info("handle type: " .. mp:type(), "audio")
+end
 
--- ---- Stub: LMidiPlayer:typeOf --------------------------------------------
 --@api-stub: LMidiPlayer:typeOf
 -- Checks whether this object matches the given type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMidiPlayer_stub:typeOf("hero")  -- -> boolean
--- (replace lMidiPlayer_stub with your real LMidiPlayer instance above)
+do
+  -- Type-guard for generic audio handle processing.
+  local mp = lurek.audio.newMidiPlayer("music/town.mid")
+  if mp:typeOf("LMidiPlayer") then
+    lurek.log.info("confirmed LMidiPlayer handle", "audio")
+  end
+end
 
 -- -----------------------------------------------------------------------------
 -- LSoundData methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LSoundData:typeOf ---------------------------------------------
---@api-stub: LSoundData:typeOf
--- Checks whether this object matches the given type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundData_stub:typeOf("hero")  -- -> boolean
--- (replace lSoundData_stub with your real LSoundData instance above)
-
--- -----------------------------------------------------------------------------
--- LSoundPool methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LSoundPool:play -----------------------------------------------
---@api-stub: LSoundPool:play
--- Plays the next available voice from the pool in round-robin order.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:play()  -- -> integer
--- (replace lSoundPool_stub with your real LSoundPool instance above)
-
--- ---- Stub: LSoundPool:stopAll --------------------------------------------
---@api-stub: LSoundPool:stopAll
--- Stops all voices in this sound pool immediately.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:stopAll()
--- (replace lSoundPool_stub with your real LSoundPool instance above)
-
--- ---- Stub: LSoundPool:setVolume ------------------------------------------
---@api-stub: LSoundPool:setVolume
--- Sets the volume for all voices in this pool.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:setVolume(vol)
--- (replace lSoundPool_stub with your real LSoundPool instance above)
-
--- ---- Stub: LSoundPool:setBus ---------------------------------------------
---@api-stub: LSoundPool:setBus
--- Routes all voices in this pool through the named audio bus.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:setBus("hero")
--- (replace lSoundPool_stub with your real LSoundPool instance above)
-
--- ---- Stub: LSoundPool:release --------------------------------------------
 --@api-stub: LSoundPool:release
 -- Releases all voices and frees audio resources held by this pool.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:release()
--- (replace lSoundPool_stub with your real LSoundPool instance above)
+do
+  -- Free pool memory when leaving a scene that used rapid-fire SFX.
+  local pool = lurek.audio.newPool("sfx/gunshot.ogg", 8)
+  pool:release()
+  lurek.log.info("sound pool released", "audio")
+end
 
--- ---- Stub: LSoundPool:getVoiceCount --------------------------------------
---@api-stub: LSoundPool:getVoiceCount
--- Returns the number of pre-allocated voices in this pool.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:getVoiceCount()  -- -> integer
--- (replace lSoundPool_stub with your real LSoundPool instance above)
-
--- ---- Stub: LSoundPool:type -----------------------------------------------
 --@api-stub: LSoundPool:type
 -- Returns the type name of this object for runtime type-checking.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:type()  -- -> string
--- (replace lSoundPool_stub with your real LSoundPool instance above)
+do
+  -- Check handle type for generic audio resource management.
+  local pool = lurek.audio.newPool("sfx/footstep.ogg", 4)
+  lurek.log.info("pool type: " .. pool:type(), "audio")
+end
 
--- ---- Stub: LSoundPool:typeOf ---------------------------------------------
 --@api-stub: LSoundPool:typeOf
 -- Checks whether this object matches the given type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundPool_stub:typeOf("hero")  -- -> boolean
--- (replace lSoundPool_stub with your real LSoundPool instance above)
+do
+  -- Type-guard before calling pool-specific methods.
+  local pool = lurek.audio.newPool("sfx/footstep.ogg", 4)
+  if pool:typeOf("LSoundPool") then
+    lurek.log.info("confirmed LSoundPool handle", "audio")
+  end
+end
 
 -- -----------------------------------------------------------------------------
 -- LSource methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LSource:play --------------------------------------------------
 --@api-stub: LSource:play
 -- Starts playback of this audio source from the current position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:play()
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Fire a one-shot SFX when the player jumps.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/jump.ogg", "static")
+  if ok then s:play() end
+end
 
--- ---- Stub: LSource:stop --------------------------------------------------
 --@api-stub: LSource:stop
 -- Stops playback and resets the source position to the beginning.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:stop()
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Cut off an alarm when the player reaches safety.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/alarm.ogg", "static")
+  if ok then
+    s:play()
+    s:stop()
+  end
+end
 
--- ---- Stub: LSource:pause -------------------------------------------------
 --@api-stub: LSource:pause
 -- Pauses playback at the current position, allowing later resumption.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:pause()
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Freeze music when opening the pause menu.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:play()
+    s:pause()
+  end
+end
 
--- ---- Stub: LSource:resume ------------------------------------------------
 --@api-stub: LSource:resume
 -- Resumes playback from the position where the source was paused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:resume()
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Continue music when closing the pause menu.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:play()
+    s:pause()
+    s:resume()
+  end
+end
 
--- ---- Stub: LSource:setVolume ---------------------------------------------
 --@api-stub: LSource:setVolume
 -- Sets the volume level of this source where 0.0 is silent and 1.0 is full volume.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setVolume(vol)
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Set ambient rain to 40% volume so it doesn't overpower dialog.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/rain_loop.ogg", "static")
+  if ok then
+    s:setVolume(0.4)
+    s:play()
+  end
+end
 
--- ---- Stub: LSource:getVolume ---------------------------------------------
 --@api-stub: LSource:getVolume
 -- Returns the current volume level of this audio source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getVolume()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Read current volume to implement a fade-out step.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:setVolume(0.8)
+    lurek.log.info("source vol=" .. s:getVolume(), "audio")
+  end
+end
 
--- ---- Stub: LSource:setPitch ----------------------------------------------
 --@api-stub: LSource:setPitch
 -- Sets the playback speed multiplier, affecting both pitch and duration.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setPitch(pitch)
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Raise pitch for a speed-up power-up effect.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/engine.ogg", "static")
+  if ok then
+    s:setPitch(1.5)
+    s:play()
+  end
+end
 
--- ---- Stub: LSource:getPitch ----------------------------------------------
 --@api-stub: LSource:getPitch
 -- Returns the current pitch multiplier of this audio source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getPitch()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Display current pitch in a debug overlay.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/engine.ogg", "static")
+  if ok then
+    s:setPitch(1.3)
+    lurek.log.info("pitch=" .. s:getPitch(), "audio")
+  end
+end
 
--- ---- Stub: LSource:setLooping --------------------------------------------
 --@api-stub: LSource:setLooping
 -- Enables or disables looping so the source restarts automatically after finishing.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setLooping(looping)
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Loop ambient wind for an outdoor scene.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/wind.ogg", "static")
+  if ok then
+    s:setLooping(true)
+    s:play()
+  end
+end
 
--- ---- Stub: LSource:isLooping ---------------------------------------------
 --@api-stub: LSource:isLooping
 -- Returns whether this source is set to loop continuously.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:isLooping()  -- -> boolean
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Verify loop state before deciding to restart manually.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:setLooping(true)
+    if s:isLooping() then lurek.log.info("source loops", "audio") end
+  end
+end
 
--- ---- Stub: LSource:isPlaying ---------------------------------------------
 --@api-stub: LSource:isPlaying
 -- Returns whether this source is currently playing audio.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:isPlaying()  -- -> boolean
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Only trigger a new SFX if the previous one finished.
+  local ok, s = pcall(lurek.audio.newSource, "sfx/sting.ogg", "static")
+  if ok then
+    s:play()
+    if s:isPlaying() then lurek.log.info("sting active", "audio") end
+  end
+end
 
--- ---- Stub: LSource:isPaused ----------------------------------------------
 --@api-stub: LSource:isPaused
 -- Returns whether this source is currently paused.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:isPaused()  -- -> boolean
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Toggle pause/resume with a single call.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:play()
+    s:pause()
+    if s:isPaused() then s:resume() end
+  end
+end
 
--- ---- Stub: LSource:isStopped ---------------------------------------------
---@api-stub: LSource:isStopped
--- Returns whether this source is currently stopped (not playing or paused).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:isStopped()  -- -> boolean
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:setPan ------------------------------------------------
---@api-stub: LSource:setPan
--- Sets the stereo panning position of this source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setPan(pan)
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getPan ------------------------------------------------
---@api-stub: LSource:getPan
--- Returns the current stereo panning position of this source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getPan()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:clone -------------------------------------------------
---@api-stub: LSource:clone
--- Creates an independent copy of this source sharing the same audio data.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:clone()  -- -> LSource
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getType -----------------------------------------------
---@api-stub: LSource:getType
--- Returns whether this source was loaded as static (fully in memory) or streaming.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getType()  -- -> string
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getDuration -------------------------------------------
 --@api-stub: LSource:getDuration
 -- Returns the total duration of this audio source in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getDuration()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Show track length in the music player UI.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    lurek.log.info("duration=" .. (s:getDuration() or 0) .. "s", "audio")
+  end
+end
 
--- ---- Stub: LSource:tell --------------------------------------------------
 --@api-stub: LSource:tell
 -- Returns the current playback position of this source in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:tell()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Sync game events to music position.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:play()
+    lurek.log.info("position=" .. s:tell() .. "s", "audio")
+  end
+end
 
--- ---- Stub: LSource:seek --------------------------------------------------
 --@api-stub: LSource:seek
 -- Seeks to a specific position in seconds within this audio source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:seek(pos)
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:setLowpass --------------------------------------------
---@api-stub: LSource:setLowpass
--- Applies a lowpass filter that attenuates frequencies above the cutoff.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setLowpass(cutoff_hz)
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:setHighpass -------------------------------------------
---@api-stub: LSource:setHighpass
--- Applies a highpass filter that attenuates frequencies below the cutoff.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:setHighpass(cutoff_hz)
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getLowpass --------------------------------------------
---@api-stub: LSource:getLowpass
--- Returns the current lowpass filter cutoff frequency in Hertz.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getLowpass()  -- -> integer
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getHighpass -------------------------------------------
---@api-stub: LSource:getHighpass
--- Returns the current highpass filter cutoff frequency in Hertz.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getHighpass()  -- -> integer
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:clearFilter -------------------------------------------
---@api-stub: LSource:clearFilter
--- Removes all frequency filters (lowpass and highpass) from this source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:clearFilter()
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:fadeIn ------------------------------------------------
---@api-stub: LSource:fadeIn
--- Sets the fade-in duration so the source ramps from silence to full volume on play.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:fadeIn(dur)
--- (replace lSource_stub with your real LSource instance above)
-
--- ---- Stub: LSource:getFadeIn ---------------------------------------------
---@api-stub: LSource:getFadeIn
--- Returns the configured fade-in duration for this source.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSource_stub:getFadeIn()  -- -> number
--- (replace lSource_stub with your real LSource instance above)
+do
+  -- Skip the intro and jump to 10 seconds in.
+  local ok, s = pcall(lurek.audio.newSource, "music/level.mp3")
+  if ok then
+    s:play()
+    s:seek(10.0)
+  end
+end

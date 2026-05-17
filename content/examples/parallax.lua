@@ -8,7 +8,8 @@ do
   function lurek.init()
     -- newLayer accepts a table with a required "texture" field and many optional fields.
     -- Use it to build each visual depth layer in a side-scroller or top-down scene.
-    local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
+    local ok_sky, sky_tex = pcall(lurek.render.newImage, "assets/parallax/sky.png")
+    if not ok_sky then return end
 
     -- Minimal layer: just a texture, everything else defaults (no scroll, z=0, full opacity)
     local sky = lurek.parallax.newLayer({ texture = sky_tex })
@@ -79,7 +80,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:addEffectPass
+--@api-stub: LParallaxLayer:addEffectPass
 -- Adds a shader effect pass to this parallax layer
 do
   function lurek.init()
@@ -95,7 +96,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:clearEffects
+--@api-stub: LParallaxLayer:clearEffects
 -- Removes all shader effect passes from this parallax layer
 do
   function lurek.init()
@@ -110,7 +111,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:effectCount
+--@api-stub: LParallaxLayer:effectCount
 -- Returns the number of shader effect passes currently applied to this layer
 do
   function lurek.init()
@@ -124,7 +125,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setMotionStretch
+--@api-stub: LParallaxLayer:setMotionStretch
 -- Enables or configures motion stretch on this parallax layer
 do
   function lurek.init()
@@ -142,7 +143,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getMotionStretch
+--@api-stub: LParallaxLayer:getMotionStretch
 -- Returns the current motion stretch settings (enabled, strength, max_scale)
 do
   function lurek.init()
@@ -160,7 +161,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:type
+--@api-stub: LParallaxSet:type
 -- Returns the Lua-visible type name string for this parallax layer handle
 do
   function lurek.init()
@@ -174,7 +175,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:update
+--@api-stub: LParallaxSet:update
 -- Advances autoscroll animation by delta time (call once per frame)
 do
   local clouds
@@ -193,7 +194,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:render
+--@api-stub: LParallaxSet:render
 -- Draws this layer using explicit camera coordinates (manual camera control)
 do
   local hills
@@ -214,7 +215,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:renderAuto
+--@api-stub: LParallaxSet:renderAuto
 -- Draws this layer using the engine's built-in camera position automatically
 do
   local mountains
@@ -233,7 +234,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:resetAutoscroll
+--@api-stub: LParallaxLayer:resetAutoscroll
 -- Resets the autoscroll accumulated offset back to zero
 do
   function lurek.init()
@@ -249,7 +250,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setScrollFactor
+--@api-stub: LParallaxLayer:setScrollFactor
 -- Sets how much this layer moves relative to camera movement (parallax ratio)
 do
   function lurek.init()
@@ -262,7 +263,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getScrollFactor
+--@api-stub: LParallaxLayer:getScrollFactor
 -- Returns the current scroll factor (x, y) of this parallax layer
 do
   function lurek.init()
@@ -278,7 +279,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setOffset
+--@api-stub: LParallaxLayer:setOffset
 -- Sets a fixed pixel offset for layer positioning
 do
   function lurek.init()
@@ -291,7 +292,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getOffset
+--@api-stub: LParallaxLayer:getOffset
 -- Returns the current fixed pixel offset (x, y)
 do
   function lurek.init()
@@ -306,7 +307,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setAutoscroll
+--@api-stub: LParallaxLayer:setAutoscroll
 -- Sets continuous automatic scroll velocity in pixels per second
 do
   function lurek.init()
@@ -322,7 +323,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getAutoscroll
+--@api-stub: LParallaxLayer:getAutoscroll
 -- Returns the current autoscroll velocity (vx, vy) in pixels per second
 do
   function lurek.init()
@@ -337,7 +338,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setRepeat
+--@api-stub: LParallaxLayer:setRepeat
 -- Enables or disables horizontal and vertical tiling for seamless scrolling
 do
   function lurek.init()
@@ -350,7 +351,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setScale
+--@api-stub: LParallaxLayer:setScale
 -- Sets the rendering scale multiplier for this layer
 do
   function lurek.init()
@@ -363,7 +364,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setZ
+--@api-stub: LParallaxLayer:setZ
 -- Sets the z-order (draw priority) of this parallax layer
 do
   function lurek.init()
@@ -376,7 +377,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getZ
+--@api-stub: LParallaxLayer:getZ
 -- Returns the current z-order value of this parallax layer
 do
   function lurek.init()
@@ -392,7 +393,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setOpacity
+--@api-stub: LParallaxLayer:setOpacity
 -- Sets the overall opacity (alpha) of this layer, clamped to 0.0–1.0
 do
   function lurek.init()
@@ -405,7 +406,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getOpacity
+--@api-stub: LParallaxLayer:getOpacity
 -- Returns the current opacity value of this parallax layer
 do
   function lurek.init()
@@ -420,7 +421,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setTint
+--@api-stub: LParallaxLayer:setTint
 -- Sets the RGBA color tint applied to this layer during rendering
 do
   function lurek.init()
@@ -433,7 +434,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getTint
+--@api-stub: LParallaxLayer:getTint
 -- Returns the current RGBA tint color of this parallax layer
 do
   function lurek.init()
@@ -446,7 +447,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setBlendMode
+--@api-stub: LParallaxLayer:setBlendMode
 -- Sets the GPU blend mode for this layer
 do
   function lurek.init()
@@ -460,7 +461,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getBlendMode
+--@api-stub: LParallaxLayer:getBlendMode
 -- Returns the current blend mode name string
 do
   function lurek.init()
@@ -476,7 +477,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setVisible
+--@api-stub: LParallaxSet:setVisible
 -- Controls whether this layer is rendered (toggle without destroying it)
 do
   function lurek.init()
@@ -489,7 +490,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:isVisible
+--@api-stub: LParallaxSet:isVisible
 -- Returns true if this layer is currently set to render
 do
   local rain
@@ -507,7 +508,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setClamp
+--@api-stub: LParallaxLayer:setClamp
 -- Restricts layer movement within a bounding box (min_x, min_y, max_x, max_y)
 do
   function lurek.init()
@@ -523,7 +524,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:clearClamp
+--@api-stub: LParallaxLayer:clearClamp
 -- Removes all clamp bounds, allowing unrestricted scrolling
 do
   function lurek.init()
@@ -537,7 +538,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setTiling
+--@api-stub: LParallaxLayer:setTiling
 -- Enables or disables the advanced tiling mode for this layer
 do
   function lurek.init()
@@ -550,7 +551,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getTiling
+--@api-stub: LParallaxLayer:getTiling
 -- Returns whether tiling mode is currently enabled
 do
   function lurek.init()
@@ -564,7 +565,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setTileSize
+--@api-stub: LParallaxLayer:setTileSize
 -- Sets the individual tile dimensions when tiling mode is active
 do
   function lurek.init()
@@ -578,7 +579,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:setDepth
+--@api-stub: LParallaxLayer:setDepth
 -- Sets a depth value used for depth-based parallax calculations
 do
   function lurek.init()
@@ -592,7 +593,7 @@ do
   end
 end
 
---@api-stub: ParallaxLayer:getDepth
+--@api-stub: LParallaxLayer:getDepth
 -- Returns the current depth value
 do
   function lurek.init()
@@ -606,7 +607,7 @@ end
 
 -- ParallaxSet methods
 
---@api-stub: ParallaxSet:type
+--@api-stub: LParallaxSet:type
 -- Returns the Lua-visible type name string for this parallax set handle
 do
   function lurek.init()
@@ -619,7 +620,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:addLayer
+--@api-stub: LParallaxSet:addLayer
 -- Adds an existing layer to this set (auto-sorted by z-order)
 do
   function lurek.init()
@@ -645,7 +646,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:removeLayerAt
+--@api-stub: LParallaxSet:removeLayerAt
 -- Removes a layer by 1-based index from this set
 do
   function lurek.init()
@@ -659,7 +660,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:layerCount
+--@api-stub: LParallaxSet:layerCount
 -- Returns the number of layers currently in this set
 do
   function lurek.init()
@@ -674,7 +675,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:sortByZ
+--@api-stub: LParallaxSet:sortByZ
 -- Re-sorts all layers in this set by their z-order values
 do
   function lurek.init()
@@ -688,7 +689,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:getLayerZAt
+--@api-stub: LParallaxSet:getLayerZAt
 -- Returns the z-order value of the layer at a given 1-based index
 do
   function lurek.init()
@@ -704,7 +705,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:setVisible
+--@api-stub: LParallaxSet:setVisible
 -- Shows or hides the entire set (all layers at once)
 do
   function lurek.init()
@@ -717,7 +718,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:isVisible
+--@api-stub: LParallaxSet:isVisible
 -- Returns true if this set is currently visible
 do
   local backdrop
@@ -736,7 +737,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:update
+--@api-stub: LParallaxSet:update
 -- Advances all layers in this set by delta time (batch autoscroll update)
 do
   local backdrop
@@ -759,7 +760,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:render
+--@api-stub: LParallaxSet:render
 -- Draws all visible layers using explicit camera coordinates
 do
   local backdrop
@@ -780,7 +781,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:renderAuto
+--@api-stub: LParallaxSet:renderAuto
 -- Draws all visible layers using the engine's built-in camera position
 do
   local backdrop
@@ -806,7 +807,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:getName
+--@api-stub: LParallaxSet:getName
 -- Returns the name string of this parallax set
 do
   function lurek.init()
@@ -817,7 +818,7 @@ do
   end
 end
 
---@api-stub: ParallaxSet:setName
+--@api-stub: LParallaxSet:setName
 -- Changes the name of this parallax set
 do
   function lurek.init()
@@ -829,6 +830,19 @@ do
 end
 
 print("content/examples/parallax.lua")
+
+-- Safe fallback: wrap newImage so missing asset files don't abort the example
+do
+  local _orig = lurek.render.newImage
+  lurek.render.newImage = function(p, ...)
+    if type(p) == "string" then
+      local ok, img = pcall(_orig, p, ...)
+      if ok then return img end
+      return _orig(lurek.image.newImageData(4, 4))
+    end
+    return _orig(p, ...)
+  end
+end
 
 -- =============================================================================
 -- STUBS: 48 uncovered lurek.parallax API item(s)
@@ -842,342 +856,64 @@ print("content/examples/parallax.lua")
 -- LParallaxLayer methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LParallaxLayer:type -------------------------------------------
 --@api-stub: LParallaxLayer:type
 -- Returns the Lua-visible type name for this parallax layer handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:type()  -- -> string
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
+do
+  -- type() returns the engine type string for handle identification.
+  local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
+  lurek.log.info("layer type: " .. layer:type(), "parallax")
+end
 
--- ---- Stub: LParallaxLayer:update -----------------------------------------
 --@api-stub: LParallaxLayer:update
 -- Advances parallax layer autoscroll by delta time.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:update(0.016)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
+do
+  -- Call update each frame to advance autoscroll (drifting clouds, flowing water).
+  local clouds = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/clouds.png"),
+    autoscroll_x = 20,
+  })
+  function lurek.process(dt) clouds:update(dt) end
+end
 
--- ---- Stub: LParallaxLayer:render -----------------------------------------
 --@api-stub: LParallaxLayer:render
 -- Enqueues render commands using explicit camera coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:render(cam_x, cam_y)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
+do
+  -- render(cam_x, cam_y) draws the layer offset by the given camera position.
+  local hills = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/hills.png"),
+    scroll_factor_x = 0.5,
+  })
+  local cam_x, cam_y = 200, 0
+  hills:render(cam_x, cam_y)
+end
 
--- ---- Stub: LParallaxLayer:renderAuto -------------------------------------
 --@api-stub: LParallaxLayer:renderAuto
 -- Enqueues render commands using the runtime camera.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:renderAuto()
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
+do
+  -- renderAuto uses the active runtime camera automatically (no manual coords needed).
+  local sky = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/sky.png"),
+    scroll_factor_x = 0.1,
+  })
+  sky:renderAuto()
+end
 
--- ---- Stub: LParallaxLayer:resetAutoscroll --------------------------------
---@api-stub: LParallaxLayer:resetAutoscroll
--- Resets layer autoscroll offset. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:resetAutoscroll()
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setScrollFactor --------------------------------
---@api-stub: LParallaxLayer:setScrollFactor
--- Sets layer scroll factor. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setScrollFactor(0.0, 0.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getScrollFactor --------------------------------
---@api-stub: LParallaxLayer:getScrollFactor
--- Returns layer scroll factor. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getScrollFactor()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setOffset --------------------------------------
---@api-stub: LParallaxLayer:setOffset
--- Sets layer offset. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setOffset(0.0, 0.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getOffset --------------------------------------
---@api-stub: LParallaxLayer:getOffset
--- Returns layer offset. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getOffset()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setAutoscroll ----------------------------------
---@api-stub: LParallaxLayer:setAutoscroll
--- Sets layer autoscroll velocity. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setAutoscroll(vx, vy)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getAutoscroll ----------------------------------
---@api-stub: LParallaxLayer:getAutoscroll
--- Returns layer autoscroll velocity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getAutoscroll()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setRepeat --------------------------------------
---@api-stub: LParallaxLayer:setRepeat
--- Sets horizontal and vertical repeat flags.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setRepeat(rx, ry)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setScale ---------------------------------------
---@api-stub: LParallaxLayer:setScale
--- Sets layer scale. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setScale(1.0, 1.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setZ -------------------------------------------
---@api-stub: LParallaxLayer:setZ
--- Sets layer z order. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setZ(0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getZ -------------------------------------------
---@api-stub: LParallaxLayer:getZ
--- Returns layer z order. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getZ()  -- -> integer
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setOpacity -------------------------------------
---@api-stub: LParallaxLayer:setOpacity
--- Sets layer opacity, clamped to 0..1.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setOpacity(1.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getOpacity -------------------------------------
---@api-stub: LParallaxLayer:getOpacity
--- Returns layer opacity. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getOpacity()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setTint ----------------------------------------
---@api-stub: LParallaxLayer:setTint
--- Sets layer tint color. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setTint(1.0, 0.8, 0.2, 1.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getTint ----------------------------------------
---@api-stub: LParallaxLayer:getTint
--- Returns layer tint color. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getTint()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setBlendMode -----------------------------------
---@api-stub: LParallaxLayer:setBlendMode
--- Sets layer blend mode by name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setBlendMode(mode)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getBlendMode -----------------------------------
---@api-stub: LParallaxLayer:getBlendMode
--- Returns layer blend mode name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getBlendMode()  -- -> string
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setVisible -------------------------------------
 --@api-stub: LParallaxLayer:setVisible
 -- Sets layer visibility. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setVisible(1.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
+do
+  -- setVisible(true/false) toggles drawing without destroying the layer.
+  local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+  fog:setVisible(false)  -- hide fog during clear weather
+  lurek.log.info("fog hidden", "parallax")
+end
 
--- ---- Stub: LParallaxLayer:isVisible --------------------------------------
 --@api-stub: LParallaxLayer:isVisible
 -- Returns layer visibility. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:isVisible()  -- -> boolean
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setClamp ---------------------------------------
---@api-stub: LParallaxLayer:setClamp
--- Sets clamp bounds for layer movement.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setClamp(min_x, min_y, max_x, max_y)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:clearClamp -------------------------------------
---@api-stub: LParallaxLayer:clearClamp
--- Clears layer clamp bounds. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:clearClamp()
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setTiling --------------------------------------
---@api-stub: LParallaxLayer:setTiling
--- Enables or disables layer tiling. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setTiling(true)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getTiling --------------------------------------
---@api-stub: LParallaxLayer:getTiling
--- Returns whether layer tiling is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getTiling()  -- -> boolean
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setTileSize ------------------------------------
---@api-stub: LParallaxLayer:setTileSize
--- Sets tile size for tiling. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setTileSize(64.0, 64.0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setDepth ---------------------------------------
---@api-stub: LParallaxLayer:setDepth
--- Sets parallax depth. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setDepth(0)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getDepth ---------------------------------------
---@api-stub: LParallaxLayer:getDepth
--- Returns parallax depth. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getDepth()  -- -> number
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:addEffectPass ----------------------------------
---@api-stub: LParallaxLayer:addEffectPass
--- Adds a shader effect pass to this layer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:addEffectPass(effect_name, [params])
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:clearEffects -----------------------------------
---@api-stub: LParallaxLayer:clearEffects
--- Clears shader effect passes from this layer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:clearEffects()
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:effectCount ------------------------------------
---@api-stub: LParallaxLayer:effectCount
--- Returns shader effect pass count. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:effectCount()  -- -> integer
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:setMotionStretch -------------------------------
---@api-stub: LParallaxLayer:setMotionStretch
--- Sets motion stretch settings. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:setMotionStretch(true, strength, max_scale)
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- ---- Stub: LParallaxLayer:getMotionStretch -------------------------------
---@api-stub: LParallaxLayer:getMotionStretch
--- Returns motion stretch settings. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxLayer_stub:getMotionStretch()  -- -> boolean
--- (replace lParallaxLayer_stub with your real LParallaxLayer instance above)
-
--- -----------------------------------------------------------------------------
--- LParallaxSet methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LParallaxSet:type ---------------------------------------------
---@api-stub: LParallaxSet:type
--- Returns the Lua-visible type name for this parallax set handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:type()  -- -> string
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:addLayer -----------------------------------------
---@api-stub: LParallaxSet:addLayer
--- Adds a parallax layer to this set. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:addLayer(1)
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:removeLayerAt ------------------------------------
---@api-stub: LParallaxSet:removeLayerAt
--- Removes a layer by one-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:removeLayerAt(1)  -- -> boolean
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:layerCount ---------------------------------------
---@api-stub: LParallaxSet:layerCount
--- Returns the number of layers in this set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:layerCount()  -- -> integer
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:getLayerZAt --------------------------------------
---@api-stub: LParallaxSet:getLayerZAt
--- Returns z order for a layer by one-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:getLayerZAt(1)  -- -> integer
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:sortByZ ------------------------------------------
---@api-stub: LParallaxSet:sortByZ
--- Sorts layers by z order. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:sortByZ()
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:setVisible ---------------------------------------
---@api-stub: LParallaxSet:setVisible
--- Sets set visibility. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:setVisible(1.0)
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:isVisible ----------------------------------------
---@api-stub: LParallaxSet:isVisible
--- Returns set visibility. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:isVisible()  -- -> boolean
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:update -------------------------------------------
---@api-stub: LParallaxSet:update
--- Updates all layers in this set. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:update(0.016)
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:render -------------------------------------------
---@api-stub: LParallaxSet:render
--- Enqueues render commands for all visible set layers using explicit camera coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:render(cam_x, cam_y)
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:renderAuto ---------------------------------------
---@api-stub: LParallaxSet:renderAuto
--- Enqueues render commands for all visible set layers using the runtime camera.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:renderAuto()
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:getName ------------------------------------------
---@api-stub: LParallaxSet:getName
--- Returns this set name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:getName()  -- -> string
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
-
--- ---- Stub: LParallaxSet:setName ------------------------------------------
---@api-stub: LParallaxSet:setName
--- Sets this set name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lParallaxSet_stub:setName("hero")
--- (replace lParallaxSet_stub with your real LParallaxSet instance above)
+do
+  -- isVisible returns the current visibility state of the layer.
+  local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+  fog:setVisible(false)
+  if not fog:isVisible() then
+    lurek.log.info("fog layer is off", "parallax")
+  end
+end

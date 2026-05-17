@@ -423,7 +423,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- mouse.setCursor --
     /// Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
-    /// @param | cursor | LCursor | `LCursor`, system cursor string, or nil.
+    /// @param | cursor | any | `LCursor`, system cursor string, or nil.
     mouse.set(
         "setCursor",
         lua.create_function(move |_, cursor_val: LuaValue| {
@@ -1013,7 +1013,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- bind --
     /// Adds one or more keyboard/gamepad bindings to an action.
     /// @param | action | string | Action name.
-    /// @param | keys | string | Binding string or array table of binding strings.
+    /// @param | keys | any | Binding string or array table of binding strings.
     input_tbl.set(
         "bind",
         lua.create_function(move |_, (action, keys): (String, LuaValue)| {
@@ -1051,7 +1051,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newMapping --
     /// Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
     /// @param | name | string | Action name.
-    /// @param | keys | string | Binding string or array table of binding strings.
+    /// @param | keys | any | Binding string or array table of binding strings.
     /// @return | table | Mapping table with action query closures.
     /// @field | isDown | function | Returns true while the action is held.
     /// @field | wasPressed | function | Returns true on the frame the action was pressed.

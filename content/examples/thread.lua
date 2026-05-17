@@ -107,14 +107,14 @@ end
 -- LThread methods
 -- =============================================================================
 
---@api-stub: LThread:type
+--@api-stub: LChannel:type
 -- Returns the type name string for this thread handle (always "LThread").
 do
   local t = lurek.thread.newThread("-- noop")
   lurek.log.info("type = " .. t:type(), "thread")
 end
 
---@api-stub: LThread:typeOf
+--@api-stub: LChannel:typeOf
 -- Checks whether this thread handle matches a given type name.
 do
   local t = lurek.thread.newThread("-- noop")
@@ -164,7 +164,7 @@ do
   lurek.log.info("after wait: running=" .. tostring(job:isRunning()), "thread")
 end
 
---@api-stub: LThread:getError
+--@api-stub: LPromise:getError
 -- Returns the error message if the worker terminated with an error, or nil.
 do
   -- Always check getError after wait to handle worker failures gracefully.
@@ -183,14 +183,14 @@ end
 -- LThreadPool methods
 -- =============================================================================
 
---@api-stub: LThreadPool:type
+--@api-stub: LChannel:type
 -- Returns the type name string for this pool handle (always "LThreadPool").
 do
   local pool = lurek.thread.newPool(2, "-- noop")
   lurek.log.info("pool type = " .. pool:type(), "thread")
 end
 
---@api-stub: LThreadPool:typeOf
+--@api-stub: LChannel:typeOf
 -- Checks whether this pool handle matches a given type name.
 do
   local pool = lurek.thread.newPool(2, "-- noop")
@@ -285,14 +285,14 @@ end
 -- LPromise methods
 -- =============================================================================
 
---@api-stub: LPromise:type
+--@api-stub: LChannel:type
 -- Returns the type name string for this promise (always "LPromise").
 do
   local p = lurek.thread.async("-- noop")
   lurek.log.info("promise type = " .. p:type(), "thread")
 end
 
---@api-stub: LPromise:typeOf
+--@api-stub: LChannel:typeOf
 -- Checks whether this promise matches a given type name.
 do
   local p = lurek.thread.async("-- noop")

@@ -72,10 +72,10 @@
   - [LAnimStateMachine:typeOf(name: string) -> boolean](#lanimstatemachinetypeofname-string-boolean)
   - [LAnimStateMachine:update(dt: number)](#lanimstatemachineupdatedt-number)
   - [LAnimSyncGroup](#lanimsyncgroup)
-  - [LAnimSyncGroup:add(handle: table)](#lanimsyncgroupaddhandle-table)
+  - [LAnimSyncGroup:add(handle: integer)](#lanimsyncgroupaddhandle-integer)
   - [LAnimSyncGroup:clear()](#lanimsyncgroupclear)
   - [LAnimSyncGroup:memberCount() -> integer](#lanimsyncgroupmembercount-integer)
-  - [LAnimSyncGroup:remove(handle: table)](#lanimsyncgroupremovehandle-table)
+  - [LAnimSyncGroup:remove(handle: integer)](#lanimsyncgroupremovehandle-integer)
   - [LAnimSyncGroup:type() -> string](#lanimsyncgrouptype-string)
   - [LAnimSyncGroup:typeOf(name: string) -> boolean](#lanimsyncgrouptypeofname-string-boolean)
   - [LBlendLayerSet](#lblendlayerset)
@@ -235,7 +235,7 @@ do
     lurek.log.info("character clips: " .. bundle.animation:getClipCount(), "anim")
   end
   if bundle and bundle.stateMachine then
-    lurek.log.info("FSM initial state: " .. bundle.stateMachine:getState(), "anim")
+    lurek.log.info("FSM initial state: " .. (bundle.stateMachine --[[@as LAnimStateMachine]]):getState(), "anim")
   end
 end
 ```
@@ -403,8 +403,8 @@ do
   local squad = lurek.animation.newSyncGroup()
 
   -- Add handles (or IDs) of animations that should stay in lockstep.
-  squad:add(1)
-  squad:add(2)
+  squad:add(1 --[[@as table]])
+  squad:add(2 --[[@as table]])
   lurek.log.info("synced animations: " .. squad:memberCount(), "anim")
 end
 ```
@@ -1797,19 +1797,19 @@ do
   local squad = lurek.animation.newSyncGroup()
 
   -- Add handles (or IDs) of animations that should stay in lockstep.
-  squad:add(1)
-  squad:add(2)
+  squad:add(1 --[[@as table]])
+  squad:add(2 --[[@as table]])
   lurek.log.info("synced animations: " .. squad:memberCount(), "anim")
 end
 ```
 
-### `LAnimSyncGroup:add(handle: table)`
+### `LAnimSyncGroup:add(handle: integer)`
 
 Adds an animation-like handle to the sync group.
 
 **Parameters**
 
-- `handle` (`table`, required) - Animation handle accepted by future sync group implementations.
+- `handle` (`integer`, required) - Animation handle accepted by future sync group implementations.
 
 #### Example
 
@@ -1820,9 +1820,9 @@ do
   -- add() registers an animation handle in the sync group.
   -- All members will be coordinated to stay on the same playback phase.
   local squad = lurek.animation.newSyncGroup()
-  squad:add(1)  -- soldier 1's animation handle
-  squad:add(2)  -- soldier 2's animation handle
-  squad:add(3)  -- soldier 3's animation handle
+  squad:add(1 --[[@as table]])  -- soldier 1's animation handle
+  squad:add(2 --[[@as table]])  -- soldier 2's animation handle
+  squad:add(3 --[[@as table]])  -- soldier 3's animation handle
 end
 ```
 
@@ -1838,9 +1838,9 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 do
   -- clear() removes all members at once. Useful when disbanding a group.
   local squad = lurek.animation.newSyncGroup()
-  squad:add(1)
-  squad:add(2)
-  squad:add(3)
+  squad:add(1 --[[@as table]])
+  squad:add(2 --[[@as table]])
+  squad:add(3 --[[@as table]])
 
   -- Battle ended — disband the synchronized formation.
   squad:clear()
@@ -1861,8 +1861,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 do
   -- memberCount() returns how many handles are currently tracked.
   local squad = lurek.animation.newSyncGroup()
-  squad:add(1)
-  squad:add(2)
+  squad:add(1 --[[@as table]])
+  squad:add(2 --[[@as table]])
 
   if squad:memberCount() > 0 then
     lurek.log.info("synchronized squad size: " .. squad:memberCount(), "anim")
@@ -1870,13 +1870,13 @@ do
 end
 ```
 
-### `LAnimSyncGroup:remove(handle: table)`
+### `LAnimSyncGroup:remove(handle: integer)`
 
 Removes an animation-like handle from the sync group.
 
 **Parameters**
 
-- `handle` (`table`, required) - Animation handle accepted by future sync group implementations.
+- `handle` (`integer`, required) - Animation handle accepted by future sync group implementations.
 
 #### Example
 
@@ -1886,11 +1886,11 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 do
   -- remove() detaches a handle from the group. It will no longer be synchronized.
   local squad = lurek.animation.newSyncGroup()
-  squad:add(1)
-  squad:add(2)
+  squad:add(1 --[[@as table]])
+  squad:add(2 --[[@as table]])
 
   -- Soldier 1 broke formation — unsync their animation.
-  squad:remove(1)
+  squad:remove(1 --[[@as table]])
 end
 ```
 

@@ -1,0 +1,25 @@
+[2026-05-17T20:17:30.769Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
+[2026-05-17T20:17:30.770Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-05-17T20:17:30.770Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo
+[2026-05-17T20:17:30.887Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-05-17T20:17:30.888Z] WARN  GENERAL [Loader Message (0x0)]
+	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
+[2026-05-17T20:17:30.888Z] WARN  	objects: (type: INSTANCE, hndl: 0x193d076fcb0, name: ?)
+[2026-05-17T20:17:30.960Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-05-17T20:17:30.960Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-05-17T20:17:30.970Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T20:17:31.229Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-05-17T20:17:31.265Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T20:17:31.265Z] INFO  [L034] GPU texture dimension limit: 32768
+[2026-05-17T20:17:31.266Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T20:17:31.572Z] INFO  [L035] GPU initialised: 786ms (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-05-17T20:17:31.573Z] DEBUG Loaded 846 mappings.
+[2026-05-17T20:17:31.597Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T20:17:31.602Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T20:17:31.607Z] DEBUG [FS01] GameFS initialised
+[2026-05-17T20:17:31.986Z] DEBUG [AT01] Simulator created
+[2026-05-17T20:17:31.991Z] DEBUG [SC01] SC01
+[2026-05-17T20:17:31.992Z] DEBUG [GU01] GuiContext created
+[2026-05-17T20:17:31.992Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo\main.lua
+[2026-05-17T20:17:34.757Z] INFO  [L039] Window close requested
+[2026-05-17T20:17:34.758Z] INFO  [L002] Lurek2D Engine stopped

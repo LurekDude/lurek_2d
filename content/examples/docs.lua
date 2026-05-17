@@ -114,7 +114,7 @@ do
   assert(lurek.docs.getCatalog():entryCount() == 0, "catalog should be empty after reset")
 end
 
---@api-stub: lurek.docs.validate
+--@api-stub: LSchema:validate
 -- Compares a documentation catalog with the live reflected `lurek` API table
 do
   -- validate() checks whether your authored docs cover the real API.
@@ -337,7 +337,7 @@ end
 
 -- Schema methods
 
---@api-stub: Schema:validate
+--@api-stub: LSchema:validate
 -- Validates a table and returns success flag plus structured error details
 do
   -- validate() returns two values: a boolean (pass/fail) and an array of error
@@ -354,7 +354,7 @@ do
   end
 end
 
---@api-stub: Schema:check
+--@api-stub: LSchema:check
 -- Validates a table and returns only the boolean result
 do
   -- check() is the lightweight alternative to validate() — returns just true/false.
@@ -367,7 +367,7 @@ do
   end
 end
 
---@api-stub: Schema:assert
+--@api-stub: LSchema:assert
 -- Validates a table and raises a Lua error if validation fails
 do
   -- assert() is the strictest mode — on failure it raises a Lua error with
@@ -378,7 +378,7 @@ do
   lurek.log.info("config", "window config validated via assert")
 end
 
---@api-stub: Schema:getName
+--@api-stub: LDocEntry:getName
 -- Returns the display name of this schema
 do
   -- getName() returns the name passed as the second arg to schema() or "schema" by default.
@@ -387,7 +387,7 @@ do
   lurek.log.debug("schema", "loaded schema: " .. label) -- prints "Point"
 end
 
---@api-stub: Schema:getFields
+--@api-stub: LSchema:getFields
 -- Returns the field names declared by this schema
 do
   -- getFields() returns a sorted array of declared field names. Useful for
@@ -400,7 +400,7 @@ end
 
 -- DocEntry methods
 
---@api-stub: DocEntry:getName
+--@api-stub: LDocEntry:getName
 -- Returns the short name of this entry (without module prefix)
 do
   local catalog = lurek.docs.scanModule("audio")
@@ -411,7 +411,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getQualifiedName
+--@api-stub: LDocEntry:getQualifiedName
 -- Returns the full dotted API name of this entry
 do
   local catalog = lurek.docs.scan()
@@ -423,7 +423,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getModule
+--@api-stub: LDocEntry:getModule
 -- Returns the module name this entry belongs to
 do
   local catalog = lurek.docs.scan()
@@ -434,7 +434,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getKind
+--@api-stub: LDocEntry:getKind
 -- Returns the documentation kind: "function", "method", "type", or "value"
 do
   -- Use getKind() to filter entries by type when building help displays
@@ -446,7 +446,7 @@ do
   lurek.log.debug("docs", "found " .. type_count .. " type entries")
 end
 
---@api-stub: DocEntry:getDescription
+--@api-stub: LDocEntry:getDescription
 -- Returns the prose description text for this entry
 do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
@@ -459,7 +459,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getParameters
+--@api-stub: LDocEntry:getParameters
 -- Returns parameter metadata as an array of {name, type, description, optional, default}
 do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
@@ -476,7 +476,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getReturns
+--@api-stub: LDocEntry:getReturns
 -- Returns return-value metadata as an array of {type, description}
 do
   local ok, catalog = pcall(lurek.docs.loadToml, "docs/api/audio.toml")
@@ -490,7 +490,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getExample
+--@api-stub: LDocEntry:getExample
 -- Returns the example code snippet if one was recorded, or nil
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -503,7 +503,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getSince
+--@api-stub: LDocEntry:getSince
 -- Returns the version this entry was introduced, or nil
 do
   -- getSince() is useful for filtering "what's new in version X" help panels
@@ -518,7 +518,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getDeprecated
+--@api-stub: LDocEntry:getDeprecated
 -- Returns the deprecation notice if the entry is deprecated, or nil
 do
   -- getDeprecated() lets you warn users about soon-to-be-removed APIs
@@ -533,7 +533,7 @@ do
   end
 end
 
---@api-stub: DocEntry:getScore
+--@api-stub: LDocEntry:getScore
 -- Returns the documentation quality score for this entry (0.0 to 1.0)
 do
   -- getScore() rates how complete a single entry's documentation is.
@@ -548,7 +548,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasDescription
+--@api-stub: LDocEntry:hasDescription
 -- Returns true if this entry has a non-empty description
 do
   local catalog = lurek.docs.scan()
@@ -560,7 +560,7 @@ do
   lurek.log.info("docs", missing .. " entries missing descriptions (expected for live scan)")
 end
 
---@api-stub: DocEntry:hasParameters
+--@api-stub: LDocEntry:hasParameters
 -- Returns true if this entry has at least one parameter documented
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -575,7 +575,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasReturnType
+--@api-stub: LDocEntry:hasReturnType
 -- Returns true if this entry has at least one return type documented
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -590,7 +590,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasExample
+--@api-stub: LDocEntry:hasExample
 -- Returns true if this entry has example code recorded
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -605,7 +605,7 @@ end
 
 -- ApiCatalog methods
 
---@api-stub: ApiCatalog:getModules
+--@api-stub: LApiCatalog:getModules
 -- Returns sorted array of module names present in this catalog
 do
   -- getModules() lists all distinct modules — use it to build navigation menus
@@ -617,7 +617,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:getEntries
+--@api-stub: LApiCatalog:getEntries
 -- Returns entry array, optionally filtered to one module
 do
   -- Pass a module name to getEntries() to retrieve only that module's entries.
@@ -627,7 +627,7 @@ do
   lurek.log.info("docs", "audio has " .. #audio_entries .. " entries in live scan")
 end
 
---@api-stub: ApiCatalog:getEntry
+--@api-stub: LApiCatalog:getEntry
 -- Returns one entry by qualified name, or nil if not found
 do
   -- getEntry() does an exact qualified-name lookup — O(n) scan of the catalog.
@@ -640,7 +640,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:getTypes
+--@api-stub: LApiCatalog:getTypes
 -- Returns documented type names for one module
 do
   -- getTypes() filters entries where kind == "type" for a given module.
@@ -653,7 +653,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:getTypeMethods
+--@api-stub: LApiCatalog:getTypeMethods
 -- Returns method entries associated with a qualified type name
 do
   -- getTypeMethods() finds entries whose qualified name starts with the type prefix.
@@ -666,7 +666,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:entryCount
+--@api-stub: LApiCatalog:entryCount
 -- Returns entry count, optionally scoped to one module
 do
   -- entryCount() with no arg returns total entries; with a module name, only that module.
@@ -676,7 +676,7 @@ do
   lurek.log.info("docs", string.format("total %d, audio %d", total, audio))
 end
 
---@api-stub: ApiCatalog:merge
+--@api-stub: LApiCatalog:merge
 -- Merges another catalog into this one, returning a new combined catalog
 do
   -- merge() combines live reflection (all names, no descriptions) with authored
@@ -690,7 +690,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:filter
+--@api-stub: LApiCatalog:filter
 -- Builds a new catalog containing only entries accepted by a predicate function
 do
   -- filter() takes a function(entry) -> bool predicate. The returned catalog
@@ -702,7 +702,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:search
+--@api-stub: LApiCatalog:search
 -- Case-insensitive substring search across names, qualified names, and descriptions
 do
   -- search() is the basis for help-system search bars. It matches against
@@ -714,7 +714,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:toTable
+--@api-stub: LQualityReport:toTable
 -- Converts catalog to plain Lua tables for lightweight inspection
 do
   -- toTable() returns an array of plain tables with name, qualifiedName, module,
@@ -727,7 +727,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:toJSON
+--@api-stub: LQualityReport:toJSON
 -- Serializes catalog to pretty-printed JSON
 do
   -- toJSON() produces a JSON array of all entries with full metadata.
@@ -740,7 +740,7 @@ end
 
 -- ValidationReport methods
 
---@api-stub: ValidationReport:isValid
+--@api-stub: LValidationReport:isValid
 -- Returns true if no live APIs are missing from the catalog
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -754,7 +754,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:getMissing
+--@api-stub: LValidationReport:getMissing
 -- Returns array of qualified names that exist live but are not documented
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -767,7 +767,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:getPhantom
+--@api-stub: LValidationReport:getPhantom
 -- Returns array of qualified names documented but not present in live reflection
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -780,7 +780,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:getIncomplete
+--@api-stub: LValidationReport:getIncomplete
 -- Returns array of qualified names with incomplete documentation
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -793,7 +793,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:missingCount
+--@api-stub: LValidationReport:missingCount
 -- Returns count of live APIs missing from the catalog
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -805,7 +805,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:phantomCount
+--@api-stub: LValidationReport:phantomCount
 -- Returns count of documented APIs absent from live reflection
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -815,7 +815,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:incompleteCount
+--@api-stub: LValidationReport:incompleteCount
 -- Returns count of entries with incomplete documentation
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -825,7 +825,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:getSummary
+--@api-stub: LQualityReport:getSummary
 -- Returns a compact human-readable text summary of the validation result
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -836,7 +836,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:toTable
+--@api-stub: LQualityReport:toTable
 -- Converts the report to a plain Lua table with missing, phantom, incomplete arrays
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -847,7 +847,7 @@ do
   end
 end
 
---@api-stub: ValidationReport:toJSON
+--@api-stub: LQualityReport:toJSON
 -- Serializes the validation report to pretty-printed JSON
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -861,7 +861,7 @@ end
 
 -- QualityReport methods
 
---@api-stub: QualityReport:getOverallScore
+--@api-stub: LQualityReport:getOverallScore
 -- Returns the aggregate quality score (0.0 to 1.0)
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -874,7 +874,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getGrade
+--@api-stub: LQualityReport:getGrade
 -- Returns the letter grade (A, B, C, D, F) derived from the overall score
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -884,7 +884,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getModuleScores
+--@api-stub: LQualityReport:getModuleScores
 -- Returns a table mapping module names to their individual quality scores
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -897,7 +897,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getWorst
+--@api-stub: LQualityReport:getWorst
 -- Returns the N lowest-scoring entries (default 10)
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -910,7 +910,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getBest
+--@api-stub: LQualityReport:getBest
 -- Returns the N highest-scoring entries (default 10)
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -923,7 +923,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getByGrade
+--@api-stub: LQualityReport:getByGrade
 -- Returns entries matching a specific grade letter
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -935,7 +935,7 @@ do
   end
 end
 
---@api-stub: QualityReport:getSummary
+--@api-stub: LQualityReport:getSummary
 -- Returns a multiline human-readable quality summary with per-module breakdown
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -946,7 +946,7 @@ do
   end
 end
 
---@api-stub: QualityReport:toTable
+--@api-stub: LQualityReport:toTable
 -- Converts the quality report to a plain Lua table
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -958,7 +958,7 @@ do
   end
 end
 
---@api-stub: QualityReport:toJSON
+--@api-stub: LQualityReport:toJSON
 -- Serializes the quality report to pretty-printed JSON
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -969,7 +969,7 @@ do
   end
 end
 
---@api-stub: LApiCatalog:type
+--@api-stub: LQualityReport:type
 -- Returns the Lua-visible type name for this API catalog handle
 do
   local catalog = lurek.docs.scan()
@@ -978,7 +978,7 @@ do
   assert(t == "LApiCatalog", "expected LApiCatalog, got " .. t)
 end
 
---@api-stub: LApiCatalog:typeOf
+--@api-stub: LQualityReport:typeOf
 -- Returns whether this API catalog handle matches a supported type name
 do
   local catalog = lurek.docs.scan()
@@ -988,7 +988,7 @@ do
   assert(catalog:typeOf("Unknown") == false)
 end
 
---@api-stub: LDocEntry:type
+--@api-stub: LQualityReport:type
 -- Returns the Lua-visible type name for this documentation entry handle
 do
   local catalog = lurek.docs.scanModule("audio")
@@ -999,7 +999,7 @@ do
   end
 end
 
---@api-stub: LDocEntry:typeOf
+--@api-stub: LQualityReport:typeOf
 -- Returns whether this documentation entry handle matches a supported type name
 do
   local catalog = lurek.docs.scanModule("audio")
@@ -1033,14 +1033,14 @@ do
   end
 end
 
---@api-stub: LSchema:type
+--@api-stub: LQualityReport:type
 -- Returns the Lua-visible type name for this schema handle
 do
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true } }, "Stats")
   assert(schema:type() == "LSchema")
 end
 
---@api-stub: LSchema:typeOf
+--@api-stub: LQualityReport:typeOf
 -- Returns whether this schema handle matches a supported type name
 do
   local schema = lurek.docs.schema({ hp = { type = "integer", required = true } }, "Stats")
@@ -1049,14 +1049,14 @@ do
   assert(schema:typeOf("Unknown") == false)
 end
 
---@api-stub: LValidationReport:type
+--@api-stub: LQualityReport:type
 -- Returns the Lua-visible type name for this validation report handle
 do
   local report = lurek.docs.validate(nil)
   assert(report:type() == "LValidationReport")
 end
 
---@api-stub: LValidationReport:typeOf
+--@api-stub: LQualityReport:typeOf
 -- Returns whether this validation report handle matches a supported type name
 do
   local report = lurek.docs.validate(nil)
@@ -1079,368 +1079,67 @@ print("content/examples/docs.lua")
 -- LApiCatalog methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LApiCatalog:getModules ----------------------------------------
---@api-stub: LApiCatalog:getModules
--- Returns every module represented in this catalog.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:getModules()  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:getEntries ----------------------------------------
---@api-stub: LApiCatalog:getEntries
--- Returns catalog entries, optionally limited to one module.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:getEntries([module])  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:getEntry ------------------------------------------
---@api-stub: LApiCatalog:getEntry
--- Returns one catalog entry by qualified API name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:getEntry(qualified_name)  -- -> LuaValue
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:getTypes ------------------------------------------
---@api-stub: LApiCatalog:getTypes
--- Returns type names documented for one module.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:getTypes(module_name)  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:getTypeMethods ------------------------------------
---@api-stub: LApiCatalog:getTypeMethods
--- Returns method entries associated with a qualified type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:getTypeMethods(qualified_name)  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:entryCount ----------------------------------------
---@api-stub: LApiCatalog:entryCount
--- Counts entries in the catalog, optionally for one module.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:entryCount([module])  -- -> integer
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:merge ---------------------------------------------
---@api-stub: LApiCatalog:merge
--- Merges another catalog into this catalog and returns a new catalog value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:merge(other)  -- -> LApiCatalog
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:filter --------------------------------------------
---@api-stub: LApiCatalog:filter
--- Builds a new catalog containing entries accepted by a Lua predicate.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:filter(predicate)  -- -> LApiCatalog
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:search --------------------------------------------
---@api-stub: LApiCatalog:search
--- Searches names, qualified names, and descriptions with a case-insensitive substring query.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:search(query)  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
-
--- ---- Stub: LApiCatalog:toTable -------------------------------------------
 --@api-stub: LApiCatalog:toTable
 -- Converts this catalog into plain Lua tables for lightweight inspection.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:toTable()  -- -> table
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
+do
+  -- toTable returns a plain Lua table for custom processing or serialization.
+  local catalog = lurek.docs.scan()
+  local tbl = catalog:toTable()
+  lurek.log.info("docs", "catalog table has " .. #tbl .. " entries")
+end
 
--- ---- Stub: LApiCatalog:toJSON --------------------------------------------
 --@api-stub: LApiCatalog:toJSON
 -- Serializes this catalog to formatted JSON.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lApiCatalog_stub:toJSON()  -- -> string
--- (replace lApiCatalog_stub with your real LApiCatalog instance above)
+do
+  -- toJSON exports the catalog as a JSON string for external tools or CI checks.
+  local catalog = lurek.docs.scan()
+  local json = catalog:toJSON()
+  lurek.log.info("docs", "JSON export length: " .. #json .. " chars")
+end
 
 -- -----------------------------------------------------------------------------
 -- LDocEntry methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LDocEntry:getName ---------------------------------------------
---@api-stub: LDocEntry:getName
--- Returns the short API name stored by this documentation entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getName()  -- -> string
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getQualifiedName ------------------------------------
---@api-stub: LDocEntry:getQualifiedName
--- Returns the full dotted API name stored by this documentation entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getQualifiedName()  -- -> string
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getModule -------------------------------------------
---@api-stub: LDocEntry:getModule
--- Returns the module name associated with this documentation entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getModule()  -- -> string
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getKind ---------------------------------------------
---@api-stub: LDocEntry:getKind
--- Returns the documentation kind recorded for this entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getKind()  -- -> string
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getDescription --------------------------------------
---@api-stub: LDocEntry:getDescription
--- Returns the prose description recorded for this entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getDescription()  -- -> string
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getParameters ---------------------------------------
---@api-stub: LDocEntry:getParameters
--- Returns parameter metadata recorded for this entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getParameters()  -- -> table
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getReturns ------------------------------------------
---@api-stub: LDocEntry:getReturns
--- Returns return-value metadata recorded for this entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getReturns()  -- -> table
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getExample ------------------------------------------
---@api-stub: LDocEntry:getExample
--- Returns this entry's example text when one was recorded.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getExample()  -- -> LuaValue
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getSince --------------------------------------------
---@api-stub: LDocEntry:getSince
--- Returns this entry's since-version text when one was recorded.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getSince()  -- -> LuaValue
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getDeprecated ---------------------------------------
---@api-stub: LDocEntry:getDeprecated
--- Returns this entry's deprecation text when one was recorded.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getDeprecated()  -- -> LuaValue
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:getScore --------------------------------------------
---@api-stub: LDocEntry:getScore
--- Returns the documentation quality score calculated for this entry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:getScore()  -- -> number
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:hasDescription --------------------------------------
---@api-stub: LDocEntry:hasDescription
--- Returns whether this entry has non-empty description text.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:hasDescription()  -- -> boolean
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:hasParameters ---------------------------------------
---@api-stub: LDocEntry:hasParameters
--- Returns whether this entry has parameter metadata.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:hasParameters()  -- -> boolean
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:hasReturnType ---------------------------------------
---@api-stub: LDocEntry:hasReturnType
--- Returns whether this entry has return-value metadata.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:hasReturnType()  -- -> boolean
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- ---- Stub: LDocEntry:hasExample ------------------------------------------
---@api-stub: LDocEntry:hasExample
--- Returns whether this entry has example text.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lDocEntry_stub:hasExample()  -- -> boolean
--- (replace lDocEntry_stub with your real LDocEntry instance above)
-
--- -----------------------------------------------------------------------------
--- LQualityReport methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LQualityReport:getOverallScore --------------------------------
---@api-stub: LQualityReport:getOverallScore
--- Returns the aggregate documentation quality score.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getOverallScore()  -- -> number
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getGrade ---------------------------------------
---@api-stub: LQualityReport:getGrade
--- Returns the letter grade derived from the aggregate documentation score.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getGrade()  -- -> string
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getModuleScores --------------------------------
---@api-stub: LQualityReport:getModuleScores
--- Returns per-module documentation quality scores.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getModuleScores()  -- -> table
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getWorst ---------------------------------------
---@api-stub: LQualityReport:getWorst
--- Returns the lowest-scoring documentation entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getWorst([count])  -- -> table
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getBest ----------------------------------------
---@api-stub: LQualityReport:getBest
--- Returns the highest-scoring documentation entries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getBest([count])  -- -> table
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getByGrade -------------------------------------
---@api-stub: LQualityReport:getByGrade
--- Returns documentation entries whose calculated grade matches a grade string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getByGrade(grade)  -- -> table
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:getSummary -------------------------------------
---@api-stub: LQualityReport:getSummary
--- Returns a human-readable summary of overall and per-module quality scores.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:getSummary()  -- -> string
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:toTable ----------------------------------------
---@api-stub: LQualityReport:toTable
--- Converts this quality report into a plain Lua table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:toTable()  -- -> table
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- ---- Stub: LQualityReport:toJSON -----------------------------------------
---@api-stub: LQualityReport:toJSON
--- Serializes this quality report to formatted JSON.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lQualityReport_stub:toJSON()  -- -> string
--- (replace lQualityReport_stub with your real LQualityReport instance above)
-
--- -----------------------------------------------------------------------------
--- LSchema methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LSchema:validate ----------------------------------------------
---@api-stub: LSchema:validate
--- Validates a Lua table and returns a success flag plus structured error rows.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSchema_stub:validate(data)  -- -> boolean
--- (replace lSchema_stub with your real LSchema instance above)
-
--- ---- Stub: LSchema:check -------------------------------------------------
---@api-stub: LSchema:check
--- Validates a Lua table and returns only the boolean result.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSchema_stub:check(data)  -- -> boolean
--- (replace lSchema_stub with your real LSchema instance above)
-
--- ---- Stub: LSchema:assert ------------------------------------------------
---@api-stub: LSchema:assert
--- Validates a Lua table and raises a Lua error when schema checks fail.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSchema_stub:assert(data)
--- (replace lSchema_stub with your real LSchema instance above)
-
--- ---- Stub: LSchema:getName -----------------------------------------------
 --@api-stub: LSchema:getName
 -- Returns this schema's display name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSchema_stub:getName()  -- -> string
--- (replace lSchema_stub with your real LSchema instance above)
+do
+  -- getName retrieves the label assigned at schema creation for logging or UI.
+  local schema = lurek.docs.schema({ hp = { type = "integer" } }, "EntityStats")
+  lurek.log.info("docs", "schema name: " .. schema:getName())
+end
 
--- ---- Stub: LSchema:getFields ---------------------------------------------
---@api-stub: LSchema:getFields
--- Returns the field names declared by this schema.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSchema_stub:getFields()  -- -> table
--- (replace lSchema_stub with your real LSchema instance above)
-
--- -----------------------------------------------------------------------------
--- LValidationReport methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LValidationReport:isValid -------------------------------------
---@api-stub: LValidationReport:isValid
--- Returns whether the validation report has no missing live APIs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:isValid()  -- -> boolean
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:getMissing ----------------------------------
---@api-stub: LValidationReport:getMissing
--- Returns live APIs that were missing from the checked catalog.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:getMissing()  -- -> table
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:getPhantom ----------------------------------
---@api-stub: LValidationReport:getPhantom
--- Returns catalog APIs that were not present in the live Lua table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:getPhantom()  -- -> table
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:getIncomplete -------------------------------
---@api-stub: LValidationReport:getIncomplete
--- Returns catalog APIs whose documentation was incomplete.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:getIncomplete()  -- -> table
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:missingCount --------------------------------
---@api-stub: LValidationReport:missingCount
--- Returns the number of live APIs missing from the catalog.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:missingCount()  -- -> integer
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:phantomCount --------------------------------
---@api-stub: LValidationReport:phantomCount
--- Returns the number of catalog APIs absent from live reflection.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:phantomCount()  -- -> integer
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:incompleteCount -----------------------------
---@api-stub: LValidationReport:incompleteCount
--- Returns the number of catalog APIs with incomplete documentation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:incompleteCount()  -- -> integer
--- (replace lValidationReport_stub with your real LValidationReport instance above)
-
--- ---- Stub: LValidationReport:getSummary ----------------------------------
 --@api-stub: LValidationReport:getSummary
 -- Returns a compact text summary of missing, phantom, and incomplete counts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:getSummary()  -- -> string
--- (replace lValidationReport_stub with your real LValidationReport instance above)
+do
+  -- getSummary gives a one-line overview ideal for CI output or log messages.
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local report = lurek.docs.validate(catalog)
+    lurek.log.info("docs", "validation: " .. report:getSummary())
+  end
+end
 
--- ---- Stub: LValidationReport:toTable -------------------------------------
 --@api-stub: LValidationReport:toTable
 -- Converts this validation report into a plain Lua table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:toTable()  -- -> table
--- (replace lValidationReport_stub with your real LValidationReport instance above)
+do
+  -- toTable returns structured data for custom processing or display.
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local report = lurek.docs.validate(catalog)
+    local tbl = report:toTable()
+    lurek.log.info("docs", "report fields: missing=" .. tostring(tbl.missing_count))
+  end
+end
 
--- ---- Stub: LValidationReport:toJSON --------------------------------------
 --@api-stub: LValidationReport:toJSON
 -- Serializes this validation report to formatted JSON.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lValidationReport_stub:toJSON()  -- -> string
--- (replace lValidationReport_stub with your real LValidationReport instance above)
+do
+  -- toJSON exports the validation report for external dashboards or CI artifacts.
+  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
+  if ok then
+    local report = lurek.docs.validate(catalog)
+    local json = report:toJSON()
+    lurek.log.info("docs", "validation JSON length: " .. #json .. " chars")
+  end
+end

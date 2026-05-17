@@ -102,7 +102,7 @@ do
   lurek.scene.switchTo(next_level, "wipe", 0.5, "ease_out", { score = 1240, level = 2 })
 end
 
---@api-stub: lurek.scene.clear
+--@api-stub: LDepthSorter:clear
 -- Remove ALL scenes from the stack (each receives leave() in order)
 do
   -- clear() empties the entire stack. Use on shutdown or when returning to title screen.

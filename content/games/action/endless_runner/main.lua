@@ -484,10 +484,10 @@ function lurek.init()
     lurek.window.setTitle("Endless Runner — Lurek2D")
     lurek.render.setBackgroundColor(0.4, 0.6, 0.9)
 
-    lurek.input.bind("jump",  {"space", "w", "up"})
-    lurek.input.bind("slide", {"s", "down"})
-    lurek.input.bind("quit",  {"escape"})
-    lurek.input.bind("start", {"return"})
+    lurek.input.bind("jump",  "space"); lurek.input.bind("jump",  "w"); lurek.input.bind("jump",  "up")
+    lurek.input.bind("slide", "s");     lurek.input.bind("slide", "down")
+    lurek.input.bind("quit",  "escape")
+    lurek.input.bind("start", "return")
 
     -- Particle: landing dust
     dust_ps = lurek.particle.newSystem({

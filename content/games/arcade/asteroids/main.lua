@@ -233,13 +233,13 @@ function lurek.init()
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Action-based input bindings
-    lurek.input.bind("rotate_left",  { "a", "left"  })
-    lurek.input.bind("rotate_right", { "d", "right" })
-    lurek.input.bind("thrust",       { "w", "up"    })
-    lurek.input.bind("fire",         { "space"       })
-    lurek.input.bind("confirm",      { "return", "kp_enter" })
-    lurek.input.bind("restart",      { "r"           })
-    lurek.input.bind("quit",         { "escape"      })
+    lurek.input.bind("rotate_left",  "a");    lurek.input.bind("rotate_left",  "left")
+    lurek.input.bind("rotate_right", "d");    lurek.input.bind("rotate_right", "right")
+    lurek.input.bind("thrust",       "w");    lurek.input.bind("thrust",       "up")
+    lurek.input.bind("fire",         "space")
+    lurek.input.bind("confirm",      "return"); lurek.input.bind("confirm", "kp_enter")
+    lurek.input.bind("restart",      "r")
+    lurek.input.bind("quit",         "escape")
 
     -- Explosion particles
     explosions = lurek.particle.newSystem({

@@ -23,10 +23,10 @@
   - [lurek.event.newSignal() -> LSignal](#lurekeventnewsignal-lsignal)
   - [lurek.event.poll() -> function](#lurekeventpoll-function)
   - [lurek.event.pump()](#lurekeventpump)
-  - [lurek.event.push(name: string, ...: table)](#lurekeventpushname-string-table)
-  - [lurek.event.pushDeferred(name: string, ...: table)](#lurekeventpushdeferredname-string-table)
-  - [lurek.event.pushDeferredPriority(name: string, priority: string, ...: table)](#lurekeventpushdeferredpriorityname-string-priority-string-table)
-  - [lurek.event.pushPriority(name: string, priority: string, ...: table)](#lurekeventpushpriorityname-string-priority-string-table)
+  - [lurek.event.push(name: string, ...: any)](#lurekeventpushname-string-any)
+  - [lurek.event.pushDeferred(name: string, ...: any)](#lurekeventpushdeferredname-string-any)
+  - [lurek.event.pushDeferredPriority(name: string, priority: string, ...: any)](#lurekeventpushdeferredpriorityname-string-priority-string-any)
+  - [lurek.event.pushPriority(name: string, priority: string, ...: any)](#lurekeventpushpriorityname-string-priority-string-any)
   - [lurek.event.quit()](#lurekeventquit)
   - [lurek.event.restart()](#lurekeventrestart)
   - [lurek.event.wait([timeout]: number) -> boolean](#lurekeventwaittimeout-number-boolean)
@@ -35,7 +35,7 @@
   - [LSignal:clear(name: string) -> integer](#lsignalclearname-string-integer)
   - [LSignal:clearAll() -> integer](#lsignalclearall-integer)
   - [LSignal:connect(name: string, func: function) -> integer](#lsignalconnectname-string-func-function-integer)
-  - [LSignal:emit(name: string, ...: table)](#lsignalemitname-string-table)
+  - [LSignal:emit(name: string, ...: any)](#lsignalemitname-string-any)
   - [LSignal:getCount(name: string) -> integer](#lsignalgetcountname-string-integer)
   - [LSignal:getTotalCount() -> integer](#lsignalgettotalcount-integer)
   - [LSignal:once(name: string, callback: function) -> integer](#lsignaloncename-string-callback-function-integer)
@@ -136,10 +136,10 @@ lurek.event.getHistory() -> table -- Returns retained pushed event history entri
 lurek.event.newSignal() -> LSignal -- Creates an isolated signal dispatcher for Lua callbacks.
 lurek.event.poll() -> function -- Creates a polling function that returns the next queued event each time it is called.
 lurek.event.pump() -- Pumps the shared event queue without removing events for Lua.
-lurek.event.push(name: string, ...: table) -- Pushes a normal-priority event into the shared event queue and optional history.
-lurek.event.pushDeferred(name: string, ...: table) -- Adds a normal-priority event to the deferred buffer instead of the live queue.
-lurek.event.pushDeferredPriority(name: string, priority: string, ...: table) -- Adds an event with explicit priority to the deferred buffer.
-lurek.event.pushPriority(name: string, priority: string, ...: table) -- Pushes an event with explicit priority into the shared event queue and optional history.
+lurek.event.push(name: string, ...: any) -- Pushes a normal-priority event into the shared event queue and optional history.
+lurek.event.pushDeferred(name: string, ...: any) -- Adds a normal-priority event to the deferred buffer instead of the live queue.
+lurek.event.pushDeferredPriority(name: string, priority: string, ...: any) -- Adds an event with explicit priority to the deferred buffer.
+lurek.event.pushPriority(name: string, priority: string, ...: any) -- Pushes an event with explicit priority into the shared event queue and optional history.
 lurek.event.quit() -- Requests engine shutdown with exit code zero.
 lurek.event.restart() -- Requests a full engine restart cycle from the runtime.
 lurek.event.wait([timeout]: number) -> boolean -- Waits for the next queued event and returns success, name, and argument table.
@@ -345,14 +345,14 @@ do
 end
 ```
 
-### `lurek.event.push(name: string, ...: table)`
+### `lurek.event.push(name: string, ...: any)`
 
 Pushes a normal-priority event into the shared event queue and optional history.
 
 **Parameters**
 
 - `name` (`string`, required) - Event name.
-- `...` (`table`, required) - Additional event arguments.
+- `...` (`any`, required) - Additional event arguments.
 
 #### Example
 
@@ -372,14 +372,14 @@ do
 end
 ```
 
-### `lurek.event.pushDeferred(name: string, ...: table)`
+### `lurek.event.pushDeferred(name: string, ...: any)`
 
 Adds a normal-priority event to the deferred buffer instead of the live queue.
 
 **Parameters**
 
 - `name` (`string`, required) - Event name to enqueue later.
-- `...` (`table`, required) - Additional event arguments stored with the event.
+- `...` (`any`, required) - Additional event arguments stored with the event.
 
 #### Example
 
@@ -397,7 +397,7 @@ do
 end
 ```
 
-### `lurek.event.pushDeferredPriority(name: string, priority: string, ...: table)`
+### `lurek.event.pushDeferredPriority(name: string, priority: string, ...: any)`
 
 Adds an event with explicit priority to the deferred buffer.
 
@@ -405,7 +405,7 @@ Adds an event with explicit priority to the deferred buffer.
 
 - `name` (`string`, required) - Event name to enqueue later.
 - `priority` (`string`, required) - Priority string `high` or `normal`.
-- `...` (`table`, required) - Additional event arguments stored with the event.
+- `...` (`any`, required) - Additional event arguments stored with the event.
 
 #### Example
 
@@ -421,7 +421,7 @@ do
 end
 ```
 
-### `lurek.event.pushPriority(name: string, priority: string, ...: table)`
+### `lurek.event.pushPriority(name: string, priority: string, ...: any)`
 
 Pushes an event with explicit priority into the shared event queue and optional history.
 
@@ -429,7 +429,7 @@ Pushes an event with explicit priority into the shared event queue and optional 
 
 - `name` (`string`, required) - Event name.
 - `priority` (`string`, required) - Priority string `high` or `normal`.
-- `...` (`table`, required) - Additional event arguments.
+- `...` (`any`, required) - Additional event arguments.
 
 #### Example
 
@@ -617,14 +617,14 @@ do
 end
 ```
 
-### `LSignal:emit(name: string, ...: table)`
+### `LSignal:emit(name: string, ...: any)`
 
 Emits a signal event and invokes matching callbacks with the remaining arguments.
 
 **Parameters**
 
 - `name` (`string`, required) - Signal event name to emit.
-- `...` (`table`, required) - Additional arguments passed to matching callbacks.
+- `...` (`any`, required) - Additional arguments passed to matching callbacks.
 
 #### Example
 

@@ -39,7 +39,7 @@
   - [LDatabase:type() -> string](#ldatabasetype-string)
   - [LDatabase:typeOf(name: string) -> boolean](#ldatabasetypeofname-string-boolean)
   - [LDataFrame](#ldataframe)
-  - [LDataFrame:addColumn(name: string, [default]: string)](#ldataframeaddcolumnname-string-default-string)
+  - [LDataFrame:addColumn(name: string, [default]: any)](#ldataframeaddcolumnname-string-default-any)
   - [LDataFrame:addRow([row_tbl]: table) -> integer](#ldataframeaddrowrowtbl-table-integer)
   - [LDataFrame:addRowBatch(rows: table)](#ldataframeaddrowbatchrows-table)
   - [LDataFrame:apply(col_val: string, func: function)](#ldataframeapplycolval-string-func-function)
@@ -52,8 +52,8 @@
   - [LDataFrame:describe() -> LDataFrame](#ldataframedescribe-ldataframe)
   - [LDataFrame:dropNil(col: string) -> LDataFrame](#ldataframedropnilcol-string-ldataframe)
   - [LDataFrame:entropy(col: string) -> number](#ldataframeentropycol-string-number)
-  - [LDataFrame:fillNil(col: string, val: string)](#ldataframefillnilcol-string-val-string)
-  - [LDataFrame:filter(col: string, op: string, val: string) -> LDataFrame](#ldataframefiltercol-string-op-string-val-string-ldataframe)
+  - [LDataFrame:fillNil(col: string, val: any)](#ldataframefillnilcol-string-val-any)
+  - [LDataFrame:filter(col: string, op: string, val: any) -> LDataFrame](#ldataframefiltercol-string-op-string-val-any-ldataframe)
   - [LDataFrame:getColumn(col: string) -> number[]](#ldataframegetcolumncol-string-number)
   - [LDataFrame:getColumnAsF64(col: string) -> number[]](#ldataframegetcolumnasf64col-string-number)
   - [LDataFrame:getRow(row: integer) -> table](#ldataframegetrowrow-integer-table)
@@ -87,7 +87,7 @@
   - [LDataFrame:sample(n: integer, [seed]: integer) -> LDataFrame](#ldataframesamplen-integer-seed-integer-ldataframe)
   - [LDataFrame:select(...: string) -> LDataFrame](#ldataframeselect-string-ldataframe)
   - [LDataFrame:setColumnFromF64(col: string, values: table)](#ldataframesetcolumnfromf64col-string-values-table)
-  - [LDataFrame:setValue(row: integer, col: string, val: string)](#ldataframesetvaluerow-integer-col-string-val-string)
+  - [LDataFrame:setValue(row: integer, col: string, val: any)](#ldataframesetvaluerow-integer-col-string-val-any)
   - [LDataFrame:slice(start: integer, end: integer) -> LDataFrame](#ldataframeslicestart-integer-end-integer-ldataframe)
   - [LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame](#ldataframesortcol-string-ascending-boolean-ldataframe)
   - [LDataFrame:stddev(col: string) -> number](#ldataframestddevcol-string-number)
@@ -118,7 +118,7 @@
   - [LLazyQuery](#llazyquery)
   - [LLazyQuery:collect() -> LDataFrame](#llazyquerycollect-ldataframe)
   - [LLazyQuery:dropNil(col: string) -> LLazyQuery](#llazyquerydropnilcol-string-llazyquery)
-  - [LLazyQuery:filter(col: string, op: string, val: string) -> LLazyQuery](#llazyqueryfiltercol-string-op-string-val-string-llazyquery)
+  - [LLazyQuery:filter(col: string, op: string, val: any) -> LLazyQuery](#llazyqueryfiltercol-string-op-string-val-any-llazyquery)
   - [LLazyQuery:head(n: integer) -> LLazyQuery](#llazyqueryheadn-integer-llazyquery)
   - [LLazyQuery:limit(n: integer) -> LLazyQuery](#llazyquerylimitn-integer-llazyquery)
   - [LLazyQuery:select(cols: table) -> LLazyQuery](#llazyqueryselectcols-table-llazyquery)
@@ -907,14 +907,14 @@ do
 end
 ```
 
-### `LDataFrame:addColumn(name: string, [default]: string)`
+### `LDataFrame:addColumn(name: string, [default]: any)`
 
 Adds a column with an optional default value.
 
 **Parameters**
 
 - `name` (`string`, required) - Column name to create.
-- `default` (`string`, optional) - Default cell value for existing rows; nil uses empty cells.
+- `default` (`any`, optional) - Default cell value for existing rows; nil uses empty cells.
 
 #### Example
 
@@ -1261,14 +1261,14 @@ do
 end
 ```
 
-### `LDataFrame:fillNil(col: string, val: string)`
+### `LDataFrame:fillNil(col: string, val: any)`
 
 Replaces nil cells in a column with a value.
 
 **Parameters**
 
 - `col` (`string`, required) - Column name string or one-based column index.
-- `val` (`string`, required) - Replacement cell value.
+- `val` (`any`, required) - Replacement cell value.
 
 #### Example
 
@@ -1290,7 +1290,7 @@ do
 end
 ```
 
-### `LDataFrame:filter(col: string, op: string, val: string) -> LDataFrame`
+### `LDataFrame:filter(col: string, op: string, val: any) -> LDataFrame`
 
 Returns rows whose column value matches a comparison.
 
@@ -1298,7 +1298,7 @@ Returns rows whose column value matches a comparison.
 
 - `col` (`string`, required) - Column name string or one-based column index.
 - `op` (`string`, required) - Comparison operator string.
-- `val` (`string`, required) - Cell value used as the comparison target.
+- `val` (`any`, required) - Cell value used as the comparison target.
 
 **Returns**: `LDataFrame` - New filtered dataframe.
 
@@ -2268,7 +2268,7 @@ do
 end
 ```
 
-### `LDataFrame:setValue(row: integer, col: string, val: string)`
+### `LDataFrame:setValue(row: integer, col: string, val: any)`
 
 Sets one cell value by one-based row and column reference.
 
@@ -2276,7 +2276,7 @@ Sets one cell value by one-based row and column reference.
 
 - `row` (`integer`, required) - One-based row index.
 - `col` (`string`, required) - Column name string or one-based column index.
-- `val` (`string`, required) - Cell value to store.
+- `val` (`any`, required) - Cell value to store.
 
 #### Example
 
@@ -3198,7 +3198,7 @@ do
 end
 ```
 
-### `LLazyQuery:filter(col: string, op: string, val: string) -> LLazyQuery`
+### `LLazyQuery:filter(col: string, op: string, val: any) -> LLazyQuery`
 
 Adds a filter step to the lazy query.
 
@@ -3206,7 +3206,7 @@ Adds a filter step to the lazy query.
 
 - `col` (`string`, required) - Column name to filter.
 - `op` (`string`, required) - Comparison operator string.
-- `val` (`string`, required) - Filter comparison value.
+- `val` (`any`, required) - Filter comparison value.
 
 **Returns**: `LLazyQuery` - New lazy query handle with the filter step.
 

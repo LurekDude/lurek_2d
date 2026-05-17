@@ -2004,7 +2004,7 @@ function LAnimStateMachine:update(dt) end
 LAnimSyncGroup = {}
 
 --- Adds an animation-like handle to the sync group.
----@param handle table Animation handle accepted by future sync group implementations.
+---@param handle number Animation handle accepted by future sync group implementations.
 function LAnimSyncGroup:add(handle) end
 
 --- Removes all members from the sync group.
@@ -2015,7 +2015,7 @@ function LAnimSyncGroup:clear() end
 function LAnimSyncGroup:memberCount() end
 
 --- Removes an animation-like handle from the sync group.
----@param handle table Animation handle accepted by future sync group implementations.
+---@param handle number Animation handle accepted by future sync group implementations.
 function LAnimSyncGroup:remove(handle) end
 
 --- Returns the Lua-visible type name for this animation sync group handle.
@@ -3909,7 +3909,7 @@ LArray = {}
 function LArray:abs() end
 
 --- Returns element-wise addition with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New array containing the addition result.
 function LArray:add(value) end
 
@@ -4016,7 +4016,7 @@ function LArray:diff(order) end
 function LArray:dilate(radius) end
 
 --- Returns element-wise division with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New array containing the division result.
 function LArray:div(value) end
 
@@ -4040,7 +4040,7 @@ function LArray:dot(other) end
 function LArray:eigenPower(max_iter, tol) end
 
 --- Returns element-wise equality comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:eq(value) end
 
@@ -4095,12 +4095,12 @@ function LArray:getShape() end
 function LArray:getSize() end
 
 --- Returns element-wise greater-than comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:gt(value) end
 
 --- Returns element-wise greater-or-equal comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:gte(value) end
 
@@ -4126,12 +4126,12 @@ function LArray:isOnGPU() end
 function LArray:linsolve(b) end
 
 --- Returns element-wise less-than comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:lt(value) end
 
 --- Returns element-wise less-or-equal comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:lte(value) end
 
@@ -4156,22 +4156,25 @@ function LArray:map(func) end
 function LArray:matmul(other) end
 
 --- Returns total maximum or a maximum array along a one-based axis.
----@param axis? number Optional one-based axis to reduce.
----@return number LArray | Scalar maximum when no axis given, or reduced array along the axis.
-function LArray:max(axis) end
+---@return number Scalar maximum when no axis is given.
+---@overload fun(axis: number): LArray # Reduced array of maximum values along the axis.
+---@overload fun(self: LArray, axis: number): LArray # Reduced array of maximum values along the axis.
+function LArray:max() end
 
 --- Returns total mean or a mean array along a one-based axis.
----@param axis? number Optional one-based axis to reduce.
----@return number LArray | Scalar mean when no axis given, or reduced array along the axis.
-function LArray:mean(axis) end
+---@return number Scalar mean when no axis is given.
+---@overload fun(axis: number): LArray # Reduced array of axis means.
+---@overload fun(self: LArray, axis: number): LArray # Reduced array of axis means.
+function LArray:mean() end
 
 --- Returns total minimum or a minimum array along a one-based axis.
----@param axis? number Optional one-based axis to reduce.
----@return number LArray | Scalar minimum when no axis given, or reduced array along the axis.
-function LArray:min(axis) end
+---@return number Scalar minimum when no axis is given.
+---@overload fun(axis: number): LArray # Reduced array of minimum values along the axis.
+---@overload fun(self: LArray, axis: number): LArray # Reduced array of minimum values along the axis.
+function LArray:min() end
 
 --- Returns element-wise multiplication with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New array containing the multiplication result.
 function LArray:mul(value) end
 
@@ -4184,7 +4187,7 @@ function LArray:mulInplace(other) end
 function LArray:neg() end
 
 --- Returns element-wise inequality comparison with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New mask array containing comparison results.
 function LArray:neq(value) end
 
@@ -4258,7 +4261,7 @@ function LArray:sobel() end
 function LArray:sqrt() end
 
 --- Returns element-wise subtraction with an array or scalar.
----@param value LArray LArray or scalar number for element-wise operation.
+---@param value any Array or scalar number for element-wise operation.
 ---@return LArray New array containing the subtraction result.
 function LArray:sub(value) end
 
@@ -4267,9 +4270,10 @@ function LArray:sub(value) end
 function LArray:subInplace(other) end
 
 --- Returns total sum or a summed array along a one-based axis.
----@param axis? number Optional one-based axis to reduce.
----@return number LArray | Scalar sum when no axis given, or reduced array along the axis.
-function LArray:sum(axis) end
+---@return number Scalar sum when no axis is given.
+---@overload fun(axis: number): LArray # Reduced array along the requested one-based axis.
+---@overload fun(self: LArray, axis: number): LArray # Reduced array along the requested one-based axis.
+function LArray:sum() end
 
 --- Returns a mask array where values above a threshold are selected.
 ---@param val number Threshold value.
@@ -4612,7 +4616,7 @@ function LRingBuffer:peekNewest() end
 function LRingBuffer:pop() end
 
 --- Pushes a value into the ring buffer and evicts the oldest value when full.
----@param value table Lua value to store in the buffer.
+---@param value any Lua value to store in the buffer.
 ---@return boolean True when the push evicted an older value.
 function LRingBuffer:push(value) end
 
@@ -4638,7 +4642,7 @@ lurek.data.compress = function(format_str, raw_data, level) end
 
 --- Compresses a string or table of strings as a chunked byte stream.
 ---@param format_str string Compression format name.
----@param chunks string Binary string or array table of binary strings.
+---@param chunks any Binary string or array table of binary strings.
 ---@param level? number Optional compression level; defaults to 6.
 ---@return string Compressed binary byte string.
 lurek.data.compressChunks = function(format_str, chunks, level) end
@@ -4662,7 +4666,7 @@ lurek.data.decompress = function(format_str, compressed) end
 
 --- Decompresses a string or table of strings as a chunked byte stream.
 ---@param format_str string Compression format name.
----@param chunks string Binary string or array table of binary strings.
+---@param chunks any Binary string or array table of binary strings.
 ---@return string Decompressed binary byte string.
 lurek.data.decompressChunks = function(format_str, chunks) end
 
@@ -4684,7 +4688,7 @@ lurek.data.fromMsgPack = function(bytes) end
 
 --- Computes the packed byte size for values and a format string.
 ---@param fmt string Binary pack format string.
----@param ... table Values measured according to the format.
+---@param ... any Values measured according to the format.
 ---@return number Packed byte size.
 lurek.data.getPackedSize = function(fmt, ...) end
 
@@ -4695,7 +4699,7 @@ lurek.data.getPackedSize = function(fmt, ...) end
 lurek.data.hash = function(algo_str, raw_data) end
 
 --- Creates ByteData from a size or string.
----@param value table Integer size for zeroed bytes, or string used as initial bytes.
+---@param value any Integer size for zeroed bytes, or string used as initial bytes.
 ---@return LByteData New LByteData userdata.
 lurek.data.newByteData = function(value) end
 
@@ -4717,7 +4721,7 @@ lurek.data.newWriter = function() end
 
 --- Packs Lua values into a binary string using a format string.
 ---@param fmt string Binary pack format string.
----@param ... table Values to pack according to the format.
+---@param ... any Values to pack according to the format.
 ---@return string Packed binary byte string.
 lurek.data.pack = function(fmt, ...) end
 
@@ -4752,7 +4756,7 @@ lurek.data.unpack = function(fmt, raw, offset) end
 
 --- Writes binary values into a byte string using a format string.
 ---@param fmt string Binary writer format string.
----@param ... table Values to write according to the format.
+---@param ... any Values to write according to the format.
 ---@return string Binary byte string containing written values.
 lurek.data.write = function(fmt, ...) end
 
@@ -4765,7 +4769,7 @@ LDataFrame = {}
 
 --- Adds a column with an optional default value.
 ---@param name string Column name to create.
----@param default? string Default cell value for existing rows; nil uses empty cells.
+---@param default? any Default cell value for existing rows; nil uses empty cells.
 function LDataFrame:addColumn(name, default) end
 
 --- Adds a row from an optional map table and returns its one-based row index.
@@ -4829,14 +4833,14 @@ function LDataFrame:entropy(col) end
 function LDataFrame:fillNil(col, val) end
 
 --- Returns rows whose column value matches a comparison.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@param op string Comparison operator string.
----@param val string Cell value used as the comparison target.
+---@param val any Cell value used as the comparison target.
 ---@return LDataFrame New filtered dataframe.
 function LDataFrame:filter(col, op, val) end
 
 --- Returns a column as an array table. This method is available to Lua scripts.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@return number[] Array table of column values.
 function LDataFrame:getColumn(col) end
 
@@ -4852,7 +4856,7 @@ function LDataFrame:getRow(row) end
 
 --- Returns one cell value by one-based row and column reference.
 ---@param row number One-based row index.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@return number string|boolean|nil | Cell value at the requested row and column.
 function LDataFrame:getValue(row, col) end
 
@@ -4968,7 +4972,7 @@ function LDataFrame:query(sql_str) end
 function LDataFrame:rank(col, order, result_col) end
 
 --- Removes a column by name or one-based index.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 function LDataFrame:removeColumn(col) end
 
 --- Removes a row by one-based index. This method is available to Lua scripts.
@@ -4976,7 +4980,7 @@ function LDataFrame:removeColumn(col) end
 function LDataFrame:removeRow(row) end
 
 --- Renames a column by name or one-based index.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@param new_name string New column name.
 function LDataFrame:rename(col, new_name) end
 
@@ -5005,7 +5009,7 @@ function LDataFrame:rows() end
 function LDataFrame:sample(n, seed) end
 
 --- Returns a dataframe with selected columns.
----@param ... string Column name strings or one-based column indices to keep.
+---@param ... any Column name strings or one-based column indices to keep.
 ---@return LDataFrame New dataframe containing selected columns.
 function LDataFrame:select(...) end
 
@@ -5016,8 +5020,8 @@ function LDataFrame:setColumnFromF64(col, values) end
 
 --- Sets one cell value by one-based row and column reference.
 ---@param row number One-based row index.
----@param col string Column name string or one-based column index.
----@param val string Cell value to store.
+---@param col any Column name string or one-based column index.
+---@param val any Cell value to store.
 function LDataFrame:setValue(row, col, val) end
 
 --- Returns a one-based inclusive row slice.
@@ -5027,7 +5031,7 @@ function LDataFrame:setValue(row, col, val) end
 function LDataFrame:slice(start, end_) end
 
 --- Returns rows sorted by a column. This method is available to Lua scripts.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@param ascending? boolean True for ascending order; defaults to true.
 ---@return LDataFrame New sorted dataframe.
 function LDataFrame:sort(col, ascending) end
@@ -5077,7 +5081,7 @@ function LDataFrame:type() end
 function LDataFrame:typeOf(name) end
 
 --- Returns unique values from a column.
----@param col string Column name string or one-based column index.
+---@param col any Column name string or one-based column index.
 ---@return number[] Array table of unique values.
 function LDataFrame:unique(col) end
 
@@ -7543,7 +7547,7 @@ function LSignal:connect(name, func) end
 
 --- Emits a signal event and invokes matching callbacks with the remaining arguments.
 ---@param name string Signal event name to emit.
----@param ... table Additional arguments passed to matching callbacks.
+---@param ... any Additional arguments passed to matching callbacks.
 function LSignal:emit(name, ...) end
 
 --- Returns the callback count for one exact signal event name.
@@ -7627,24 +7631,24 @@ lurek.event.pump = function() end
 
 --- Pushes a normal-priority event into the shared event queue and optional history.
 ---@param name string Event name.
----@param ... table Additional event arguments.
+---@param ... any Additional event arguments.
 lurek.event.push = function(name, ...) end
 
 --- Adds a normal-priority event to the deferred buffer instead of the live queue.
 ---@param name string Event name to enqueue later.
----@param ... table Additional event arguments stored with the event.
+---@param ... any Additional event arguments stored with the event.
 lurek.event.pushDeferred = function(name, ...) end
 
 --- Adds an event with explicit priority to the deferred buffer.
 ---@param name string Event name to enqueue later.
 ---@param priority string Priority string `high` or `normal`.
----@param ... table Additional event arguments stored with the event.
+---@param ... any Additional event arguments stored with the event.
 lurek.event.pushDeferredPriority = function(name, priority, ...) end
 
 --- Pushes an event with explicit priority into the shared event queue and optional history.
 ---@param name string Event name.
 ---@param priority string Priority string `high` or `normal`.
----@param ... table Additional event arguments.
+---@param ... any Additional event arguments.
 lurek.event.pushPriority = function(name, priority, ...) end
 
 --- Requests engine shutdown with exit code zero.
@@ -10213,7 +10217,7 @@ lurek.input.advancePlayback = function() end
 
 --- Adds one or more keyboard/gamepad bindings to an action.
 ---@param action string Action name.
----@param keys string Binding string or array table of binding strings.
+---@param keys any Binding string or array table of binding strings.
 lurek.input.bind = function(action, keys) end
 
 --- Removes all action bindings from the map.
@@ -10454,7 +10458,7 @@ lurek.input.mouse.newCursor = function(pixels, width, height, hotx, hoty) end
 
 --- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
 ---@param name string Action name.
----@param keys string Binding string or array table of binding strings.
+---@param keys any Binding string or array table of binding strings.
 ---@return InputNewMappingResult Mapping table with action query closures.
 lurek.input.newMapping = function(name, keys) end
 
@@ -10467,7 +10471,7 @@ lurek.input.gamepad.saveGamepadMappings = function(path) end
 lurek.input.gamepad.setBackgroundEvents = function(enable) end
 
 --- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
----@param cursor LCursor `LCursor`, system cursor string, or nil.
+---@param cursor any `LCursor`, system cursor string, or nil.
 lurek.input.mouse.setCursor = function(cursor) end
 
 --- Stores a controller mapping string for a gamepad GUID.
@@ -12180,14 +12184,9 @@ lurek.math.cos = function(x) end
 ---@return number Angle in degrees.
 lurek.math.deg = function(rad) end
 
----@class MathDelaunayTriangulateResult
----@field 1 number First vertex index.
----@field 2 number Second vertex index.
----@field 3 number Third vertex index.
-
 --- Computes Delaunay triangles for a flat point table.
 ---@param pts table Flat numeric point table.
----@return MathDelaunayTriangulateResult Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
+---@return table Array of triangle index tables; each entry is `{i1, i2, i3}` (1-based vertex indices).
 lurek.math.delaunayTriangulate = function(pts) end
 
 --- Returns Euclidean distance between two points.
@@ -12684,12 +12683,9 @@ lurek.math.sqrt = function(x) end
 ---@return number Tangent value.
 lurek.math.tan = function(x) end
 
----@class MathTriangulateResult
----@field 1 number Point component (interleaved x,y pairs).
-
 --- Triangulates a flat polygon point table.
 ---@param pts table Flat numeric table `{x1, y1, x2, y2, ...}` with at least three points.
----@return MathTriangulateResult Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
+---@return table Array table of flat triangle point tables; each entry is `{x1,y1,x2,y2,x3,y3}`.
 lurek.math.triangulate = function(pts) end
 
 --- Creates a 2D vector. This function is exposed to Lua scripts.
@@ -13757,6 +13753,7 @@ lurek.network.createRoom = function(name, host, max_players) end
 lurek.network.discoverLobbies = function(timeout_ms) end
 
 ---@class NetworkJoinRoomResult
+---@field id string Room id.
 ---@field name string Room name.
 ---@field host string Host address.
 ---@field player_count number Current player count.
@@ -13768,6 +13765,7 @@ lurek.network.discoverLobbies = function(timeout_ms) end
 lurek.network.joinRoom = function(id) end
 
 ---@class NetworkLeaveRoomResult
+---@field id string Room id.
 ---@field room_id string Room identifier.
 ---@field peer_id string Peer identifier.
 
@@ -15565,7 +15563,7 @@ function LEventBus:clearAll() end
 
 --- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
 ---@param event string The event name to emit.
----@param ... table Additional arguments passed to each listener callback.
+---@param ... any Additional arguments passed to each listener callback.
 function LEventBus:emit(event, ...) end
 
 --- Return an array of all event names that have at least one listener.
@@ -15602,7 +15600,7 @@ function LFactory:clearAll() end
 
 --- Create a new object by type name, passing additional arguments to the constructor.
 ---@param typeName string The registered type to instantiate.
----@param ... table Extra arguments forwarded to the constructor.
+---@param ... any Extra arguments forwarded to the constructor.
 ---@return table a The created object table.
 ---@return nil b When not available.
 function LFactory:create(typeName, ...) end
@@ -15662,7 +15660,7 @@ function LFunnel:update(dt) end
 LList = {}
 
 --- Append a value to the end of the list.
----@param value string The value to append.
+---@param value any The value to append.
 function LList:add(value) end
 
 --- Remove all items from the list. This method is available to Lua scripts.
@@ -15686,7 +15684,7 @@ function LList:indexOf(value) end
 
 --- Insert a value at a 1-based index, shifting subsequent items right.
 ---@param index number 1-based insertion position.
----@param value string The value to insert.
+---@param value any The value to insert.
 function LList:insert(index, value) end
 
 --- Check whether the list is empty. This method is available to Lua scripts.
@@ -15703,7 +15701,7 @@ function LList:len() end
 function LList:pop() end
 
 --- Append a value to the end of the list (alias for add).
----@param value string The value to append.
+---@param value any The value to append.
 function LList:push(value) end
 
 --- Remove and return the value at a 1-based index. Returns nil if out of range.
@@ -15717,7 +15715,7 @@ function LList:reverse() end
 
 --- Replace the value at a 1-based index. Errors if index is 0 or out of range.
 ---@param index number 1-based position.
----@param value string The new value.
+---@param value any The new value.
 function LList:set(index, value) end
 
 --- Remove and return the first value. Returns nil if empty.
@@ -15730,7 +15728,7 @@ function LList:shift() end
 function LList:toArray() end
 
 --- Insert a value at the beginning of the list.
----@param value string The value to prepend.
+---@param value any The value to prepend.
 function LList:unshift(value) end
 
 --- Lua-facing string-keyed dictionary (map) with keys(), values(), entries(), and merge operations.
@@ -15784,7 +15782,7 @@ function LMap:remove(key) end
 
 --- Set a key-value pair in the map. Replaces any existing value for the same key.
 ---@param key string The key.
----@param value string The value to store.
+---@param value any The value to store.
 function LMap:set(key, value) end
 
 --- Return an array of all values in the map.
@@ -15796,7 +15794,7 @@ function LMap:values() end
 LMediator = {}
 
 --- Send a message to all handlers on all channels. Every registered handler receives the payload.
----@param ... table Arguments passed to every handler.
+---@param ... any Arguments passed to every handler.
 function LMediator:broadcast(...) end
 
 --- Return an array of all channel names that have at least one handler.
@@ -15828,7 +15826,7 @@ function LMediator:removeChannel(channel) end
 
 --- Send a message to all handlers on a specific channel with optional payload arguments.
 ---@param channel string The target channel name.
----@param ... table Additional arguments passed to each handler.
+---@param ... any Additional arguments passed to each handler.
 function LMediator:send(channel, ...) end
 
 --- Lua-facing object pool for reusing pre-allocated game objects (bullets, particles, enemies) to avoid per-frame allocations.
@@ -15841,7 +15839,7 @@ LObjectPool = {}
 function LObjectPool:acquire() end
 
 --- Add an object to the pool's idle set, making it available for future acquisition.
----@param value table The object table to store in the pool.
+---@param value any The object value to store in the pool.
 function LObjectPool:add(value) end
 
 --- Destroy all objects (active and idle) and reset the pool to empty.
@@ -15860,7 +15858,7 @@ function LObjectPool:getAvailableCount() end
 function LObjectPool:getTotalCount() end
 
 --- Return an active object back to the pool's idle set so it can be reused.
----@param value table The object table to release back into the pool.
+---@param value any The object value to release back into the pool.
 function LObjectPool:release(value) end
 
 --- Lua-facing reactive observer that stores values and notifies subscribers when values change.
@@ -15991,7 +15989,7 @@ function LPriorityQueue:pop() end
 
 --- Add an item with a numeric priority. Higher priority items are dequeued first.
 ---@param priority number The priority value (higher = dequeued sooner).
----@param value table The payload table to store.
+---@param value any The payload value to store.
 ---@param label? string Optional human-readable label for debugging.
 ---@return number The internal ID of the enqueued item.
 function LPriorityQueue:push(priority, value, label) end
@@ -16019,12 +16017,12 @@ function LQueue:dequeue() end
 function LQueue:dequeueBack() end
 
 --- Add a value to the back of the queue. Returns false if at capacity.
----@param value string The value to enqueue.
+---@param value any The value to enqueue.
 ---@return boolean True if enqueued, false if full.
 function LQueue:enqueue(value) end
 
 --- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
----@param value string The value to insert at the front.
+---@param value any The value to insert at the front.
 ---@return boolean True if enqueued, false if full.
 function LQueue:enqueueFront(value) end
 
@@ -16035,7 +16033,7 @@ function LQueue:front() end
 
 --- Insert a value at a 1-based index in the queue. Returns false if at capacity.
 ---@param index number 1-based insertion position.
----@param value string The value to insert.
+---@param value any The value to insert.
 ---@return boolean True if inserted, false if full.
 function LQueue:insertAt(index, value) end
 
@@ -16200,7 +16198,7 @@ function LServiceLocator:locate(name) end
 
 --- Register a service instance under a given name. Replaces any previously registered service with the same name.
 ---@param name string Unique identifier for the service.
----@param value table The service table to register.
+---@param value any The service value to register.
 function LServiceLocator:provide(name, value) end
 
 --- Unregister and discard a service by name.
@@ -16294,7 +16292,7 @@ function LStack:clear() end
 
 --- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 ---@param index number 1-based insertion position.
----@param value string The value to insert.
+---@param value any The value to insert.
 ---@return boolean True if inserted, false if full.
 function LStack:insertAt(index, value) end
 
@@ -16348,12 +16346,12 @@ function LStack:popBottom() end
 function LStack:popMany(count) end
 
 --- Push a value onto the top of the stack. Returns false if the stack is at capacity.
----@param value string The value to push.
+---@param value any The value to push.
 ---@return boolean True if pushed, false if full.
 function LStack:push(value) end
 
 --- Push a value onto the bottom of the stack. Returns false if at capacity.
----@param value string The value to insert at the bottom.
+---@param value any The value to insert at the bottom.
 ---@return boolean True if pushed, false if full.
 function LStack:pushBottom(value) end
 
@@ -16375,7 +16373,7 @@ LStrategy = {}
 function LStrategy:clear() end
 
 --- Execute the currently active strategy, passing through all arguments and returning its results.
----@param ... table Arguments forwarded to the active strategy function.
+---@param ... any Arguments forwarded to the active strategy function.
 ---@return table a Return value from the strategy function.
 ---@return nil b When not available.
 function LStrategy:execute(...) end
@@ -16442,7 +16440,7 @@ LWeightedRandom = {}
 
 --- Add an item with a relative weight. Higher weight = higher selection probability.
 ---@param weight number The selection weight (must be > 0).
----@param value string The payload value returned on pick.
+---@param value any The payload value returned on pick.
 ---@param label? string Optional human-readable label.
 ---@return number The internal ID of the added entry.
 function LWeightedRandom:add(weight, value, label) end
@@ -20314,6 +20312,11 @@ lurek.render.pushSortKey = function(depth) end
 ---@param ry? number Vertical corner radius (defaults to rx).
 lurek.render.rectangle = function(mode, x, y, w, h, rx, ry) end
 
+--- Marks a canvas as needing a full clear before its next render pass. Use before re-rendering to avoid content accumulation.
+---@param canvas LCanvas Canvas to reset.
+---@return nil No return value.
+lurek.render.resetCanvas = function(canvas) end
+
 --- Applies a rotation to the current transformation matrix.
 ---@param angle number Rotation angle in radians.
 lurek.render.rotate = function(angle) end
@@ -20902,7 +20905,7 @@ lurek.scene.setCurrentLayer = function(layer) end
 
 --- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
 ---@param key string The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
----@param value table Value to store (a table with your game data).
+---@param value any Value to store under the scene data key.
 lurek.scene.setData = function(key, value) end
 
 ---@class TransitionsSlideResult
@@ -21573,14 +21576,14 @@ lurek.runtime.parseArgs = function(args) end
 lurek.runtime.reloadConfig = function() end
 
 ---@class RuntimeRunBatchResult
----@field status string Task status: passed, failed, or skipped.
+---@field status string Task status: `passed`, `failed`, or `skipped`.
 ---@field time number Elapsed time in seconds.
----@field error string? Error message when status is failed.
+---@field error string? Error message when status is `failed`.
 
 --- Executes a table of named task functions sequentially, collecting pass/fail results and elapsed time for each.
 ---@param tasks table Table mapping task names (string) to task functions (function).
 ---@param opts? table Options table. Set `stopOnError = true` to skip remaining tasks after the first failure.
----@return RuntimeRunBatchResult Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
+---@return RuntimeRunBatchResult Table mapping each task name to a result table.
 lurek.runtime.runBatch = function(tasks, opts) end
 
 --- Copies a string to the system clipboard. Logs a warning if the clipboard is unavailable or the write fails.
@@ -22095,7 +22098,7 @@ function LChannel:popBytes() end
 function LChannel:popTable() end
 
 --- Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
----@param value table The message table to send.
+---@param value any The message value to send.
 ---@return number The message sequence ID assigned to this push.
 function LChannel:push(value) end
 
@@ -22110,12 +22113,12 @@ function LChannel:pushBytes(data) end
 function LChannel:pushTable(value) end
 
 --- Pushes a value and blocks until a consumer pops it (synchronous handoff).
----@param value table The message table to send.
+---@param value any The message value to send.
 ---@return boolean true when the value has been consumed.
 function LChannel:supply(value) end
 
 --- Attempts to push a value onto a bounded channel without blocking.
----@param value table The message table to send.
+---@param value any The message value to send.
 ---@return boolean true if the value was enqueued, false if the channel is full.
 function LChannel:tryPush(value) end
 
@@ -22134,7 +22137,7 @@ LPromise = {}
 
 --- Creates a new promise that runs the given code with the parent promise's result as its first argument.
 ---@param code string Lua source code to execute in the chained worker thread.
----@param ... table Additional arguments forwarded after the parent result.
+---@param ... any Additional arguments forwarded after the parent result.
 ---@return LPromise A new promise representing the chained computation.
 function LPromise:chain(code, ...) end
 
@@ -22173,7 +22176,7 @@ function LThread:getError() end
 function LThread:isRunning() end
 
 --- Launches the worker thread, executing the Lua code string supplied at creation time.
----@param ... table Zero or more arguments forwarded to the worker as the `arg` table.
+---@param ... any Zero or more arguments forwarded to the worker as the `arg` table.
 function LThread:start(...) end
 
 --- Returns the type name of this object.
@@ -22215,7 +22218,7 @@ function LThreadPool:join(timeout) end
 function LThreadPool:size() end
 
 --- Pushes a value into the pool's input channel for processing by a worker thread.
----@param value table The message table to send.
+---@param value any The message value to send.
 function LThreadPool:submit(value) end
 
 --- Returns the type name of this object.
@@ -22229,7 +22232,7 @@ function LThreadPool:typeOf(name) end
 
 --- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
 ---@param codeOrFunc string|function Lua source code or a dumpable Lua function to execute.
----@param ... table Additional arguments forwarded to the worker.
+---@param ... any Additional arguments forwarded to the worker.
 ---@return LPromise A promise that resolves to the worker's return value.
 lurek.thread.async = function(codeOrFunc, ...) end
 

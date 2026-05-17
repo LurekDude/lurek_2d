@@ -512,6 +512,7 @@ do
   local function inner_function()
     local frames = lurek.devtools.getCallStack(5)
     for i, f in ipairs(frames) do
+      ---@cast f {source: string, line: integer, name: string, what: string}
       lurek.devtools.debug(string.format(
         "#%d %s:%d in %s (%s)", i, f.source, f.line, f.name, f.what
       ))
@@ -520,7 +521,7 @@ do
   inner_function()
 end
 
---@api-stub: lurek.devtools.eval
+--@api-stub: LReplConsole:eval
 -- Evaluates Lua code in the current state and returns success plus values or failure plus an error message
 do
   -- Returns (true, result) on success, (false, error_string) on failure.
@@ -670,7 +671,7 @@ do
   end
 end
 
---@api-stub: FileWatcher:onChanged
+--@api-stub: LFileWatcher:onChanged
 -- Fires the callback registered for the changed event on this file watcher.
 do
   -- The callback receives no arguments. Use a closure to capture context.
@@ -683,7 +684,7 @@ do
   end)
 end
 
---@api-stub: FileWatcher:check
+--@api-stub: LFileWatcher:check
 -- Checks on this file watcher and returns the result.
 do
   -- Returns true if a change was detected (and callback was fired).
@@ -698,7 +699,7 @@ do
   end
 end
 
---@api-stub: FileWatcher:getPath
+--@api-stub: LFileWatcher:getPath
 -- Returns the path of this file watcher.
 do
   -- Useful when you store multiple watchers in a list.
@@ -709,7 +710,7 @@ do
   lurek.devtools.debug("watcher target: " .. fw:getPath())
 end
 
---@api-stub: FileWatcher:cancel
+--@api-stub: LFileWatcher:cancel
 -- Cancels the current operation of this file watcher.
 do
   -- After cancel(), check() becomes a no-op and the callback is cleared.
@@ -736,7 +737,7 @@ do
   lurek.devtools.info("repl: pi*2 = " .. tostring(result))
 end
 
---@api-stub: ReplConsole:eval
+--@api-stub: LReplConsole:eval
 -- Performs the eval operation on this repl console.
 do
   -- eval() runs Lua code and returns the result.
@@ -751,7 +752,7 @@ do
   lurek.devtools.debug("debug_flag = " .. tostring(flag))
 end
 
---@api-stub: ReplConsole:history
+--@api-stub: LReplConsole:history
 -- Performs the history operation on this repl console.
 do
   -- Returns an array of previously evaluated command strings.
@@ -767,7 +768,7 @@ do
   end
 end
 
---@api-stub: ReplConsole:clear
+--@api-stub: LReplConsole:clear
 -- Clears all items from this repl console.
 do
   -- Wipes command history. Use for a "clear" command in the console.
@@ -779,7 +780,7 @@ do
   lurek.devtools.debug("after clear: " .. repl:len() .. " entries")  -- 0
 end
 
---@api-stub: ReplConsole:len
+--@api-stub: LReplConsole:len
 -- Performs the len operation on this repl console.
 do
   -- Returns the number of entries stored in history.
@@ -794,7 +795,7 @@ end
 -- TYPE INTROSPECTION (LFileWatcher)
 -- =============================================================================
 
---@api-stub: LFileWatcher:type
+--@api-stub: LReplConsole:type
 -- Returns the Lua-visible type name for this file watcher handle
 do
   -- Returns the string "LFileWatcher". Use for debugging or type dispatch.
@@ -802,7 +803,7 @@ do
   lurek.devtools.debug("type = " .. fw:type())  -- "LFileWatcher"
 end
 
---@api-stub: LFileWatcher:typeOf
+--@api-stub: LReplConsole:typeOf
 -- Returns whether this file watcher handle matches a supported type name
 do
   -- Checks against "LFileWatcher" and the base "Object" type.
@@ -847,63 +848,3 @@ print("content/examples/devtools.lua")
 -- -----------------------------------------------------------------------------
 -- LFileWatcher methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LFileWatcher:onChanged ----------------------------------------
---@api-stub: LFileWatcher:onChanged
--- Sets the callback invoked when this watcher observes a change.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFileWatcher_stub:onChanged(func)
--- (replace lFileWatcher_stub with your real LFileWatcher instance above)
-
--- ---- Stub: LFileWatcher:check --------------------------------------------
---@api-stub: LFileWatcher:check
--- Polls the watcher and invokes the change callback when a change is found.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFileWatcher_stub:check()  -- -> boolean
--- (replace lFileWatcher_stub with your real LFileWatcher instance above)
-
--- ---- Stub: LFileWatcher:getPath ------------------------------------------
---@api-stub: LFileWatcher:getPath
--- Returns the watched path. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFileWatcher_stub:getPath()  -- -> string
--- (replace lFileWatcher_stub with your real LFileWatcher instance above)
-
--- ---- Stub: LFileWatcher:cancel -------------------------------------------
---@api-stub: LFileWatcher:cancel
--- Cancels this watcher and removes its callback.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lFileWatcher_stub:cancel()
--- (replace lFileWatcher_stub with your real LFileWatcher instance above)
-
--- -----------------------------------------------------------------------------
--- LReplConsole methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LReplConsole:eval ---------------------------------------------
---@api-stub: LReplConsole:eval
--- Evaluates Lua code through this REPL console and records it in history.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lReplConsole_stub:eval(code)  -- -> LuaValue
--- (replace lReplConsole_stub with your real LReplConsole instance above)
-
--- ---- Stub: LReplConsole:history ------------------------------------------
---@api-stub: LReplConsole:history
--- Returns this REPL console's recorded command history.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lReplConsole_stub:history()  -- -> table
--- (replace lReplConsole_stub with your real LReplConsole instance above)
-
--- ---- Stub: LReplConsole:clear --------------------------------------------
---@api-stub: LReplConsole:clear
--- Clears this REPL console's command history.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lReplConsole_stub:clear()
--- (replace lReplConsole_stub with your real LReplConsole instance above)
-
--- ---- Stub: LReplConsole:len ----------------------------------------------
---@api-stub: LReplConsole:len
--- Returns the number of entries stored in this REPL console history.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lReplConsole_stub:len()  -- -> integer
--- (replace lReplConsole_stub with your real LReplConsole instance above)

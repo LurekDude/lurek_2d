@@ -115,7 +115,7 @@ impl LuaUserData for LuaRingBuffer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- push --
         /// Pushes a value into the ring buffer and evicts the oldest value when full.
-        /// @param | value | table | Lua value to store in the buffer.
+        /// @param | value | any | Lua value to store in the buffer.
         /// @return | boolean | True when the push evicted an older value.
         methods.add_method_mut("push", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
@@ -274,7 +274,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- pack --
     /// Packs Lua values into a binary string using a format string.
     /// @param | fmt | string | Binary pack format string.
-    /// @param | ... | table | Values to pack according to the format.
+    /// @param | ... | any | Values to pack according to the format.
     /// @return | string | Packed binary byte string.
     tbl.set(
         "pack",
@@ -305,7 +305,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- getPackedSize --
     /// Computes the packed byte size for values and a format string.
     /// @param | fmt | string | Binary pack format string.
-    /// @param | ... | table | Values measured according to the format.
+    /// @param | ... | any | Values measured according to the format.
     /// @return | integer | Packed byte size.
     tbl.set(
         "getPackedSize",
@@ -351,7 +351,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- compressChunks --
     /// Compresses a string or table of strings as a chunked byte stream.
     /// @param | format_str | string | Compression format name.
-    /// @param | chunks | string | Binary string or array table of binary strings.
+    /// @param | chunks | any | Binary string or array table of binary strings.
     /// @param | level | integer? | Optional compression level; defaults to 6.
     /// @return | string | Compressed binary byte string.
     tbl.set(
@@ -371,7 +371,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- decompressChunks --
     /// Decompresses a string or table of strings as a chunked byte stream.
     /// @param | format_str | string | Compression format name.
-    /// @param | chunks | string | Binary string or array table of binary strings.
+    /// @param | chunks | any | Binary string or array table of binary strings.
     /// @return | string | Decompressed binary byte string.
     tbl.set(
         "decompressChunks",
@@ -431,7 +431,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
     // -- newByteData --
     /// Creates ByteData from a size or string.
-    /// @param | value | table | Integer size for zeroed bytes, or string used as initial bytes.
+    /// @param | value | any | Integer size for zeroed bytes, or string used as initial bytes.
     /// @return | LByteData | New LByteData userdata.
     tbl.set(
         "newByteData",
@@ -474,7 +474,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- write --
     /// Writes binary values into a byte string using a format string.
     /// @param | fmt | string | Binary writer format string.
-    /// @param | ... | table | Values to write according to the format.
+    /// @param | ... | any | Values to write according to the format.
     /// @return | string | Binary byte string containing written values.
     tbl.set(
         "write",

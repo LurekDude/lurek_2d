@@ -477,7 +477,7 @@ lurek.window.windowConfig( opts : table )  -- Applies multiple window settings a
 
 ```lua
 lurek.input.advancePlayback() -> table  -- Advances playback by one frame and returns events for that frame
-lurek.input.bind( action : string, keys : string )  -- Adds one or more keyboard/gamepad bindings to an action
+lurek.input.bind( action : string, keys : any )  -- Adds one or more keyboard/gamepad bindings to an action
 lurek.input.clearBindings()  -- Removes all action bindings from the map
 lurek.input.getAxis( id : integer, axis : integer ) -> number  -- Returns a gamepad axis value by index
 lurek.input.getAxisCount( id : integer ) -> integer  -- Returns the axis count for a gamepad
@@ -526,10 +526,10 @@ lurek.input.loadGamepadMappings( path : string )  -- Loads gamepad mapping strin
 lurek.input.loadRecording( json : string )  -- Loads recording JSON into the module recorder
 lurek.input.newCombo( steps : table, opts : table? ) -> LCombo  -- Creates a combo detector from string steps or step tables with optional timing
 lurek.input.newCursor( pixels : table, width : integer, height : integer, hotx : integer?, hoty : integer? ) -> LCursor  -- Creates a custom cursor handle from RGBA pixels and hotspot coordinates
-lurek.input.newMapping( name : string, keys : string ) -> table  -- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions
+lurek.input.newMapping( name : string, keys : any ) -> table  -- Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions
 lurek.input.saveGamepadMappings( path : string )  -- Saves gamepad mapping strings to a file
 lurek.input.setBackgroundEvents( enable : boolean )  -- Enables or disables background gamepad event processing
-lurek.input.setCursor( cursor : LCursor )  -- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow
+lurek.input.setCursor( cursor : any )  -- Sets the active cursor from a cursor handle, system cursor name, or nil for arrow
 lurek.input.setGamepadMapping( guid : string, mapping : string )  -- Stores a controller mapping string for a gamepad GUID
 lurek.input.setGrabbed( grabbed : boolean )  -- Sets whether the mouse is grabbed by the window
 lurek.input.setKeyRepeat( enabled : boolean )  -- Enables or disables key repeat tracking
@@ -1797,10 +1797,10 @@ lurek.signal.getHistory() -> table  -- Returns retained pushed event history ent
 lurek.signal.newSignal() -> LSignal  -- Creates an isolated signal dispatcher for Lua callbacks
 lurek.signal.poll() -> function  -- Creates a polling function that returns the next queued event each time it is called
 lurek.signal.pump()  -- Pumps the shared event queue without removing events for Lua
-lurek.signal.push( name : string, ... : table )  -- Pushes a normal-priority event into the shared event queue and optional history
-lurek.signal.pushDeferred( name : string, ... : table )  -- Adds a normal-priority event to the deferred buffer instead of the live queue
-lurek.signal.pushDeferredPriority( name : string, priority : string, ... : table )  -- Adds an event with explicit priority to the deferred buffer
-lurek.signal.pushPriority( name : string, priority : string, ... : table )  -- Pushes an event with explicit priority into the shared event queue and optional history
+lurek.signal.push( name : string, ... : any )  -- Pushes a normal-priority event into the shared event queue and optional history
+lurek.signal.pushDeferred( name : string, ... : any )  -- Adds a normal-priority event to the deferred buffer instead of the live queue
+lurek.signal.pushDeferredPriority( name : string, priority : string, ... : any )  -- Adds an event with explicit priority to the deferred buffer
+lurek.signal.pushPriority( name : string, priority : string, ... : any )  -- Pushes an event with explicit priority into the shared event queue and optional history
 lurek.signal.quit()  -- Requests engine shutdown with exit code zero
 lurek.signal.restart()  -- Requests a full engine restart cycle from the runtime
 lurek.signal.wait( timeout : number? ) -> boolean  -- Waits for the next queued event and returns success, name, and argument table
@@ -1814,7 +1814,7 @@ Lua-side signal object storing subscriptions and Lua callback registry keys.
 LSignal:clear( name : string ) -> integer  -- Removes all callbacks registered for one exact signal event name
 LSignal:clearAll() -> integer  -- Removes every callback from this signal object
 LSignal:connect( name : string, func : function ) -> integer  -- Registers a callback for an exact name or wildcard signal pattern
-LSignal:emit( name : string, ... : table )  -- Emits a signal event and invokes matching callbacks with the remaining arguments
+LSignal:emit( name : string, ... : any )  -- Emits a signal event and invokes matching callbacks with the remaining arguments
 LSignal:getCount( name : string ) -> integer  -- Returns the callback count for one exact signal event name
 LSignal:getTotalCount() -> integer  -- Returns the total callback count across all signal event names
 LSignal:once( name : string, callback : function ) -> integer  -- Registers a callback that is removed after its next matching emission
@@ -1873,7 +1873,7 @@ lurek.system.setLogLevel( level : string )  -- Sets the engine-wide log verbosit
 *Coverage: 43/43 items documented (100%)*
 
 ```lua
-lurek.thread.async( codeOrFunc : string|function, ... : table ) -> LPromise  -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result
+lurek.thread.async( codeOrFunc : string|function, ... : any ) -> LPromise  -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result
 lurek.thread.getChannel( name : string ) -> LChannel  -- Returns a named shared channel, creating it on first access. Repeated calls with the same name return the same channel
 lurek.thread.getWorkerCapabilities() -> string[]  -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible)
 lurek.thread.newBoundedChannel( capacity : integer ) -> LChannel  -- Creates a new bounded channel with a fixed capacity, blocking pushes when full
@@ -1896,11 +1896,11 @@ LChannel:peek() -> table  -- Returns the next value from the channel without rem
 LChannel:pop() -> table  -- Removes and returns the next value from the channel without blocking
 LChannel:popBytes() -> string  -- Pops the next value from the channel only if it is a byte blob, discarding non-bytes values
 LChannel:popTable() -> table  -- Pops the next value from the channel only if it is a table, discarding non-table values
-LChannel:push( value : table ) -> integer  -- Pushes a value onto the channel. Blocks on bounded channels if the channel is full
+LChannel:push( value : any ) -> integer  -- Pushes a value onto the channel. Blocks on bounded channels if the channel is full
 LChannel:pushBytes( data : string ) -> integer  -- Pushes raw binary data onto the channel as a byte blob
 LChannel:pushTable( value : table ) -> integer  -- Pushes a table value onto the channel, raising an error if the value is not a table
-LChannel:supply( value : table ) -> boolean  -- Pushes a value and blocks until a consumer pops it (synchronous handoff)
-LChannel:tryPush( value : table ) -> boolean  -- Attempts to push a value onto a bounded channel without blocking
+LChannel:supply( value : any ) -> boolean  -- Pushes a value and blocks until a consumer pops it (synchronous handoff)
+LChannel:tryPush( value : any ) -> boolean  -- Attempts to push a value onto a bounded channel without blocking
 LChannel:type() -> string  -- Returns the type name of this object
 LChannel:typeOf( name : string ) -> boolean  -- Checks whether this object matches the given type name
 ```
@@ -1910,7 +1910,7 @@ LChannel:typeOf( name : string ) -> boolean  -- Checks whether this object match
 Lua-visible handle representing an asynchronous computation that will produce a single result value.
 
 ```lua
-LPromise:chain( code : string, ... : table ) -> LPromise  -- Creates a new promise that runs the given code with the parent promise's result as its first argument
+LPromise:chain( code : string, ... : any ) -> LPromise  -- Creates a new promise that runs the given code with the parent promise's result as its first argument
 LPromise:getError() -> string  -- Returns the error message from the promise, if it terminated with an error
 LPromise:isDone() -> boolean  -- Checks whether the asynchronous computation has completed
 LPromise:result() -> table  -- Returns the result value of the completed promise
@@ -1925,7 +1925,7 @@ Lua-visible handle wrapping a single background worker VM that executes a Lua co
 ```lua
 LThread:getError() -> string  -- Returns the error message from the worker thread, if it terminated with an error
 LThread:isRunning() -> boolean  -- Checks whether the worker thread is still executing
-LThread:start( ... : table )  -- Launches the worker thread, executing the Lua code string supplied at creation time
+LThread:start( ... : any )  -- Launches the worker thread, executing the Lua code string supplied at creation time
 LThread:type() -> string  -- Returns the type name of this object
 LThread:typeOf( name : string ) -> boolean  -- Checks whether this object matches the given type name
 LThread:wait()  -- Blocks the calling thread until the worker thread finishes execution
@@ -1941,7 +1941,7 @@ LThreadPool:getInputChannel() -> LChannel  -- Returns the pool's shared input ch
 LThreadPool:getOutputChannel() -> LChannel  -- Returns the pool's shared output channel where worker threads place their results
 LThreadPool:join( timeout : number? ) -> boolean  -- Blocks until all workers finish or the optional timeout elapses
 LThreadPool:size() -> integer  -- Returns the number of worker threads in the pool
-LThreadPool:submit( value : table )  -- Pushes a value into the pool's input channel for processing by a worker thread
+LThreadPool:submit( value : any )  -- Pushes a value into the pool's input channel for processing by a worker thread
 LThreadPool:type() -> string  -- Returns the type name of this object
 LThreadPool:typeOf( name : string ) -> boolean  -- Checks whether this object matches the given type name
 ```
@@ -2635,7 +2635,7 @@ lurek.dataframe.toVec( df : LDataFrame ) -> LVecFrame  -- Converts a dataframe t
 Lua-side dataframe handle for tabular data with named columns and typed cells.
 
 ```lua
-LDataFrame:addColumn( name : string, default : string? )  -- Adds a column with an optional default value
+LDataFrame:addColumn( name : string, default : any? )  -- Adds a column with an optional default value
 LDataFrame:addRow( row_tbl : table? ) -> integer  -- Adds a row from an optional map table and returns its one-based row index
 LDataFrame:addRowBatch( rows : table )  -- Appends multiple rows from array-style row tables
 LDataFrame:apply( col_val : string, func : function )  -- Applies a Lua function to each value in a column in place
@@ -2648,8 +2648,8 @@ LDataFrame:countBy( col : string ) -> LDataFrame  -- Counts occurrences of each 
 LDataFrame:describe() -> LDataFrame  -- Returns summary statistics for numeric columns
 LDataFrame:dropNil( col : string ) -> LDataFrame  -- Returns rows where the chosen column is not nil
 LDataFrame:entropy( col : string ) -> number  -- Returns entropy for a column. This method is available to Lua scripts
-LDataFrame:fillNil( col : string, val : string )  -- Replaces nil cells in a column with a value
-LDataFrame:filter( col : string, op : string, val : string ) -> LDataFrame  -- Returns rows whose column value matches a comparison
+LDataFrame:fillNil( col : string, val : any )  -- Replaces nil cells in a column with a value
+LDataFrame:filter( col : string, op : string, val : any ) -> LDataFrame  -- Returns rows whose column value matches a comparison
 LDataFrame:getColumn( col : string ) -> number[]  -- Returns a column as an array table. This method is available to Lua scripts
 LDataFrame:getColumnAsF64( col : string ) -> number[]  -- Returns a numeric column as an array of numbers
 LDataFrame:getRow( row : integer ) -> table  -- Returns a row as a table keyed by column name
@@ -2683,7 +2683,7 @@ LDataFrame:rows() -> function  -- Returns an iterator function over one-based ro
 LDataFrame:sample( n : integer, seed : integer? ) -> LDataFrame  -- Returns a sampled dataframe. This method is available to Lua scripts
 LDataFrame:select( ... : string ) -> LDataFrame  -- Returns a dataframe with selected columns
 LDataFrame:setColumnFromF64( col : string, values : table )  -- Replaces a numeric column from an array table of numbers
-LDataFrame:setValue( row : integer, col : string, val : string )  -- Sets one cell value by one-based row and column reference
+LDataFrame:setValue( row : integer, col : string, val : any )  -- Sets one cell value by one-based row and column reference
 LDataFrame:slice( start : integer, end : integer ) -> LDataFrame  -- Returns a one-based inclusive row slice
 LDataFrame:sort( col : string, ascending : boolean? ) -> LDataFrame  -- Returns rows sorted by a column. This method is available to Lua scripts
 LDataFrame:stddev( col : string ) -> number  -- Returns the numeric standard deviation of a column
@@ -2745,7 +2745,7 @@ Lua-side lazy dataframe query pipeline.
 ```lua
 LLazyQuery:collect() -> LDataFrame  -- Executes the lazy query and returns a dataframe
 LLazyQuery:dropNil( col : string ) -> LLazyQuery  -- Adds a step that drops rows with nil values in a column
-LLazyQuery:filter( col : string, op : string, val : string ) -> LLazyQuery  -- Adds a filter step to the lazy query
+LLazyQuery:filter( col : string, op : string, val : any ) -> LLazyQuery  -- Adds a filter step to the lazy query
 LLazyQuery:head( n : integer ) -> LLazyQuery  -- Adds a head limit step to the lazy query
 LLazyQuery:limit( n : integer ) -> LLazyQuery  -- Adds a row limit step to the lazy query
 LLazyQuery:select( cols : table ) -> LLazyQuery  -- Adds a column selection step to the lazy query
@@ -2797,27 +2797,27 @@ LVecFrame:typeOf( name : string ) -> boolean  -- Returns whether this vectorized
 
 ```lua
 lurek.data.compress( format_str : string, raw_data : string, level : integer? ) -> string  -- Compresses a binary string using a named compression format
-lurek.data.compressChunks( format_str : string, chunks : string, level : integer? ) -> string  -- Compresses a string or table of strings as a chunked byte stream
+lurek.data.compressChunks( format_str : string, chunks : any, level : integer? ) -> string  -- Compresses a string or table of strings as a chunked byte stream
 lurek.data.crc32( raw_data : string ) -> integer  -- Computes CRC32 for a binary string
 lurek.data.decode( format_str : string, encoded : string ) -> string  -- Decodes a string using a named text encoding format
 lurek.data.decompress( format_str : string, compressed : string ) -> string  -- Decompresses a binary string using a named compression format
-lurek.data.decompressChunks( format_str : string, chunks : string ) -> string  -- Decompresses a string or table of strings as a chunked byte stream
+lurek.data.decompressChunks( format_str : string, chunks : any ) -> string  -- Decompresses a string or table of strings as a chunked byte stream
 lurek.data.encode( format_str : string, raw_data : string ) -> string  -- Encodes a binary string using a named text encoding format
 lurek.data.encodeToml( tbl : table ) -> string  -- Encodes a Lua table into a TOML document string
 lurek.data.fromMsgPack( bytes : string ) -> LuaValue  -- Decodes a structured binary interchange payload back into Lua values
-lurek.data.getPackedSize( fmt : string, ... : table ) -> integer  -- Computes the packed byte size for values and a format string
+lurek.data.getPackedSize( fmt : string, ... : any ) -> integer  -- Computes the packed byte size for values and a format string
 lurek.data.hash( algo_str : string, raw_data : string ) -> string  -- Hashes a binary string with a named algorithm
-lurek.data.newByteData( value : table ) -> LByteData  -- Creates ByteData from a size or string
+lurek.data.newByteData( value : any ) -> LByteData  -- Creates ByteData from a size or string
 lurek.data.newDataView( raw : string, offset : integer?, size : integer? ) -> LDataView  -- Creates a DataView over a binary string slice
 lurek.data.newRingBuffer( capacity : integer ) -> LRingBuffer  -- Creates a fixed-capacity ring buffer for Lua values
 lurek.data.newWriter() -> LDataWriter  -- Creates an empty binary data writer
-lurek.data.pack( fmt : string, ... : table ) -> string  -- Packs Lua values into a binary string using a format string
+lurek.data.pack( fmt : string, ... : any ) -> string  -- Packs Lua values into a binary string using a format string
 lurek.data.parseToml( text : string ) -> table  -- Parses TOML text into Lua tables and scalar values
 lurek.data.read( fmt : string, raw : string, offset : integer? ) -> LuaValue  -- Reads binary values from a byte string using a format string
 lurek.data.size( fmt : string ) -> integer  -- Measures fixed byte size for a binary format string
 lurek.data.toMsgPack( value : table ) -> string  -- Encodes a Lua value into the current structured binary interchange payload
 lurek.data.unpack( fmt : string, raw : string, offset : integer? ) -> LuaValue  -- Unpacks values from a binary string using a format string
-lurek.data.write( fmt : string, ... : table ) -> string  -- Writes binary values into a byte string using a format string
+lurek.data.write( fmt : string, ... : any ) -> string  -- Writes binary values into a byte string using a format string
 ```
 
 ### `LByteData`
@@ -2892,7 +2892,7 @@ LRingBuffer:len() -> integer  -- Returns the number of values currently stored
 LRingBuffer:peek() -> LuaValue  -- Returns the oldest stored value without removing it from the ring buffer
 LRingBuffer:peekNewest() -> LuaValue  -- Returns the newest stored value without removing it from the ring buffer
 LRingBuffer:pop() -> LuaValue  -- Removes and returns the oldest stored value from the ring buffer
-LRingBuffer:push( value : table ) -> boolean  -- Pushes a value into the ring buffer and evicts the oldest value when full
+LRingBuffer:push( value : any ) -> boolean  -- Pushes a value into the ring buffer and evicts the oldest value when full
 LRingBuffer:toTable() -> number[]  -- Returns stored values in oldest-to-newest order
 LRingBuffer:type() -> string  -- Returns the Lua-visible type name for this ring buffer handle
 LRingBuffer:typeOf( name : string ) -> boolean  -- Returns whether this ring buffer handle matches a supported type name
@@ -3512,7 +3512,7 @@ LUniverse:defineBlueprint( name : string, components : table )  -- Defines a nam
 LUniverse:defineTag( name : string ) -> integer  -- Defines a bitmap tag name and assigns it a bit slot
 LUniverse:deserialize( snapshot : table )  -- Replaces this universe state from a serialized Lua snapshot
 LUniverse:each( name : string, callback : function )  -- Iterates entities with one component and calls a Lua callback for each match
-LUniverse:emit( event : string, ... : table )  -- Calls matching event-named functions on registered systems
+LUniverse:emit( event : string, ... : any )  -- Calls matching event-named functions on registered systems
 LUniverse:extendBlueprint( name : string, parent : string, overrides : table )  -- Defines a blueprint that inherits from a parent blueprint and applies overrides
 LUniverse:flushObservers()  -- Delivers queued component add and remove events to registered observer callbacks
 LUniverse:get( id : integer, name : string ) -> table|number|string|boolean|nil  -- Returns a component value from an entity
@@ -3556,7 +3556,7 @@ LUniverse:removeSystem( system : table )  -- Removes a previously registered Lua
 LUniverse:removeTag( id : integer, tag : string )  -- Removes a string tag from an entity
 LUniverse:render()  -- Runs registered render-phase systems using their render or draw callbacks
 LUniverse:serialize() -> table  -- Serializes this universe into a Lua table snapshot
-LUniverse:set( id : integer, name : string, value : table )  -- Stores or replaces a component value on an entity
+LUniverse:set( id : integer, name : string, value : any )  -- Stores or replaces a component value on an entity
 LUniverse:setLayer( id : integer, layer : integer )  -- Assigns a numeric layer to an entity
 LUniverse:setParent( child_id : integer, parent_id : integer? )  -- Sets or clears the parent entity for a child entity
 LUniverse:snapshot() -> table  -- Serializes this universe into a Lua table snapshot
@@ -3623,7 +3623,7 @@ lurek.scene.render()  -- Call `render(self)` on every scene in the stack from bo
 lurek.scene.renderUi()  -- Call `render_ui(self)` on every scene in the stack from bottom to top. Use this for screen-space HUD elements, health bars, score displays, menus, and overlays that should draw on top of the world after `render`
 lurek.scene.serializeScene() -> table  -- Capture the current scene stack state as a serializable snapshot table. The snapshot contains a `stack` array of registered scene names (in stack order) and a `data` map of shared data key-value pairs. Use this for save/load systems to persist the player's navigation state
 lurek.scene.setCurrentLayer( layer : integer ) -> boolean  -- Set the rendering layer of the current top scene. Scenes with higher layer values are processed and drawn after lower-layer scenes. Use layers to control draw order when multiple scenes are active (e.g. game world at layer 0, HUD overlay at layer 10)
-lurek.scene.setData( key : string, value : table )  -- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene
+lurek.scene.setData( key : string, value : any )  -- Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene
 lurek.scene.slide( direction : string?, duration : number? ) -> table  -- Create a directional slide transition descriptor table. The new scene slides in from the specified direction, pushing the old scene out
 lurek.scene.switchTo( scene : table, transition : string?, duration : number?, easing : string?, params : table? )  -- Replace the current top scene with a different one without changing stack depth. The old scene receives `leave()` and the new scene receives `enter(self, params)`. Unlike `push`, no scene is added to the stack — the old scene is removed and the new one takes its slot. Ideal for transitioning between peer-level game states (e.g. level 1 → level 2)
 lurek.scene.unregisterScene( name : string )  -- Remove a scene registration by name. Does not pop the scene if it is currently active on the stack — it only removes the name mapping
@@ -4396,7 +4396,7 @@ Lua-facing publish/subscribe event bus allowing decoupled communication between 
 ```lua
 LEventBus:clear( event : string )  -- Remove all listeners subscribed to a specific event name
 LEventBus:clearAll()  -- Remove all listeners from every event on this bus. Resets the bus to empty
-LEventBus:emit( event : string, ... : table )  -- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments
+LEventBus:emit( event : string, ... : any )  -- Emit an event, invoking all subscribed listeners in priority order with optional payload arguments
 LEventBus:getEvents() -> string[]  -- Return an array of all event names that have at least one listener
 LEventBus:getListenerCount( event : string ) -> number  -- Return the number of active listeners for a given event name
 LEventBus:off( id : integer )  -- Unsubscribe a listener by its subscription ID. Removes the callback from the event bus
@@ -4410,7 +4410,7 @@ Lua-facing factory pattern for creating typed game objects from registered const
 ```lua
 LFactory:alias( alias : string, canonical : string )  -- Create an alias that maps to an existing type name. `create(alias)` will use the canonical constructor
 LFactory:clearAll()  -- Remove all registered types and constructors, resetting the factory
-LFactory:create( typeName : string, ... : table ) -> table  -- Create a new object by type name, passing additional arguments to the constructor
+LFactory:create( typeName : string, ... : any ) -> table  -- Create a new object by type name, passing additional arguments to the constructor
 LFactory:getTypes() -> string[]  -- Return an array of all registered type names
 LFactory:has( typeName : string ) -> boolean  -- Check whether a constructor is registered for the given type name
 LFactory:register( typeName : string, ctor : function )  -- Register a constructor function for a given type name. Future `create()` calls with this type will invoke it
@@ -4477,14 +4477,14 @@ LMap:values() -> number[]  -- Return an array of all values in the map
 Lua-facing mediator for channel-based message passing between decoupled game systems.
 
 ```lua
-LMediator:broadcast( ... : table )  -- Send a message to all handlers on all channels. Every registered handler receives the payload
+LMediator:broadcast( ... : any )  -- Send a message to all handlers on all channels. Every registered handler receives the payload
 LMediator:channels() -> string[]  -- Return an array of all channel names that have at least one handler
 LMediator:clear()  -- Remove all channels and handlers, resetting the mediator
 LMediator:handlerCount( channel : string ) -> number  -- Return the number of handlers registered on a specific channel
 LMediator:off( channel : string, id : integer )  -- Unregister a handler from a channel by its ID
 LMediator:on( channel : string, callback : function ) -> number  -- Register a handler callback on a named channel. Returns an ID for unregistration
 LMediator:removeChannel( channel : string )  -- Remove an entire channel and all its handlers
-LMediator:send( channel : string, ... : table )  -- Send a message to all handlers on a specific channel with optional payload arguments
+LMediator:send( channel : string, ... : any )  -- Send a message to all handlers on a specific channel with optional payload arguments
 ```
 
 ### `LObjectPool`
@@ -4493,12 +4493,12 @@ Lua-facing object pool for reusing pre-allocated game objects (bullets, particle
 
 ```lua
 LObjectPool:acquire() -> table  -- Take an idle object from the pool and mark it active. Returns nil if the pool is empty
-LObjectPool:add( value : table )  -- Add an object to the pool's idle set, making it available for future acquisition
+LObjectPool:add( value : any )  -- Add an object to the pool's idle set, making it available for future acquisition
 LObjectPool:clearAll()  -- Destroy all objects (active and idle) and reset the pool to empty
 LObjectPool:getActiveCount() -> number  -- Return the number of objects currently checked out from the pool
 LObjectPool:getAvailableCount() -> number  -- Return the number of idle objects ready for acquisition
 LObjectPool:getTotalCount() -> number  -- Return the total number of objects managed by this pool (active + idle)
-LObjectPool:release( value : table )  -- Return an active object back to the pool's idle set so it can be reused
+LObjectPool:release( value : any )  -- Return an active object back to the pool's idle set so it can be reused
 ```
 
 ### `LObserver`
@@ -4519,7 +4519,7 @@ Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and co
 
 ```lua
 LPatternGraph:addEdge( from : integer, to : integer, weight : number?, label : string? ) -> number  -- Add a directed (or undirected) edge between two nodes with optional weight and label
-LPatternGraph:addNode( label : string?, value : table? ) -> number  -- Add a node to the graph with an optional label and payload value
+LPatternGraph:addNode( label : string?, value : any? ) -> number  -- Add a node to the graph with an optional label and payload value
 LPatternGraph:bfs( start : integer ) -> integer[]  -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order
 LPatternGraph:clearAll()  -- Remove all nodes, edges, and payloads from the graph
 LPatternGraph:dfs( start : integer ) -> integer[]  -- Perform a depth-first search from a node. Returns visited node IDs in DFS order
@@ -4543,7 +4543,7 @@ LPriorityQueue:isEmpty() -> boolean  -- Check whether the queue contains no item
 LPriorityQueue:len() -> number  -- Return the number of items currently in the queue
 LPriorityQueue:peek() -> table  -- Return the highest-priority item without removing it. Returns nil if empty
 LPriorityQueue:pop() -> table  -- Remove and return the highest-priority item. Returns nil if the queue is empty
-LPriorityQueue:push( priority : integer, value : table, label : string? ) -> number  -- Add an item with a numeric priority. Higher priority items are dequeued first
+LPriorityQueue:push( priority : integer, value : any, label : string? ) -> number  -- Add an item with a numeric priority. Higher priority items are dequeued first
 ```
 
 ### `LQueue`
@@ -4608,7 +4608,7 @@ LServiceLocator:clearAll()  -- Remove all registered services and reset the loca
 LServiceLocator:getServices() -> string[]  -- Return an array of all registered service names
 LServiceLocator:has( name : string ) -> boolean  -- Check whether a service with the given name is currently registered
 LServiceLocator:locate( name : string ) -> table  -- Retrieve a registered service by name. Returns nil if not found
-LServiceLocator:provide( name : string, value : table )  -- Register a service instance under a given name. Replaces any previously registered service with the same name
+LServiceLocator:provide( name : string, value : any )  -- Register a service instance under a given name. Replaces any previously registered service with the same name
 LServiceLocator:remove( name : string )  -- Unregister and discard a service by name
 ```
 
@@ -4671,7 +4671,7 @@ Lua-facing strategy pattern allowing hot-swappable algorithm implementations by 
 
 ```lua
 LStrategy:clear()  -- Remove all strategies and reset the selection
-LStrategy:execute( ... : table ) -> table  -- Execute the currently active strategy, passing through all arguments and returning its results
+LStrategy:execute( ... : any ) -> table  -- Execute the currently active strategy, passing through all arguments and returning its results
 LStrategy:getCurrent() -> string  -- Return the name of the currently active strategy, or nil if none set
 LStrategy:has( name : string ) -> boolean  -- Check whether a strategy with the given name is registered
 LStrategy:names() -> string[]  -- Return an array of all registered strategy names
@@ -4764,10 +4764,10 @@ LAnimStateMachine:update( dt : number )  -- Advances the animation state machine
 Lua-side animation synchronization group for coordinating multiple animation handles.
 
 ```lua
-LAnimSyncGroup:add( handle : table )  -- Adds an animation-like handle to the sync group
+LAnimSyncGroup:add( handle : integer )  -- Adds an animation-like handle to the sync group
 LAnimSyncGroup:clear()  -- Removes all members from the sync group
 LAnimSyncGroup:memberCount() -> integer  -- Returns the number of handles tracked by the sync group
-LAnimSyncGroup:remove( handle : table )  -- Removes an animation-like handle from the sync group
+LAnimSyncGroup:remove( handle : integer )  -- Removes an animation-like handle from the sync group
 LAnimSyncGroup:type() -> string  -- Returns the Lua-visible type name for this animation sync group handle
 LAnimSyncGroup:typeOf( name : string ) -> boolean  -- Returns whether this animation sync group handle matches a supported type name
 ```

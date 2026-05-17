@@ -22,7 +22,7 @@ end
 
 -- Minimap methods
 
---@api-stub: Minimap:getGridWidth
+--@api-stub: LMinimap:getGridWidth
 -- Returns the grid width of this minimap.
 do
   -- Use getGridWidth() to iterate over the x axis of the grid.
@@ -35,7 +35,7 @@ do
   end
 end
 
---@api-stub: Minimap:getGridHeight
+--@api-stub: LMinimap:getGridHeight
 -- Returns the grid height of this minimap.
 do
   -- Use getGridHeight() to iterate over the y axis.
@@ -47,7 +47,7 @@ do
   end
 end
 
---@api-stub: Minimap:getGridSize
+--@api-stub: LMinimap:getGridSize
 -- Returns the grid size of this minimap.
 do
   -- getGridSize() returns both dimensions at once — handy for area calculations.
@@ -57,7 +57,7 @@ do
   lurek.log.info("dungeon has " .. (gw * gh) .. " tiles to fill", "minimap")
 end
 
---@api-stub: Minimap:getDisplayWidth
+--@api-stub: LMinimap:getDisplayWidth
 -- Returns the display width of this minimap.
 do
   -- getDisplayWidth() returns the pixel width on screen.
@@ -69,7 +69,7 @@ do
   lurek.log.info("label goes at x=" .. label_x, "ui")
 end
 
---@api-stub: Minimap:getDisplayHeight
+--@api-stub: LMinimap:getDisplayHeight
 -- Returns the display height of this minimap.
 do
   -- getDisplayHeight() returns the pixel height on screen.
@@ -82,7 +82,7 @@ do
   lurek.log.info("minimap fits above chat: " .. tostring(fits), "ui")
 end
 
---@api-stub: Minimap:getDisplaySize
+--@api-stub: LMinimap:getDisplaySize
 -- Returns the display size of this minimap.
 do
   -- getDisplaySize() returns both width and height in pixels.
@@ -93,7 +93,7 @@ do
   lurek.log.info("minimap center pixel: " .. center_px_x .. "," .. center_px_y, "minimap")
 end
 
---@api-stub: Minimap:setDisplaySize
+--@api-stub: LMinimap:setDisplaySize
 -- Sets the display size of this minimap.
 do
   -- setDisplaySize(w, h) changes the on-screen pixel size at runtime.
@@ -107,7 +107,7 @@ do
   lurek.log.info("expanded minimap to " .. w .. "x" .. h, "ui")
 end
 
---@api-stub: Minimap:getTerrain
+--@api-stub: LMinimap:getTerrain
 -- Returns the terrain of this minimap.
 do
   -- getTerrain(x, y) returns the terrain type id at a grid cell.
@@ -120,7 +120,7 @@ do
   lurek.log.info("tile at 4,4: " .. (names[t] or "unknown"), "minimap")
 end
 
---@api-stub: Minimap:setTerrainData
+--@api-stub: LMinimap:setTerrainData
 -- Sets the terrain data of this minimap.
 do
   -- setTerrainData(data) replaces ALL cells from a flat array (row-major order).
@@ -136,7 +136,7 @@ do
   lurek.log.info("loaded " .. #level .. " cells of dungeon data", "minimap")
 end
 
---@api-stub: Minimap:getTerrainColor
+--@api-stub: LMinimap:getTerrainColor
 -- Returns the terrain color of this minimap.
 do
   -- getTerrainColor(type) returns r, g, b, a for a registered terrain type.
@@ -147,7 +147,7 @@ do
   lurek.log.info("forest swatch: rgba(" .. r .. "," .. g .. "," .. b .. "," .. a .. ")", "ui")
 end
 
---@api-stub: Minimap:getTileDescription
+--@api-stub: LMinimap:getTileDescription
 -- Returns the tile description of this minimap.
 do
   -- getTileDescription(type_id) returns the string description, or nil if unset.
@@ -160,7 +160,7 @@ do
   end
 end
 
---@api-stub: Minimap:setFogEnabled
+--@api-stub: LMinimap:setFogEnabled
 -- Sets whether fog of war is enabled on this minimap.
 do
   -- setFogEnabled(bool) turns fog of war on or off.
@@ -174,7 +174,7 @@ do
   end
 end
 
---@api-stub: Minimap:isFogEnabled
+--@api-stub: LMinimap:isFogEnabled
 -- Returns true if fog of war is currently enabled.
 do
   -- isFogEnabled() checks if fog is active. Use to gate fog-related logic.
@@ -188,7 +188,7 @@ do
   end
 end
 
---@api-stub: Minimap:setFogLevel
+--@api-stub: LMinimap:setFogLevel
 -- Sets the fog level for a specific grid cell.
 do
   -- setFogLevel(x, y, level) sets visibility per cell.
@@ -205,7 +205,7 @@ do
   mm:setFogLevel(5, 5, 1)
 end
 
---@api-stub: Minimap:getFogLevel
+--@api-stub: LMinimap:getFogLevel
 -- Returns the fog level for a specific grid cell.
 do
   -- getFogLevel(x, y) returns 0 (fogged), 1 (explored), or 2 (visible).
@@ -221,7 +221,7 @@ do
   end
 end
 
---@api-stub: Minimap:getFogColor
+--@api-stub: LMinimap:getFogColor
 -- Returns the fog color used when rendering fogged cells.
 do
   -- getFogColor() returns r, g, b, a of the fog overlay.
@@ -232,7 +232,7 @@ do
   lurek.log.info("fog rgba: " .. r .. "," .. g .. "," .. b .. "," .. a, "fog")
 end
 
---@api-stub: Minimap:setFogData
+--@api-stub: LMinimap:setFogData
 -- Sets all fog levels from a flat array (row-major, like setTerrainData).
 do
   -- setFogData(data) bulk-sets fog for every cell at once.
@@ -246,7 +246,7 @@ do
   lurek.log.info("fog state restored from save", "minimap")
 end
 
---@api-stub: Minimap:isObjectTypeVisible
+--@api-stub: LMinimap:isObjectTypeVisible
 -- Returns true if the given object type is currently visible on the minimap.
 do
   -- isObjectTypeVisible(type_idx) checks draw visibility per type.
@@ -258,7 +258,7 @@ do
   end
 end
 
---@api-stub: Minimap:getObjectTypeCount
+--@api-stub: LMinimap:getObjectTypeCount
 -- Returns the number of registered object types.
 do
   -- getObjectTypeCount() returns how many types have been registered with addObjectType.
@@ -270,7 +270,7 @@ do
   lurek.log.info("registered " .. mm:getObjectTypeCount() .. " object types", "minimap")
 end
 
---@api-stub: Minimap:removeObject
+--@api-stub: LMinimap:removeObject
 -- Removes a tracked object from this minimap by its id.
 do
   -- removeObject(id) removes a specific tracked object. Returns true if found.
@@ -285,7 +285,7 @@ do
   end
 end
 
---@api-stub: Minimap:clearObjects
+--@api-stub: LMinimap:clearObjects
 -- Clears all tracked objects from this minimap.
 do
   -- clearObjects() removes every object at once.
@@ -299,7 +299,7 @@ do
   lurek.log.info("objects after wave clear: " .. mm:getObjectCount(), "minimap")
 end
 
---@api-stub: Minimap:getObjectCount
+--@api-stub: LMinimap:getObjectCount
 -- Returns the number of tracked objects on this minimap.
 do
   -- getObjectCount() returns the total number of objects currently placed.
@@ -312,7 +312,7 @@ do
   lurek.log.info("tracked objects: " .. mm:getObjectCount(), "minimap")
 end
 
---@api-stub: Minimap:getOwnerColor
+--@api-stub: LMinimap:getOwnerColor
 -- Returns the RGBA color assigned to an owner id.
 do
   -- getOwnerColor(owner) returns r, g, b, a for a team/faction colour.
@@ -323,7 +323,7 @@ do
   lurek.log.info("team 2 colour: rgba(" .. r .. "," .. g .. "," .. b .. "," .. a .. ")", "team")
 end
 
---@api-stub: Minimap:setColorMode
+--@api-stub: LMinimap:setColorMode
 -- Sets the color mode used for rendering terrain cells.
 do
   -- setColorMode(mode) switches between "terrain" (natural colours) and "political" (owner-based).
@@ -335,7 +335,7 @@ do
   lurek.log.info("map mode: " .. mm:getColorMode(), "minimap")
 end
 
---@api-stub: Minimap:getColorMode
+--@api-stub: LMinimap:getColorMode
 -- Returns the current color mode of this minimap.
 do
   -- getColorMode() returns "terrain" or "political".
@@ -348,7 +348,7 @@ do
   end
 end
 
---@api-stub: Minimap:setZoom
+--@api-stub: LMinimap:setZoom
 -- Sets the zoom level of this minimap.
 do
   -- setZoom(factor) magnifies the minimap view.
@@ -359,7 +359,7 @@ do
   lurek.log.info("zoom level: " .. mm:getZoom(), "minimap")
 end
 
---@api-stub: Minimap:getZoom
+--@api-stub: LMinimap:getZoom
 -- Returns the current zoom level.
 do
   -- getZoom() returns the current magnification factor.
@@ -371,7 +371,7 @@ do
   lurek.log.info("effective cell size: " .. cell_px .. " px", "minimap")
 end
 
---@api-stub: Minimap:setCenter
+--@api-stub: LMinimap:setCenter
 -- Sets the world center point of this minimap's view.
 do
   -- setCenter(x, y) pans the minimap view to center on grid coordinates.
@@ -384,7 +384,7 @@ do
   mm:setCenter(player.x, player.y)
 end
 
---@api-stub: Minimap:getCenter
+--@api-stub: LMinimap:getCenter
 -- Returns the current center point of this minimap's view.
 do
   -- getCenter() returns x, y of the current view center.
@@ -395,7 +395,7 @@ do
   lurek.log.info("view centered at " .. cx .. "," .. cy, "minimap")
 end
 
---@api-stub: Minimap:getCenterX
+--@api-stub: LMinimap:getCenterX
 -- Returns the x coordinate of the minimap's view center.
 do
   -- getCenterX() returns just the x component. Useful for single-axis clamping.
@@ -408,7 +408,7 @@ do
   end
 end
 
---@api-stub: Minimap:getCenterY
+--@api-stub: LMinimap:getCenterY
 -- Returns the y coordinate of the minimap's view center.
 do
   -- getCenterY() returns just the y component.
@@ -420,7 +420,7 @@ do
   mm:setCenter(mm:getCenterX(), cy)
 end
 
---@api-stub: Minimap:clearViewportRect
+--@api-stub: LMinimap:clearViewportRect
 -- Clears the viewport rectangle overlay from this minimap.
 do
   -- clearViewportRect() removes the camera rectangle indicator.
@@ -435,7 +435,7 @@ do
   end
 end
 
---@api-stub: Minimap:getViewportRect
+--@api-stub: LMinimap:getViewportRect
 -- Returns the viewport rectangle (x, y, w, h) or nil if not set.
 do
   -- getViewportRect() returns x, y, w, h of the camera's visible area on the minimap.
@@ -449,7 +449,7 @@ do
   end
 end
 
---@api-stub: Minimap:setViewportVisible
+--@api-stub: LMinimap:setViewportVisible
 -- Sets whether the viewport rectangle overlay is drawn.
 do
   -- setViewportVisible(bool) toggles the camera rect overlay without removing it.
@@ -462,7 +462,7 @@ do
   mm:setViewportVisible(true)
 end
 
---@api-stub: Minimap:isViewportVisible
+--@api-stub: LMinimap:isViewportVisible
 -- Returns true if the viewport rectangle overlay is visible.
 do
   -- isViewportVisible() returns the visibility state of the viewport rect.
@@ -474,7 +474,7 @@ do
   end
 end
 
---@api-stub: Minimap:getViewportColor
+--@api-stub: LMinimap:getViewportColor
 -- Returns the RGBA color of the viewport rectangle overlay.
 do
   -- getViewportColor() returns r, g, b, a for the camera rect border.
@@ -485,7 +485,7 @@ do
   lurek.log.info("viewport colour: rgba(" .. r .. "," .. g .. "," .. b .. "," .. a .. ")", "ui")
 end
 
---@api-stub: Minimap:getPingCount
+--@api-stub: LMinimap:getPingCount
 -- Returns the number of active ping effects on this minimap.
 do
   -- getPingCount() returns how many pings are currently animating.
@@ -500,7 +500,7 @@ do
   end
 end
 
---@api-stub: Minimap:removeMarker
+--@api-stub: LMinimap:removeMarker
 -- Removes a marker from this minimap by its id.
 do
   -- removeMarker(id) deletes a marker. Returns true if it existed.
@@ -513,7 +513,7 @@ do
   end
 end
 
---@api-stub: Minimap:hasMarker
+--@api-stub: LMinimap:hasMarker
 -- Returns true if a marker with the given id exists.
 do
   -- hasMarker(id) checks existence before performing operations on a marker.
@@ -526,7 +526,7 @@ do
   end
 end
 
---@api-stub: Minimap:getMarkerDescription
+--@api-stub: LMinimap:getMarkerDescription
 -- Returns the description text of a marker, or nil.
 do
   -- getMarkerDescription(id) returns the string passed to addMarker.
@@ -539,7 +539,7 @@ do
   end
 end
 
---@api-stub: Minimap:getMarkerCount
+--@api-stub: LMinimap:getMarkerCount
 -- Returns the total number of markers placed on this minimap.
 do
   -- getMarkerCount() returns how many markers exist.
@@ -551,7 +551,7 @@ do
   lurek.log.info("points of interest: " .. mm:getMarkerCount(), "minimap")
 end
 
---@api-stub: Minimap:clearMarkerAnimation
+--@api-stub: LMinimap:clearMarkerAnimation
 -- Clears the animation on a marker by its id.
 do
   -- clearMarkerAnimation(id) stops any active animation on the marker.
@@ -563,7 +563,7 @@ do
   mm:clearMarkerAnimation(id)
 end
 
---@api-stub: Minimap:clearOverlay
+--@api-stub: LMinimap:clearOverlay
 -- Clears all drawn overlay shapes (lines, rectangles).
 do
   -- clearOverlay() removes every overlay shape at once.
@@ -575,7 +575,7 @@ do
   mm:clearOverlay()
 end
 
---@api-stub: Minimap:clearPath
+--@api-stub: LMinimap:clearPath
 -- Clears a specific path by id, or all paths if no id is given.
 do
   -- clearPath(id) removes one path; clearPath() with no arg removes all paths.
@@ -586,7 +586,7 @@ do
   mm:clearPath(path_id)
 end
 
---@api-stub: Minimap:setLayer
+--@api-stub: LMinimap:setLayer
 -- Sets the active display layer of this minimap.
 do
   -- setLayer(index) switches which layer's terrain data is rendered.
@@ -599,7 +599,7 @@ do
   mm:setLayer(1)
 end
 
---@api-stub: Minimap:getLayer
+--@api-stub: LMinimap:getLayer
 -- Returns the currently active layer index.
 do
   -- getLayer() returns which layer is being displayed.
@@ -610,7 +610,7 @@ do
   lurek.log.info("current: " .. (floor_names[mm:getLayer()] or "unknown"), "minimap")
 end
 
---@api-stub: Minimap:setAntiAlias
+--@api-stub: LMinimap:setAntiAlias
 -- Enables or disables anti-aliasing on this minimap.
 do
   -- setAntiAlias(bool) controls edge smoothing.
@@ -624,7 +624,7 @@ do
   end
 end
 
---@api-stub: Minimap:isAntiAlias
+--@api-stub: LMinimap:isAntiAlias
 -- Returns true if anti-aliasing is enabled.
 do
   -- isAntiAlias() returns current AA state.
@@ -635,7 +635,7 @@ do
   lurek.log.info("minimap AA=" .. tostring(settings.antiAlias), "settings")
 end
 
---@api-stub: Minimap:setClickable
+--@api-stub: LMinimap:setClickable
 -- Enables or disables click interaction on this minimap.
 do
   -- setClickable(bool) controls whether the minimap responds to mouse clicks.
@@ -648,7 +648,7 @@ do
   end
 end
 
---@api-stub: Minimap:isClickable
+--@api-stub: LMinimap:isClickable
 -- Returns true if click interaction is enabled.
 do
   -- isClickable() returns whether the minimap accepts mouse input.
@@ -660,7 +660,7 @@ do
   end
 end
 
---@api-stub: Minimap:update
+--@api-stub: LMinimap:update
 -- Advances minimap animations and timers by delta time.
 do
   -- update(dt) must be called each frame to animate pings, marker animations, etc.
@@ -674,7 +674,7 @@ do
   end
 end
 
---@api-stub: Minimap:type
+--@api-stub: LMinimap:type
 -- Returns the Lua-visible type name string for this minimap handle.
 do
   -- type() returns "LMinimap" — the internal type name of the handle.
@@ -683,7 +683,7 @@ do
   lurek.log.info("handle type: " .. mm:type(), "ui")
 end
 
---@api-stub: Minimap:typeOf
+--@api-stub: LMinimap:typeOf
 -- Returns true if this handle matches the given type name string.
 do
   -- typeOf(name) checks against "LMinimap", "Minimap", and "Object".
@@ -697,7 +697,7 @@ do
   end
 end
 
---@api-stub: Minimap:render
+--@api-stub: LMinimap:render
 -- Enqueues render commands to draw the minimap at a screen position.
 do
   -- render(x, y) draws the minimap on screen at pixel coordinates.
@@ -717,7 +717,7 @@ do
   end
 end
 
---@api-stub: Minimap:drawToImage
+--@api-stub: LMinimap:drawToImage
 -- Renders the minimap into an image data object at a given pixel scale.
 do
   -- drawToImage(pixel_size) returns an LImage snapshot of the minimap.
@@ -730,7 +730,7 @@ do
   lurek.log.info("snapshot: " .. img:getWidth() .. "x" .. img:getHeight() .. " px", "minimap")
 end
 
---@api-stub: Minimap:addMarker
+--@api-stub: LMinimap:addMarker
 -- Adds a marker at grid coordinates with optional description and color.
 do
   -- addMarker(x, y [, desc, r, g, b, a]) -> marker_id
@@ -747,7 +747,7 @@ do
   lurek.log.info("placed markers: " .. quest_marker .. ", " .. danger_marker .. ", " .. poi, "minimap")
 end
 
---@api-stub: Minimap:addObjectType
+--@api-stub: LMinimap:addObjectType
 -- Registers a named object type with a display color.
 do
   -- addObjectType(name, r, g, b [, a]) -> type_index (one-based)
@@ -761,7 +761,7 @@ do
   lurek.log.info("types registered: " .. mm:getObjectTypeCount(), "minimap")
 end
 
---@api-stub: Minimap:addPing
+--@api-stub: LMinimap:addPing
 -- Adds a timed ping effect that fades out over its duration.
 do
   -- addPing(x, y, duration [, r, g, b, a])
@@ -776,7 +776,7 @@ do
   lurek.log.info("active pings: " .. mm:getPingCount(), "minimap")
 end
 
---@api-stub: Minimap:drawLine
+--@api-stub: LMinimap:drawLine
 -- Draws an overlay line between two grid points.
 do
   -- drawLine(x1, y1, x2, y2, color_tbl)
@@ -793,7 +793,7 @@ do
   lurek.log.info("territory border drawn", "minimap")
 end
 
---@api-stub: Minimap:drawRect
+--@api-stub: LMinimap:drawRect
 -- Draws an overlay rectangle at a grid position.
 do
   -- drawRect(x, y, w, h, color_tbl)
@@ -806,7 +806,7 @@ do
   lurek.log.info("danger zone highlighted", "minimap")
 end
 
---@api-stub: Minimap:getHoverInfo
+--@api-stub: LMinimap:getHoverInfo
 -- Returns tooltip text for a screen position, if available.
 do
   -- getHoverInfo(sx, sy, mx, my) returns hover text based on screen coords.
@@ -821,7 +821,7 @@ do
   lurek.log.info("hover: " .. tostring(info), "minimap")
 end
 
---@api-stub: Minimap:gridToScreen
+--@api-stub: LMinimap:gridToScreen
 -- Converts grid coordinates to screen pixel coordinates.
 do
   -- gridToScreen(gx, gy, mx, my) -> sx, sy
@@ -834,7 +834,7 @@ do
   lurek.log.info("grid 16,16 -> screen " .. tostring(sx) .. "," .. tostring(sy), "minimap")
 end
 
---@api-stub: Minimap:screenToGrid
+--@api-stub: LMinimap:screenToGrid
 -- Converts screen pixel coordinates to grid coordinates.
 do
   -- screenToGrid(sx, sy, mx, my) -> gx, gy
@@ -846,7 +846,7 @@ do
   lurek.log.info("click -> grid cell " .. tostring(gx) .. "," .. tostring(gy), "minimap")
 end
 
---@api-stub: Minimap:setFogColor
+--@api-stub: LMinimap:setFogColor
 -- Sets the RGBA color of the fog overlay.
 do
   -- setFogColor(r, g, b [, a]) changes the appearance of fogged cells.
@@ -858,7 +858,7 @@ do
   lurek.log.info("dark fog colour set for night dungeon", "minimap")
 end
 
---@api-stub: Minimap:setLayerData
+--@api-stub: LMinimap:setLayerData
 -- Sets raw terrain cell data for a specific layer.
 do
   -- setLayerData(layer, data_tbl) populates a layer's grid from a flat array.
@@ -877,7 +877,7 @@ do
   lurek.log.info("2 dungeon floors loaded", "minimap")
 end
 
---@api-stub: Minimap:setMarkerAnimation
+--@api-stub: LMinimap:setMarkerAnimation
 -- Sets an animation on a marker by type name and speed.
 do
   -- setMarkerAnimation(id, anim_type, speed)
@@ -891,7 +891,7 @@ do
   lurek.log.info("quest marker now pulsing", "minimap")
 end
 
---@api-stub: Minimap:setObject
+--@api-stub: LMinimap:setObject
 -- Places or updates a tracked object on the minimap.
 do
   -- setObject(id, x, y, type_idx [, owner])
@@ -908,7 +908,7 @@ do
   lurek.log.info("tracking " .. mm:getObjectCount() .. " unit(s)", "minimap")
 end
 
---@api-stub: Minimap:setObjectTypeVisible
+--@api-stub: LMinimap:setObjectTypeVisible
 -- Sets whether objects of a given type are drawn on the minimap.
 do
   -- setObjectTypeVisible(type_idx, visible) toggles rendering for a whole category.
@@ -920,7 +920,7 @@ do
   lurek.log.info("enemies hidden: " .. tostring(not mm:isObjectTypeVisible(enemy_idx)), "minimap")
 end
 
---@api-stub: Minimap:setOwnerColor
+--@api-stub: LMinimap:setOwnerColor
 -- Assigns an RGBA color to an owner/team id.
 do
   -- setOwnerColor(owner, r, g, b [, a]) defines faction colours.
@@ -934,7 +934,7 @@ do
   lurek.log.info("4 team colours assigned", "minimap")
 end
 
---@api-stub: Minimap:setTerrain
+--@api-stub: LMinimap:setTerrain
 -- Sets the terrain type for a specific grid cell.
 do
   -- setTerrain(x, y, terrain_type) assigns a terrain type id to a cell.
@@ -951,7 +951,7 @@ do
   lurek.log.info("lake painted on minimap", "minimap")
 end
 
---@api-stub: Minimap:setTerrainColor
+--@api-stub: LMinimap:setTerrainColor
 -- Assigns an RGBA display color to a terrain type id.
 do
   -- setTerrainColor(terrain_type, r, g, b [, a])
@@ -966,7 +966,7 @@ do
   lurek.log.info("5 terrain colours registered", "minimap")
 end
 
---@api-stub: Minimap:setTileDescription
+--@api-stub: LMinimap:setTileDescription
 -- Assigns a text description to a terrain type id for tooltips.
 do
   -- setTileDescription(type_id, desc)
@@ -980,7 +980,7 @@ do
   lurek.log.info("tile tooltips configured", "minimap")
 end
 
---@api-stub: Minimap:setViewportColor
+--@api-stub: LMinimap:setViewportColor
 -- Sets the RGBA color of the viewport rectangle overlay.
 do
   -- setViewportColor(r, g, b [, a]) customizes the camera rect appearance.
@@ -990,7 +990,7 @@ do
   lurek.log.info("viewport colour: bright yellow", "minimap")
 end
 
---@api-stub: Minimap:setViewportRect
+--@api-stub: LMinimap:setViewportRect
 -- Sets the viewport rectangle showing the camera's visible area on the minimap.
 do
   -- setViewportRect(x, y, w, h) defines the camera frustum on the map.
@@ -1002,7 +1002,7 @@ do
   lurek.log.info("viewport rect shows camera frustum", "minimap")
 end
 
---@api-stub: Minimap:showPath
+--@api-stub: LMinimap:showPath
 -- Draws a coloured path overlay and returns its id.
 do
   -- showPath(points_tbl, color_tbl) -> path_id
@@ -1016,7 +1016,7 @@ do
   lurek.log.info("navigation path id: " .. path_id, "minimap")
 end
 
---@api-stub: Minimap:getCellCount
+--@api-stub: LMinimap:getCellCount
 -- Returns the total number of grid cells (grid_w * grid_h).
 do
   -- getCellCount() is a shorthand for getGridWidth() * getGridHeight().
@@ -1026,7 +1026,7 @@ do
   lurek.log.info("total cells: " .. total, "minimap")
 end
 
---@api-stub: Minimap:trackCamera
+--@api-stub: LMinimap:trackCamera
 -- Centers the minimap and viewport rectangle from a camera handle.
 do
   -- trackCamera(camera_ud) reads position and zoom from an LCamera
@@ -1042,7 +1042,7 @@ do
   lurek.log.info("camera rect: " .. tostring(x) .. "," .. tostring(y) .. " " .. tostring(w) .. "x" .. tostring(h), "minimap")
 end
 
---@api-stub: Minimap:revealRadius
+--@api-stub: LMinimap:revealRadius
 -- Reveals fog of war in a circle around a world position.
 do
   -- revealRadius(cx, cy, radius) sets cells within radius to fog level 2 (visible).
@@ -1055,7 +1055,7 @@ do
   lurek.log.info("center fog level: " .. mm:getFogLevel(8, 8), "minimap")
 end
 
---@api-stub: Minimap:setObjectTypeTexture
+--@api-stub: LMinimap:setObjectTypeTexture
 -- Assigns an image texture to an object type for custom icons.
 do
   -- setObjectTypeTexture(type_idx, image_ud, width, height)
@@ -1068,7 +1068,7 @@ do
   mm:setObjectTypeTexture(idx, icon, 12, 12)
 end
 
---@api-stub: Minimap:clearObjectTypeTexture
+--@api-stub: LMinimap:clearObjectTypeTexture
 -- Removes the image texture from an object type, reverting to colour dot.
 do
   -- clearObjectTypeTexture(type_idx) reverts to the default colour rendering.
@@ -1081,7 +1081,7 @@ do
   mm:clearObjectTypeTexture(idx)
 end
 
---@api-stub: Minimap:setMarkerTexture
+--@api-stub: LMinimap:setMarkerTexture
 -- Assigns an image texture to a specific marker for a custom icon.
 do
   -- setMarkerTexture(id, image_ud [, width, height])
@@ -1093,7 +1093,7 @@ do
   mm:setMarkerTexture(id, quest_icon, 10, 10)
 end
 
---@api-stub: Minimap:clearMarkerTexture
+--@api-stub: LMinimap:clearMarkerTexture
 -- Removes the image texture from a marker, reverting to default dot.
 do
   -- clearMarkerTexture(id) removes the custom icon from a marker.
@@ -1106,7 +1106,7 @@ do
   mm:clearMarkerTexture(id)
 end
 
---@api-stub: Minimap:getOverlayShapeCount
+--@api-stub: LMinimap:getOverlayShapeCount
 -- Returns the number of overlay shapes (lines and rectangles) drawn.
 do
   -- getOverlayShapeCount() returns total overlays for budget tracking.
@@ -1118,7 +1118,7 @@ do
   lurek.log.info("overlay shapes: " .. count .. " (max recommended: 50)", "minimap")
 end
 
---@api-stub: Minimap:getPathCount
+--@api-stub: LMinimap:getPathCount
 -- Returns the number of active path overlays.
 do
   -- getPathCount() returns how many paths are currently displayed.
@@ -1129,7 +1129,7 @@ do
   lurek.log.info("active paths: " .. mm:getPathCount(), "minimap")
 end
 
---@api-stub: Minimap:getLayerCount
+--@api-stub: LMinimap:getLayerCount
 -- Returns the number of layers that have data.
 do
   -- getLayerCount() returns how many layers have been populated with setLayerData.
@@ -1141,7 +1141,7 @@ do
   lurek.log.info("dungeon has " .. mm:getLayerCount() .. " floors", "minimap")
 end
 
---@api-stub: Minimap:getLayerData
+--@api-stub: LMinimap:getLayerData
 -- Returns the raw cell data array for a specific layer.
 do
   -- getLayerData(layer) returns a flat array table, or nil if layer is empty.
@@ -1167,605 +1167,3 @@ print("content/examples/minimap.lua")
 -- -----------------------------------------------------------------------------
 -- LMinimap methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LMinimap:getGridWidth -----------------------------------------
---@api-stub: LMinimap:getGridWidth
--- Returns the minimap grid width. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getGridWidth()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getGridHeight ----------------------------------------
---@api-stub: LMinimap:getGridHeight
--- Returns the minimap grid height. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getGridHeight()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getCellCount -----------------------------------------
---@api-stub: LMinimap:getCellCount
--- Returns the total number of grid cells.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getCellCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getGridSize ------------------------------------------
---@api-stub: LMinimap:getGridSize
--- Returns the minimap grid size. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getGridSize()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getDisplayWidth --------------------------------------
---@api-stub: LMinimap:getDisplayWidth
--- Returns the minimap display width.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getDisplayWidth()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getDisplayHeight -------------------------------------
---@api-stub: LMinimap:getDisplayHeight
--- Returns the minimap display height.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getDisplayHeight()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getDisplaySize ---------------------------------------
---@api-stub: LMinimap:getDisplaySize
--- Returns the minimap display size. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getDisplaySize()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setDisplaySize ---------------------------------------
---@api-stub: LMinimap:setDisplaySize
--- Sets the minimap display size. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setDisplaySize(64.0, 64.0)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setTerrain -------------------------------------------
---@api-stub: LMinimap:setTerrain
--- Sets terrain type for a one-based grid cell.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setTerrain(0.0, 0.0, terrain_type)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getTerrain -------------------------------------------
---@api-stub: LMinimap:getTerrain
--- Returns terrain type for a one-based grid cell.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getTerrain(0.0, 0.0)  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setTerrainData ---------------------------------------
---@api-stub: LMinimap:setTerrainData
--- Replaces terrain data from a flat array table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setTerrainData(data)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setTerrainColor --------------------------------------
---@api-stub: LMinimap:setTerrainColor
--- Sets RGBA color for a terrain type. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setTerrainColor(terrain_type, 1.0, 0.8, 0.2, [a])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getTerrainColor --------------------------------------
---@api-stub: LMinimap:getTerrainColor
--- Returns RGBA color for a terrain type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getTerrainColor(terrain_type)  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setTileDescription -----------------------------------
---@api-stub: LMinimap:setTileDescription
--- Sets text description for a tile type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setTileDescription(type_id, desc)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getTileDescription -----------------------------------
---@api-stub: LMinimap:getTileDescription
--- Returns text description for a tile type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getTileDescription(type_id)  -- -> string
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setFogEnabled ----------------------------------------
---@api-stub: LMinimap:setFogEnabled
--- Enables or disables fog display. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setFogEnabled(true)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:isFogEnabled -----------------------------------------
---@api-stub: LMinimap:isFogEnabled
--- Returns whether fog display is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:isFogEnabled()  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setFogLevel ------------------------------------------
---@api-stub: LMinimap:setFogLevel
--- Sets fog level for a one-based grid cell.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setFogLevel(0.0, 0.0, level)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getFogLevel ------------------------------------------
---@api-stub: LMinimap:getFogLevel
--- Returns fog level for a one-based grid cell.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getFogLevel(0.0, 0.0)  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setFogColor ------------------------------------------
---@api-stub: LMinimap:setFogColor
--- Sets the fog overlay color. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setFogColor(1.0, 0.8, 0.2, [a])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getFogColor ------------------------------------------
---@api-stub: LMinimap:getFogColor
--- Returns the fog overlay color. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getFogColor()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setFogData -------------------------------------------
---@api-stub: LMinimap:setFogData
--- Replaces fog data from a flat array table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setFogData(data)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:addObjectType ----------------------------------------
---@api-stub: LMinimap:addObjectType
--- Adds an object type and returns its one-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:addObjectType("hero", 1.0, 0.8, 0.2, [a])  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setObjectTypeVisible ---------------------------------
---@api-stub: LMinimap:setObjectTypeVisible
--- Sets visibility for an object type by one-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setObjectTypeVisible(type_idx, true)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:isObjectTypeVisible ----------------------------------
---@api-stub: LMinimap:isObjectTypeVisible
--- Returns visibility for an object type by one-based index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:isObjectTypeVisible(type_idx)  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getObjectTypeCount -----------------------------------
---@api-stub: LMinimap:getObjectTypeCount
--- Returns the number of object types.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getObjectTypeCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setObjectTypeTexture ---------------------------------
---@api-stub: LMinimap:setObjectTypeTexture
--- Assigns an image texture to an object type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setObjectTypeTexture()
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearObjectTypeTexture -------------------------------
---@api-stub: LMinimap:clearObjectTypeTexture
--- Clears image texture for an object type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearObjectTypeTexture(type_idx)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setObject --------------------------------------------
---@api-stub: LMinimap:setObject
--- Adds or updates an object on the minimap.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setObject(1, 0.0, 0.0, type_idx, [owner])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:removeObject -----------------------------------------
---@api-stub: LMinimap:removeObject
--- Removes an object by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:removeObject(1)  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearObjects -----------------------------------------
---@api-stub: LMinimap:clearObjects
--- Clears all objects from the minimap.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearObjects()
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getObjectCount ---------------------------------------
---@api-stub: LMinimap:getObjectCount
--- Returns the number of objects on the minimap.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getObjectCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setOwnerColor ----------------------------------------
---@api-stub: LMinimap:setOwnerColor
--- Sets RGBA color for an owner id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setOwnerColor(owner, 1.0, 0.8, 0.2, [a])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getOwnerColor ----------------------------------------
---@api-stub: LMinimap:getOwnerColor
--- Returns RGBA color for an owner id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getOwnerColor(owner)  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setColorMode -----------------------------------------
---@api-stub: LMinimap:setColorMode
--- Sets the minimap color mode. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setColorMode(mode)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getColorMode -----------------------------------------
---@api-stub: LMinimap:getColorMode
--- Returns the current minimap color mode.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getColorMode()  -- -> string
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setZoom ----------------------------------------------
---@api-stub: LMinimap:setZoom
--- Sets minimap zoom. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setZoom(zoom)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getZoom ----------------------------------------------
---@api-stub: LMinimap:getZoom
--- Returns minimap zoom. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getZoom()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setCenter --------------------------------------------
---@api-stub: LMinimap:setCenter
--- Sets minimap world center. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setCenter(0.0, 0.0)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:trackCamera ------------------------------------------
---@api-stub: LMinimap:trackCamera
--- Centers the minimap and viewport rectangle from a camera handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:trackCamera(camera_ud)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:revealRadius -----------------------------------------
---@api-stub: LMinimap:revealRadius
--- Reveals fog inside a world-space radius.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:revealRadius(cx, cy, 24.0)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getCenter --------------------------------------------
---@api-stub: LMinimap:getCenter
--- Returns minimap world center. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getCenter()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getCenterX -------------------------------------------
---@api-stub: LMinimap:getCenterX
--- Returns minimap world center x coordinate.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getCenterX()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getCenterY -------------------------------------------
---@api-stub: LMinimap:getCenterY
--- Returns minimap world center y coordinate.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getCenterY()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setViewportRect --------------------------------------
---@api-stub: LMinimap:setViewportRect
--- Sets the visible viewport rectangle shown on the minimap.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setViewportRect(0.0, 0.0, 64.0, 64.0)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearViewportRect ------------------------------------
---@api-stub: LMinimap:clearViewportRect
--- Clears the viewport rectangle. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearViewportRect()
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getViewportRect --------------------------------------
---@api-stub: LMinimap:getViewportRect
--- Returns the viewport rectangle when one is set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getViewportRect()  -- -> LuaValue
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setViewportVisible -----------------------------------
---@api-stub: LMinimap:setViewportVisible
--- Sets whether the viewport rectangle is visible.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setViewportVisible(true)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:isViewportVisible ------------------------------------
---@api-stub: LMinimap:isViewportVisible
--- Returns whether the viewport rectangle is visible.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:isViewportVisible()  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setViewportColor -------------------------------------
---@api-stub: LMinimap:setViewportColor
--- Sets the viewport rectangle color.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setViewportColor(1.0, 0.8, 0.2, [a])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getViewportColor -------------------------------------
---@api-stub: LMinimap:getViewportColor
--- Returns the viewport rectangle color.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getViewportColor()  -- -> number
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:addPing ----------------------------------------------
---@api-stub: LMinimap:addPing
--- Adds a timed ping effect at a minimap world position. The ping fades out over its duration.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:addPing()
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getPingCount -----------------------------------------
---@api-stub: LMinimap:getPingCount
--- Returns the number of active pings.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getPingCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:addMarker --------------------------------------------
---@api-stub: LMinimap:addMarker
--- Adds a marker and returns its id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:addMarker()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:removeMarker -----------------------------------------
---@api-stub: LMinimap:removeMarker
--- Removes a marker by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:removeMarker(1)  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:hasMarker --------------------------------------------
---@api-stub: LMinimap:hasMarker
--- Returns whether a marker id exists.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:hasMarker(1)  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getMarkerDescription ---------------------------------
---@api-stub: LMinimap:getMarkerDescription
--- Returns a marker description by id.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getMarkerDescription(1)  -- -> string
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getMarkerCount ---------------------------------------
---@api-stub: LMinimap:getMarkerCount
--- Returns the number of markers. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getMarkerCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setMarkerTexture -------------------------------------
---@api-stub: LMinimap:setMarkerTexture
--- Assigns an image texture to a marker.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setMarkerTexture(1, image_ud, [width], [height])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearMarkerTexture -----------------------------------
---@api-stub: LMinimap:clearMarkerTexture
--- Clears image texture from a marker.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearMarkerTexture(1)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setMarkerAnimation -----------------------------------
---@api-stub: LMinimap:setMarkerAnimation
--- Sets marker animation by type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setMarkerAnimation(1, anim_type, 120.0)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearMarkerAnimation ---------------------------------
---@api-stub: LMinimap:clearMarkerAnimation
--- Clears marker animation by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearMarkerAnimation(1)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:drawLine ---------------------------------------------
---@api-stub: LMinimap:drawLine
--- Adds an overlay line. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:drawLine(x1, y1, x2, y2, color_tbl)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:drawRect ---------------------------------------------
---@api-stub: LMinimap:drawRect
--- Adds an overlay rectangle. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:drawRect(0.0, 0.0, 64.0, 64.0, color_tbl)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearOverlay -----------------------------------------
---@api-stub: LMinimap:clearOverlay
--- Clears overlay shapes. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearOverlay()
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getOverlayShapeCount ---------------------------------
---@api-stub: LMinimap:getOverlayShapeCount
--- Returns the number of overlay shapes.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getOverlayShapeCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:showPath ---------------------------------------------
---@api-stub: LMinimap:showPath
--- Adds a colored path overlay and returns its id.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:showPath(points_tbl, color_tbl)  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:clearPath --------------------------------------------
---@api-stub: LMinimap:clearPath
--- Clears one path by id or all paths when no id is provided.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:clearPath([id])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getPathCount -----------------------------------------
---@api-stub: LMinimap:getPathCount
--- Returns the number of paths. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getPathCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setLayer ---------------------------------------------
---@api-stub: LMinimap:setLayer
--- Sets active minimap layer. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setLayer(1)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getLayer ---------------------------------------------
---@api-stub: LMinimap:getLayer
--- Returns active minimap layer. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getLayer()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getLayerCount ----------------------------------------
---@api-stub: LMinimap:getLayerCount
--- Returns the number of minimap layers.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getLayerCount()  -- -> integer
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setLayerData -----------------------------------------
---@api-stub: LMinimap:setLayerData
--- Sets raw cell data for a layer. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setLayerData(1, data_tbl)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getLayerData -----------------------------------------
---@api-stub: LMinimap:getLayerData
--- Returns raw cell data for a layer. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getLayerData(1)  -- -> table
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setAntiAlias -----------------------------------------
---@api-stub: LMinimap:setAntiAlias
--- Enables or disables minimap anti-aliasing.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setAntiAlias(true)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:isAntiAlias ------------------------------------------
---@api-stub: LMinimap:isAntiAlias
--- Returns whether anti-aliasing is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:isAntiAlias()  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:setClickable -----------------------------------------
---@api-stub: LMinimap:setClickable
--- Enables or disables minimap click handling.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:setClickable(true)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:isClickable ------------------------------------------
---@api-stub: LMinimap:isClickable
--- Returns whether minimap click handling is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:isClickable()  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:getHoverInfo -----------------------------------------
---@api-stub: LMinimap:getHoverInfo
--- Returns hover text for a screen position when available.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:getHoverInfo(1.0, 1.0, mx, my)  -- -> string
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:screenToGrid -----------------------------------------
---@api-stub: LMinimap:screenToGrid
--- Converts a screen position to grid coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:screenToGrid(1.0, 1.0, mx, my)  -- -> LuaValue
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:gridToScreen -----------------------------------------
---@api-stub: LMinimap:gridToScreen
--- Converts grid coordinates to screen coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:gridToScreen(gx, gy, mx, my)  -- -> LuaValue
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:update -----------------------------------------------
---@api-stub: LMinimap:update
--- Advances minimap animations and timers.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:update(0.016)
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:type -------------------------------------------------
---@api-stub: LMinimap:type
--- Returns the Lua-visible type name for this minimap handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:type()  -- -> string
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:typeOf -----------------------------------------------
---@api-stub: LMinimap:typeOf
--- Returns whether this minimap handle matches a supported type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:typeOf("hero")  -- -> boolean
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:render -----------------------------------------------
---@api-stub: LMinimap:render
--- Enqueues minimap render commands at an optional screen position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:render([x], [y])
--- (replace lMinimap_stub with your real LMinimap instance above)
-
--- ---- Stub: LMinimap:drawToImage ------------------------------------------
---@api-stub: LMinimap:drawToImage
--- Draws the minimap into image data at a pixel size.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMinimap_stub:drawToImage(pixel_size)  -- -> LImageData
--- (replace lMinimap_stub with your real LMinimap instance above)

@@ -308,6 +308,6 @@ end
 
 function lurek.process(dt) end
 function lurek.draw()
-    lurek.render.clear(0, 0, 0, 1)
+    lurek.render.clear(0, 0, 0)
     lurek.render.print("[process_map] Przetwarzanie... sprawdź konsolę.", 10, 10)
 end

@@ -1,313 +1,313 @@
--- process_map.lua — Narzędzie do przetwarzania mapy prowincji
--- Uruchom jako main.lua w katalogu eu2/ (musi być dostęp do map.png)
---
--- Działanie:
---   1. Downscale 2x metodą głosowania 2×2 (bez nowych kolorów)
---   2. 2 przebiegi wygładzania krawędzi (głosowanie 4-sąsiadów, waga własna = 2)
---   3. Magenta (znaczniki stolic) → zastąpione kolorem prowincji
---   4. Białe piksele → 1 na prowincję, w zredukowanej pozycji,
---      z 4 sąsiadami tego samego koloru (przeszukiwanie promień 1–12)
---   5. Zapis do map2.png
---
--- Jak uruchomić:
---   1. Utwórz kopię zapasową: cp main.lua main_game.lua
---   2. Zastąp main.lua tym plikiem: cp process_map.lua main.lua
---   3. Uruchom grę eu2 ("Run: Debug — pick demo" → eu2)
---   4. Poczekaj na "Gotowe!" w konsoli i zamknij okno
---   5. Przywróć: cp main_game.lua main.lua
+﻿
+local R = lurek.render
 
-local MAP_IN  = "map.png"
-local MAP_OUT = "map2.png"
+local MAP_W = 1000
+local MAP_H = 450
+local PIXEL_SIZE = 8
+local SANITIZED_MAP_PATH = "save/eu2/map2.png"
 
--- Progi klasyfikacji pikseli
-local WHITE_THRESH   = 240   -- r,g,b >= 240 → biały (znacznik prowincji)
-local MAGENTA_R_MIN  = 180   -- r >= 180, g < 60, b >= 180 → magenta (stolica)
-local MAGENTA_G_MAX  = 60
-local BLACK_MAX      = 40    -- r,g,b < 40 → czarny (ocean)
+local reg = nil
 
--- Sąsiedzi 4-kierunkowi
-local DIRS = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }
+local cam = { x = 0, y = 0, zoom = 1.0 }
+local drag = { active = false, sx = 0, sy = 0, cx = 0, cy = 0 }
+local hovered_gid = nil
+local selected_gid = nil
+local map_mode = "terrain"
+local draw_labels = true
+local ui_font = nil
 
--- Pomocnicze funkcje klasyfikacji -----------------------------------------
+-- Canvas caching state
+local map_canvas = nil
+local map_dirty = true
+local cam_prev = { x = 0, y = 0, zoom = 1.0 }
+local prev_ww, prev_hh = 0, 0
+local prev_map_mode = "terrain"
+local prev_draw_labels = true
 
-local function is_white(r, g, b)
-    return r >= WHITE_THRESH and g >= WHITE_THRESH and b >= WHITE_THRESH
-end
-
-local function is_magenta(r, g, b)
-    return r >= MAGENTA_R_MIN and g < MAGENTA_G_MAX and b >= MAGENTA_R_MIN
-end
-
-local function is_black(r, g, b)
-    return r < BLACK_MAX and g < BLACK_MAX and b < BLACK_MAX
-end
-
-local function is_province(r, g, b)
-    return not is_white(r, g, b)
-        and not is_magenta(r, g, b)
-        and not is_black(r, g, b)
-end
-
--- Kolor → klucz liczbowy i odwrotnie
-local function ck(r, g, b)
-    return r * 65536 + g * 256 + b
-end
-
-local function ck_rgb(k)
-    local r = math.floor(k / 65536)
-    local g = math.floor((k / 256) % 256)
-    local b = k % 256
-    return r, g, b
-end
-
--- Czy piksel (x,y) ma 4 sąsiadów dokładnie tego samego koloru?
-local function has_4_same(img, x, y, r, g, b, w, h)
-    if x <= 0 or x >= w - 1 or y <= 0 or y >= h - 1 then
-        return false
+local function reg_call(method, ...)
+    if not reg then
+        return nil
     end
-    for _, d in ipairs(DIRS) do
-        local nr, ng, nb = img:getPixel(x + d[1], y + d[2])
-        if nr ~= r or ng ~= g or nb ~= b then
-            return false
-        end
+    local fn = reg[method]
+    if type(fn) ~= "function" then
+        return nil
     end
-    return true
+    local ok, a, b, c, d, e = pcall(fn, reg, ...)
+    if not ok then
+        return nil
+    end
+    return a, b, c, d, e
 end
 
--- Krok 2: jeden przebieg wygładzania krawędzi -----------------------------
--- Dla każdego nieokeanicznego piksela zbieramy głosy 4 sąsiadów + własny×2.
--- Zwycięski kolor musi już istnieć na obrazie (żadnych nowych RGB).
-local function smooth_once(img, w, h)
-    local next = lurek.image.newImageData(w, h)
-    for y = 0, h - 1 do
-        for x = 0, w - 1 do
-            local r, g, b, a = img:getPixel(x, y)
-            if is_black(r, g, b) then
-                next:setPixel(x, y, r, g, b, a)
-            else
-                local sk     = ck(r, g, b)
-                local votes  = { [sk] = 2 }  -- waga własna = 2
-                for _, d in ipairs(DIRS) do
-                    local nx, ny = x + d[1], y + d[2]
-                    if nx >= 0 and nx < w and ny >= 0 and ny < h then
-                        local nr, ng, nb = img:getPixel(nx, ny)
-                        if not is_black(nr, ng, nb) then
-                            local nk = ck(nr, ng, nb)
-                            votes[nk] = (votes[nk] or 0) + 1
-                        end
-                    end
-                end
-                local bk, bv = sk, 0
-                for k, v in pairs(votes) do
-                    if v > bv then bk = k; bv = v end
-                end
-                local fr, fg, fb = ck_rgb(bk)
-                next:setPixel(x, y, fr, fg, fb, 255)
-            end
-        end
-    end
-    return next
+local function clamp(v, lo, hi)
+    if v < lo then return lo end
+    if v > hi then return hi end
+    return v
 end
 
--- =========================================================================
+local function fit_camera()
+    local ww, hh = lurek.window.getDimensions()
+    if reg and reg.fitCamera then
+        local x, y, z = reg:fitCamera(ww, hh, PIXEL_SIZE)
+        cam.x, cam.y, cam.zoom = x, y, z
+        return
+    end
+
+    local sw = MAP_W * PIXEL_SIZE
+    local sh = MAP_H * PIXEL_SIZE
+    cam.zoom = math.min(ww / sw, hh / sh)
+    cam.x = (ww - sw * cam.zoom) * 0.5
+    cam.y = (hh - sh * cam.zoom) * 0.5
+end
+
+function lurek.resize(w, h)
+    map_dirty = true
+end
+
+local function hover_info(gid)
+    if not gid then
+        return nil
+    end
+    local snap = reg_call("getProvince", gid)
+    if type(snap) ~= "table" then
+        return nil
+    end
+    local attrs = snap.attrs or {}
+    local gameid = attrs.game_id
+    local terrain = attrs.terrain or "unknown"
+    local name = attrs.name or ("Province " .. tostring(gameid or gid))
+    return {
+        gameid = gameid,
+        terrain = terrain,
+        name = tostring(name):gsub("_", " "),
+    }
+end
+
 function lurek.init()
-    print("[process_map] Wczytywanie " .. MAP_IN .. "...")
-    local src = lurek.image.newImageData(MAP_IN)
-    assert(src, "Błąd: nie można wczytać " .. MAP_IN)
-
-    local W  = src:getWidth()
-    local H  = src:getHeight()
-    local W2 = math.floor(W / 2)
-    local H2 = math.floor(H / 2)
-
-    print(string.format(
-        "[process_map] Rozmiar: %dx%d → %dx%d", W, H, W2, H2))
-
-    -- =====================================================================
-    -- Krok 1: Downscale 2x metodą głosowania w bloku 2×2
-    --   – piksele białe i magenta wykluczone z głosowania
-    --   – zapamiętujemy pozycję białego piksela dla każdej prowincji
-    -- =====================================================================
-    print("[process_map] [1/3] Downscale z głosowaniem 2×2...")
-
-    local out = lurek.image.newImageData(W2, H2)
-
-    -- Mapa: ck(prowincja) → {ox, oy} — pierwsza znaleziona pozycja białego piksela
-    local province_white = {}
-
-    for oy = 0, H2 - 1 do
-        for ox = 0, W2 - 1 do
-            local sx = ox * 2
-            local sy = oy * 2
-
-            local votes           = {}
-            local found_white     = false
-
-            for dy = 0, 1 do
-                for dx = 0, 1 do
-                    local px = sx + dx
-                    local py = sy + dy
-                    if px < W and py < H then
-                        local r, g, b = src:getPixel(px, py)
-                        if is_white(r, g, b) then
-                            found_white = true
-                        elseif is_province(r, g, b) then
-                            local k = ck(r, g, b)
-                            votes[k] = (votes[k] or 0) + 1
-                        end
-                        -- czarny i magenta → pomijane w głosowaniu
-                    end
-                end
-            end
-
-            local best_k, best_v = 0, 0
-            for k, v in pairs(votes) do
-                if v > best_v then best_k = k; best_v = v end
-            end
-
-            local r, g, b
-            if best_v > 0 then
-                r, g, b = ck_rgb(best_k)
-                -- Zapamiętaj pierwszą pozycję białego znacznika tej prowincji
-                if found_white and not province_white[best_k] then
-                    province_white[best_k] = { ox, oy }
-                end
-            else
-                -- Cały blok to ocean lub wyłącznie magenta/biały bez prowincji obok
-                r, g, b = src:getPixel(sx, sy)
-                if is_magenta(r, g, b) or is_white(r, g, b) then
-                    r, g, b = 0, 0, 0
-                end
-            end
-
-            out:setPixel(ox, oy, r, g, b, 255)
-        end
+    local ok_font, f = pcall(R.newFont, "fonts/OpenSans.ttf", 8)
+    if ok_font and f then
+        ui_font = f
+        R.setFont(ui_font)
     end
 
-    -- =====================================================================
-    -- Krok 2: 2× wygładzanie krawędzi (bez nowych kolorów)
-    -- =====================================================================
-    print("[process_map] [2/3] Wygładzanie krawędzi (2 przebiegi)...")
-
-    out = smooth_once(out, W2, H2)
-    out = smooth_once(out, W2, H2)
-
-    -- =====================================================================
-    -- Krok 3: Umieszczanie białych pikseli — 1 na prowincję
-    --   Warunek: piksel musi leżeć na kolorze swojej prowincji
-    --            i mieć 4 sąsiadów dokładnie tego samego koloru.
-    --   Strategia:
-    --     a) Sprawdź zapamiętaną pozycję po wygładzeniu
-    --     b) Jeśli kolor się zmienił, znajdź najbliższy piksel prowincji (r=1..6)
-    --     c) Sprawdź warunek 4-sąsiadów w promieniu r=0..12
-    --     d) Awaryjnie: umieść bez sprawdzania sąsiadów
-    -- =====================================================================
-    print("[process_map] [3/3] Umieszczanie białych pikseli (1 na prowincję)...")
-
-    local placed = 0
-    local fallback = 0
-    local skipped = 0
-
-    for pk, pos in pairs(province_white) do
-        local pr, pg, pb = ck_rgb(pk)
-        local ox, oy = pos[1], pos[2]
-
-        -- (a) Szukamy centroidu prowincji (cx,cy) — zaczynamy od zapamiętanej pozycji
-        local cx, cy = ox, oy
-        do
-            local cur_r, cur_g, cur_b = out:getPixel(ox, oy)
-            if cur_r ~= pr or cur_g ~= pg or cur_b ~= pb then
-                -- Po wygładzeniu tu jest inny kolor — szukaj w pobliżu
-                cx, cy = -1, -1
-                for radius = 1, 6 do
-                    if cx >= 0 then break end
-                    for dy = -radius, radius do
-                        if cx >= 0 then break end
-                        for dx = -radius, radius do
-                            if math.abs(dx) == radius or math.abs(dy) == radius then
-                                local tx = ox + dx
-                                local ty = oy + dy
-                                if tx >= 0 and tx < W2 and ty >= 0 and ty < H2 then
-                                    local tr, tg, tb = out:getPixel(tx, ty)
-                                    if tr == pr and tg == pg and tb == pb then
-                                        cx, cy = tx, ty
-                                        break
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        if cx < 0 then
-            -- Prowincja zniknęła całkowicie po wygładzeniu (bardzo mała) → pomiń
-            skipped = skipped + 1
-            goto continue
-        end
-
-        -- (c) Szukaj pozycji z 4 identycznymi sąsiadami (promień 0..12)
-        local placed_here = false
-
-        if has_4_same(out, cx, cy, pr, pg, pb, W2, H2) then
-            out:setPixel(cx, cy, 255, 255, 255, 255)
-            placed = placed + 1
-            placed_here = true
-        else
-            for radius = 1, 12 do
-                if placed_here then break end
-                for dy = -radius, radius do
-                    if placed_here then break end
-                    for dx = -radius, radius do
-                        if math.abs(dx) == radius or math.abs(dy) == radius then
-                            local tx = cx + dx
-                            local ty = cy + dy
-                            if tx >= 0 and tx < W2 and ty >= 0 and ty < H2 then
-                                local tr, tg, tb = out:getPixel(tx, ty)
-                                if tr == pr and tg == pg and tb == pb
-                                    and has_4_same(out, tx, ty, pr, pg, pb, W2, H2) then
-                                    out:setPixel(tx, ty, 255, 255, 255, 255)
-                                    placed = placed + 1
-                                    placed_here = true
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        -- (d) Awaryjnie — umieść na środku (może nie mieć 4 sąsiadów)
-        if not placed_here then
-            local tr, tg, tb = out:getPixel(cx, cy)
-            if tr == pr and tg == pg and tb == pb then
-                out:setPixel(cx, cy, 255, 255, 255, 255)
-                fallback = fallback + 1
-            else
-                skipped = skipped + 1
-            end
-        end
-
-        ::continue::
-    end
-
-    print(string.format(
-        "[process_map] Białe piksele: umieszczono=%d  awaryjnie=%d  pominięto=%d",
-        placed, fallback, skipped))
-
-    -- =====================================================================
-    -- Zapis
-    -- =====================================================================
-    print("[process_map] Zapisywanie " .. MAP_OUT .. "...")
-    lurek.image.savePNG(out, MAP_OUT)
-    print("[process_map] ✓ Gotowe! Zapisano: " .. MAP_OUT)
-
-    lurek.event.quit()
+    lurek.province.sanitizeMarkedPng("map.png", SANITIZED_MAP_PATH)
+    reg = lurek.province.newFromPng("eu2", SANITIZED_MAP_PATH)
+    lurek.province.setActive("eu2")
+    reg:importMetadataFromFiles({
+        color_map_png = SANITIZED_MAP_PATH,
+        marker_png = "map.png",
+        color_csv = "prov_cols.csv",
+        province_toml = "province.toml",
+        water_terrain_tokens = { "sea", "river" },
+        water_terrain_type = 0,
+        land_terrain_type = 1,
+        set_political_colors = true,
+        set_label_text = true,
+        set_capitals = true,
+        set_label_lines = true,
+    })
+    fit_camera()
 end
 
-function lurek.process(dt) end
+function lurek.update(dt)
+    local mx, my = lurek.input.mouse.getPosition()
+    if drag.active then
+        cam.x = drag.cx + (mx - drag.sx)
+        cam.y = drag.cy + (my - drag.sy)
+    end
+
+    if reg and reg.screenToProvince then
+        hovered_gid = reg:screenToProvince(mx, my, cam.x, cam.y, cam.zoom, PIXEL_SIZE)
+    else
+        local s = cam.zoom * PIXEL_SIZE
+        local px = math.floor((mx - cam.x) / s)
+        local py = math.floor((my - cam.y) / s)
+
+        if px >= 0 and py >= 0 and px < MAP_W and py < MAP_H then
+            local gid = reg_call("getAt", px, py) or 0
+            hovered_gid = gid ~= 0 and gid or nil
+        else
+            hovered_gid = nil
+        end
+    end
+end
+
+function lurek.process(dt)
+    lurek.update(dt)
+end
+
+function lurek.mousepressed(x, y, button)
+    if button == 1 then
+        drag.active = true
+        drag.sx, drag.sy = x, y
+        drag.cx, drag.cy = cam.x, cam.y
+    end
+end
+
+function lurek.mousereleased(x, y, button)
+    if button ~= 1 then return end
+    local dx = x - drag.sx
+    local dy = y - drag.sy
+    drag.active = false
+    if dx * dx + dy * dy <= 16 then
+        selected_gid = hovered_gid
+    end
+end
+
+function lurek.wheelmoved(dx, dy)
+    if dy == 0 then return end
+    local mx, my = lurek.input.mouse.getPosition()
+    local old = cam.zoom
+    cam.zoom = clamp(cam.zoom * (dy > 0 and 1.12 or (1.0 / 1.12)), 0.02, 12.0)
+    if lurek.province and lurek.province.zoomCameraAt then
+        cam.x, cam.y = lurek.province.zoomCameraAt(mx, my, cam.x, cam.y, old, cam.zoom)
+    else
+        local s = cam.zoom / old
+        cam.x = mx - (mx - cam.x) * s
+        cam.y = my - (my - cam.y) * s
+    end
+end
+
+function lurek.keypressed(key)
+    if key == "escape" then
+        lurek.event.quit()
+    elseif key == "1" then
+        map_mode = "political"
+    elseif key == "2" then
+        map_mode = "terrain"
+    elseif key == "3" then
+        map_mode = "visibility"
+    elseif key == "l" then
+        draw_labels = not draw_labels
+    end
+end
+
+local function draw_hud()
+    if ui_font then
+        R.setFont(ui_font)
+    end
+
+    local fps = lurek.timer.getFPS()
+    local stats = R.getStats()
+
+    R.setColor(0, 0, 0, 0.70)
+    R.rectangle("fill", 8, 8, 760, 76)
+    R.setColor(1, 1, 1, 1)
+    R.print("EU2 province renderer: Rust GPU path (lurek.province)", 14, 14)
+    R.print("Map mode [1/2/3]: " .. map_mode .. "   Labels [L]: " .. tostring(draw_labels), 14, 34)
+    R.print(string.format("FPS: %d  Draw calls: %d  Batched: %d", fps, stats.gpu_draw_calls or 0, stats.batched_draws or 0), 14, 54)
+
+    if hovered_gid then
+        local info = hover_info(hovered_gid) or {}
+        local gameid = info.gameid
+        local name = info.name or ("Province " .. tostring(gameid or hovered_gid))
+        local terrain = info.terrain or "unknown"
+        local neighbors = reg_call("getNeighbors", hovered_gid) or {}
+
+        local ww, hh = lurek.window.getDimensions()
+        local tx, ty = ww - 360, hh - 98
+        R.setColor(0, 0, 0, 0.78)
+        R.rectangle("fill", tx, ty, 352, 90)
+        R.setColor(1, 0.86, 0.35, 1)
+        R.print(name, tx + 8, ty + 8)
+        R.setColor(0.8, 0.8, 0.8, 1)
+        R.print("Grid: " .. tostring(hovered_gid) .. "  ID: " .. tostring(gameid or "-") .. "  terrain: " .. terrain, tx + 8, ty + 30)
+        R.print("Neighbors: " .. tostring(#neighbors) .. "  Selected: " .. tostring(selected_gid or "-"), tx + 8, ty + 52)
+    end
+end
+
+local function render_frame()
+    local ww, hh = lurek.window.getDimensions()
+
+    -- Recreate canvas on resize or first frame
+    if map_canvas == nil or ww ~= prev_ww or hh ~= prev_hh then
+        map_canvas = R.newCanvas(ww, hh)
+        map_dirty = true
+        prev_ww, prev_hh = ww, hh
+    end
+
+    -- Dirty detection: camera, mode, labels
+    if cam.x ~= cam_prev.x or cam.y ~= cam_prev.y or cam.zoom ~= cam_prev.zoom
+       or map_mode ~= prev_map_mode or draw_labels ~= prev_draw_labels then
+        map_dirty = true
+        cam_prev.x, cam_prev.y, cam_prev.zoom = cam.x, cam.y, cam.zoom
+        prev_map_mode = map_mode
+        prev_draw_labels = draw_labels
+    end
+
+    -- Render map to canvas only when dirty
+    if map_dirty then
+        R.resetCanvas(map_canvas)
+        R.setCanvas(map_canvas)
+        reg_call("render", {
+            x = cam.x,
+            y = cam.y,
+            zoom = cam.zoom,
+            pixel_size = PIXEL_SIZE,
+            screen_w = ww,
+            screen_h = hh,
+            map_mode = map_mode,
+            draw_fills = true,
+            draw_borders = true,
+            draw_labels = draw_labels,
+            draw_capitals = true,
+            border_width = 1.0,
+            hovered_id = nil,
+            selected_id = nil,
+        })
+        R.setCanvas()
+        map_dirty = false
+    end
+
+    -- Draw cached canvas to screen
+    R.setColor(1, 1, 1, 1)
+    R.draw(map_canvas, 0, 0)
+
+    -- Draw hover/selection highlights directly (cheap, changes per frame)
+    if selected_gid and reg then
+        reg_call("render", {
+            x = cam.x,
+            y = cam.y,
+            zoom = cam.zoom,
+            pixel_size = PIXEL_SIZE,
+            screen_w = ww,
+            screen_h = hh,
+            map_mode = map_mode,
+            draw_fills = false,
+            draw_borders = false,
+            draw_labels = false,
+            draw_capitals = false,
+            border_width = 1.0,
+            hovered_id = nil,
+            selected_id = selected_gid,
+        })
+    end
+    if hovered_gid and reg then
+        reg_call("render", {
+            x = cam.x,
+            y = cam.y,
+            zoom = cam.zoom,
+            pixel_size = PIXEL_SIZE,
+            screen_w = ww,
+            screen_h = hh,
+            map_mode = map_mode,
+            draw_fills = false,
+            draw_borders = false,
+            draw_labels = false,
+            draw_capitals = false,
+            border_width = 1.0,
+            hovered_id = hovered_gid,
+            selected_id = nil,
+        })
+    end
+
+    draw_hud()
+end
+
 function lurek.draw()
-    lurek.render.clear(0, 0, 0, 1)
-    lurek.render.print("[process_map] Przetwarzanie... sprawdź konsolę.", 10, 10)
+    render_frame()
+end
+
+function lurek.render()
+    render_frame()
 end

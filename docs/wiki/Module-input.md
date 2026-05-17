@@ -15,7 +15,7 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.input.advancePlayback() -> table](#lurekinputadvanceplayback-table)
-  - [lurek.input.bind(action: string, keys: string)](#lurekinputbindaction-string-keys-string)
+  - [lurek.input.bind(action: string, keys: any)](#lurekinputbindaction-string-keys-any)
   - [lurek.input.clearBindings()](#lurekinputclearbindings)
   - [lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number](#lurekinputgamepadgetaxisid-integer-axis-integer-number)
   - [lurek.input.gamepad.getAxisCount(id: integer) -> integer](#lurekinputgamepadgetaxiscountid-integer-integer)
@@ -64,10 +64,10 @@
   - [lurek.input.loadRecording(json: string)](#lurekinputloadrecordingjson-string)
   - [lurek.input.newCombo(steps: table, [opts]: table) -> LCombo](#lurekinputnewcombosteps-table-opts-table-lcombo)
   - [lurek.input.mouse.newCursor(pixels: table, width: integer, height: integer, [hotx]: integer, [hoty]: integer) -> LCursor](#lurekinputmousenewcursorpixels-table-width-integer-height-integer-hotx-integer-hoty-integer-lcursor)
-  - [lurek.input.newMapping(name: string, keys: string) -> table](#lurekinputnewmappingname-string-keys-string-table)
+  - [lurek.input.newMapping(name: string, keys: any) -> table](#lurekinputnewmappingname-string-keys-any-table)
   - [lurek.input.gamepad.saveGamepadMappings(path: string)](#lurekinputgamepadsavegamepadmappingspath-string)
   - [lurek.input.gamepad.setBackgroundEvents(enable: boolean)](#lurekinputgamepadsetbackgroundeventsenable-boolean)
-  - [lurek.input.mouse.setCursor(cursor: LCursor)](#lurekinputmousesetcursorcursor-lcursor)
+  - [lurek.input.mouse.setCursor(cursor: any)](#lurekinputmousesetcursorcursor-any)
   - [lurek.input.gamepad.setGamepadMapping(guid: string, mapping: string)](#lurekinputgamepadsetgamepadmappingguid-string-mapping-string)
   - [lurek.input.mouse.setGrabbed(grabbed: boolean)](#lurekinputmousesetgrabbedgrabbed-boolean)
   - [lurek.input.keyboard.setKeyRepeat(enabled: boolean)](#lurekinputkeyboardsetkeyrepeatenabled-boolean)
@@ -201,7 +201,7 @@ end
 
 ```lua
 lurek.input.advancePlayback() -> table -- Advances playback by one frame and returns events for that frame.
-lurek.input.bind(action: string, keys: string) -- Adds one or more keyboard/gamepad bindings to an action.
+lurek.input.bind(action: string, keys: any) -- Adds one or more keyboard/gamepad bindings to an action.
 lurek.input.clearBindings() -- Removes all action bindings from the map.
 lurek.input.gamepad.getAxis(id: integer, axis: integer) -> number -- Returns a gamepad axis value by index.
 lurek.input.gamepad.getAxisCount(id: integer) -> integer -- Returns the axis count for a gamepad.
@@ -246,14 +246,14 @@ do
 end
 ```
 
-### `lurek.input.bind(action: string, keys: string)`
+### `lurek.input.bind(action: string, keys: any)`
 
 Adds one or more keyboard/gamepad bindings to an action.
 
 **Parameters**
 
 - `action` (`string`, required) - Action name.
-- `keys` (`string`, required) - Binding string or array table of binding strings.
+- `keys` (`any`, required) - Binding string or array table of binding strings.
 
 #### Example
 
@@ -407,7 +407,7 @@ do
   -- Useful for displaying current bindings in an options screen
   local bindings = lurek.input.getBindings()
   for action, keys in pairs(bindings) do
-    lurek.log.debug(action .. " bound to: " .. table.concat(keys, ", "), "input")
+    lurek.log.debug(action .. " bound to: " .. table.concat(keys --[[@as string[] ]], ", "), "input")
   end
 end
 ```
@@ -1736,14 +1736,14 @@ do
     -- Switch to crosshair when aiming
 ```
 
-### `lurek.input.newMapping(name: string, keys: string) -> table`
+### `lurek.input.newMapping(name: string, keys: any) -> table`
 
 Creates an action mapping table with isDown, wasPressed, and wasReleased helper functions.
 
 **Parameters**
 
 - `name` (`string`, required) - Action name.
-- `keys` (`string`, required) - Binding string or array table of binding strings.
+- `keys` (`any`, required) - Binding string or array table of binding strings.
 
 **Returns**: `table` - Mapping table with action query closures.
 
@@ -1833,13 +1833,13 @@ end
 do
 ```
 
-### `lurek.input.mouse.setCursor(cursor: LCursor)`
+### `lurek.input.mouse.setCursor(cursor: any)`
 
 Sets the active cursor from a cursor handle, system cursor name, or nil for arrow.
 
 **Parameters**
 
-- `cursor` (`LCursor`, required) - `LCursor`, system cursor string, or nil.
+- `cursor` (`any`, required) - `LCursor`, system cursor string, or nil.
 
 #### Example
 

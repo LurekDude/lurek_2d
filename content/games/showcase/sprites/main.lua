@@ -222,16 +222,16 @@ end
 -- ============================================================
 -- Input bindings
 -- ============================================================
-lurek.input.bind("move_up",     { "w" })
-lurek.input.bind("move_down",   { "s" })
-lurek.input.bind("move_left",   { "a" })
-lurek.input.bind("move_right",  { "d" })
-lurek.input.bind("scale_up",    { "equal" })
-lurek.input.bind("scale_down",  { "minus" })
-lurek.input.bind("tint",        { "c" })
-lurek.input.bind("trail",       { "t" })
-lurek.input.bind("quit",        { "escape" })
-lurek.input.bind("start",       { "return" })
+lurek.input.bind("move_up",     "w")
+lurek.input.bind("move_down",   "s")
+lurek.input.bind("move_left",   "a")
+lurek.input.bind("move_right",  "d")
+lurek.input.bind("scale_up",    "equal")
+lurek.input.bind("scale_down",  "minus")
+lurek.input.bind("tint",        "c")
+lurek.input.bind("trail",       "t")
+lurek.input.bind("quit",        "escape")
+lurek.input.bind("start",       "return")
 
 -- ============================================================
 -- Init

@@ -91,10 +91,6 @@ local particles      = {}
 local portrait_tweens = { Luna = {x=0, alpha=0}, Sol = {x=0, alpha=0}, Nova = {x=0, alpha=0} }
 local text_box_alpha  = 0
 
--- Camera
----@type LCamera
-local camera = nil
-
 -- Ending tracking
 local ending_char = nil
 local ending_timer = 0
@@ -436,6 +432,34 @@ local function determine_ending()
 end
 
 -- ---------------------------------------------------------------------------
+-- Enter a scene
+-- ---------------------------------------------------------------------------
+local function enter_scene()
+    local sc = scenes[scene_index]
+    if not sc then determine_ending(); return end
+    current_state = STATE.SCENE
+    scene_label = sc.label
+    scene_bg = sc.bg
+    visible_chars = sc.chars or {}
+    dialog_index = 1
+
+    -- Initialize portrait tweens off-screen
+    for name, tw in pairs(portrait_tweens) do
+        tw.alpha = 0
+        tw.x = CHARS[name].pos_x - 60
+    end
+
+    spawn_transition(25)
+
+    if #sc.dialog > 0 then
+        local first = sc.dialog[1]
+        current_speaker = first.speaker
+        current_speaker_color = (CHARS[first.speaker] or CHARS.Narrator).color
+        set_typewriter(first.text)
+    end
+end
+
+-- ---------------------------------------------------------------------------
 -- Advance to next dialog line or choice, or next scene
 -- ---------------------------------------------------------------------------
 local function advance()
@@ -471,34 +495,6 @@ local function advance()
                 determine_ending()
             end
         end
-    end
-end
-
--- ---------------------------------------------------------------------------
--- Enter a scene
--- ---------------------------------------------------------------------------
-function enter_scene()
-    local sc = scenes[scene_index]
-    if not sc then determine_ending(); return end
-    current_state = STATE.SCENE
-    scene_label = sc.label
-    scene_bg = sc.bg
-    visible_chars = sc.chars or {}
-    dialog_index = 1
-
-    -- Initialize portrait tweens off-screen
-    for name, tw in pairs(portrait_tweens) do
-        tw.alpha = 0
-        tw.x = CHARS[name].pos_x - 60
-    end
-
-    spawn_transition(25)
-
-    if #sc.dialog > 0 then
-        local first = sc.dialog[1]
-        current_speaker = first.speaker
-        current_speaker_color = (CHARS[first.speaker] or CHARS.Narrator).color
-        set_typewriter(first.text)
     end
 end
 
@@ -582,23 +578,11 @@ local function text_(a, b, c, d, e, f, g, h)
     end
     _gfx.print(tostring(a), b, c)
 end
-local function ln(x1, y1, x2, y2, c)
-    if type(c) == "table" then _sc(c) end
-    _gfx.line(x1, y1, x2, y2)
-end
 
 function lurek.init()
     lurek.window.setTitle("Visual Novel — Lurek2D")
     lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
-    camera = lurek.camera.new()
     title_alpha = 0
-end
-
--- ---------------------------------------------------------------------------
--- lurek.ready
--- ---------------------------------------------------------------------------
-local function _ready_setup()
-
 end
 
 -- ---------------------------------------------------------------------------

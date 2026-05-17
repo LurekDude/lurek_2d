@@ -18,7 +18,7 @@ end
 
 -- Universe methods
 
---@api-stub: Universe:spawn
+--@api-stub: LUniverse:spawn
 -- Creates a new entity and returns its numeric id
 do
   local world = lurek.ecs.newUniverse()
@@ -33,7 +33,7 @@ do
   world:set(enemy, "health",   { hp = 5, max = 5 })
 end
 
---@api-stub: Universe:kill
+--@api-stub: LUniverse:kill
 -- Deletes an entity and removes all its components from the universe
 do
   local world = lurek.ecs.newUniverse()
@@ -46,7 +46,7 @@ do
   world:kill(bullet)
 end
 
---@api-stub: Universe:isAlive
+--@api-stub: LUniverse:isAlive
 -- Returns true if an entity id currently exists in this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -61,7 +61,7 @@ do
   end
 end
 
---@api-stub: Universe:get
+--@api-stub: LUniverse:get
 -- Returns a component value table from an entity (or nil if absent)
 do
   local world = lurek.ecs.newUniverse()
@@ -81,7 +81,7 @@ do
   end
 end
 
---@api-stub: Universe:has
+--@api-stub: LUniverse:has
 -- Returns true if an entity has a named component
 do
   local world = lurek.ecs.newUniverse()
@@ -96,7 +96,7 @@ do
   end
 end
 
---@api-stub: Universe:remove
+--@api-stub: LUniverse:remove
 -- Removes a named component from an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -112,7 +112,7 @@ do
   assert(not world:has(e, "burning"))
 end
 
---@api-stub: Universe:getComponents
+--@api-stub: LUniverse:getComponents
 -- Returns an array of component name strings currently stored on an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -128,7 +128,7 @@ do
   end
 end
 
---@api-stub: Universe:query
+--@api-stub: LUniverse:query
 -- Returns entity ids that have ALL listed component names (varargs)
 do
   local world = lurek.ecs.newUniverse()
@@ -154,7 +154,7 @@ do
   lurek.log.debug("spatial entities=" .. #all_spatial, "ecs")
 end
 
---@api-stub: Universe:getEntities
+--@api-stub: LUniverse:getEntities
 -- Returns all live entity ids in this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -166,7 +166,7 @@ do
   lurek.log.info("total entities=" .. #all, "ecs")
 end
 
---@api-stub: Universe:getEntityCount
+--@api-stub: LUniverse:getEntityCount
 -- Returns the number of live entities in this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -180,7 +180,7 @@ do
   end
 end
 
---@api-stub: Universe:removeSystem
+--@api-stub: LUniverse:removeSystem
 -- Removes a previously registered system table from this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -197,7 +197,7 @@ do
   world:removeSystem(ai_system)
 end
 
---@api-stub: Universe:update
+--@api-stub: LUniverse:update
 -- Runs all registered update-phase systems with a frame delta time
 do
   local world = lurek.ecs.newUniverse()
@@ -219,7 +219,7 @@ do
   function lurek.process(dt) world:update(dt) end
 end
 
---@api-stub: Universe:render
+--@api-stub: LUniverse:render
 -- Runs all registered render-phase systems (render or draw callbacks)
 do
   local world = lurek.ecs.newUniverse()
@@ -240,7 +240,7 @@ do
   function lurek.draw() world:render() end
 end
 
---@api-stub: Universe:emit
+--@api-stub: LUniverse:emit
 -- Dispatches a named event to all systems that define a matching method
 do
   local world = lurek.ecs.newUniverse()
@@ -267,7 +267,7 @@ do
   lurek.log.info("hp after hit=" .. world:get(target, "health").hp, "ecs")
 end
 
---@api-stub: Universe:getSystemCount
+--@api-stub: LUniverse:getSystemCount
 -- Returns the number of registered systems in this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -278,7 +278,7 @@ do
   lurek.log.info("systems registered=" .. world:getSystemCount(), "ecs")
 end
 
---@api-stub: Universe:clear
+--@api-stub: LUniverse:clear
 -- Clears all entities, components, systems, and state from this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -290,7 +290,7 @@ do
   lurek.log.info("after clear count=" .. world:getEntityCount(), "ecs")
 end
 
---@api-stub: Universe:release
+--@api-stub: LUniverse:release
 -- Releases universe contents (alias for clear — frees all state)
 do
   local world = lurek.ecs.newUniverse()
@@ -301,7 +301,7 @@ do
   world:release()
 end
 
---@api-stub: Universe:addTag
+--@api-stub: LUniverse:addTag
 -- Adds a string tag to an entity for categorical grouping
 do
   local world = lurek.ecs.newUniverse()
@@ -316,7 +316,7 @@ do
   -- Tags persist until explicitly removed or the entity is killed.
 end
 
---@api-stub: Universe:removeTag
+--@api-stub: LUniverse:removeTag
 -- Removes a string tag from an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -329,7 +329,7 @@ do
   assert(not world:hasTag(e, "alive"))
 end
 
---@api-stub: Universe:hasTag
+--@api-stub: LUniverse:hasTag
 -- Returns true if an entity has a given string tag
 do
   local world = lurek.ecs.newUniverse()
@@ -343,7 +343,7 @@ do
   end
 end
 
---@api-stub: Universe:getTags
+--@api-stub: LUniverse:getTags
 -- Returns an array of all string tags assigned to an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -358,7 +358,7 @@ do
   end
 end
 
---@api-stub: Universe:getEntitiesByTag
+--@api-stub: LUniverse:getEntitiesByTag
 -- Returns all entity ids that have a specific string tag
 do
   local world = lurek.ecs.newUniverse()
@@ -373,7 +373,7 @@ do
   lurek.log.info("enemy count=" .. #enemies, "ecs")
 end
 
---@api-stub: Universe:setLayer
+--@api-stub: LUniverse:setLayer
 -- Assigns a numeric render layer to an entity for draw ordering
 do
   local world = lurek.ecs.newUniverse()
@@ -387,7 +387,7 @@ do
   world:setLayer(actor, 10)
 end
 
---@api-stub: Universe:getLayer
+--@api-stub: LUniverse:getLayer
 -- Returns the numeric layer assigned to an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -401,7 +401,7 @@ do
   end
 end
 
---@api-stub: Universe:getEntitiesByLayer
+--@api-stub: LUniverse:getEntitiesByLayer
 -- Returns all entity ids assigned to a specific numeric layer
 do
   local world = lurek.ecs.newUniverse()
@@ -417,7 +417,7 @@ do
   lurek.log.debug("layer 1 entities=" .. #fg, "ecs")
 end
 
---@api-stub: Universe:getEntitiesSorted
+--@api-stub: LUniverse:getEntitiesSorted
 -- Returns all live entities sorted by layer (ascending) for draw ordering
 do
   local world = lurek.ecs.newUniverse()
@@ -433,7 +433,7 @@ do
   end
 end
 
---@api-stub: Universe:defineTag
+--@api-stub: LUniverse:defineTag
 -- Defines a bitmap tag name and assigns it a bit slot for fast queries
 do
   local world = lurek.ecs.newUniverse()
@@ -446,7 +446,7 @@ do
   lurek.log.info("player bit=" .. bit_player .. " enemy bit=" .. bit_enemy, "ecs")
 end
 
---@api-stub: Universe:bitmapTag
+--@api-stub: LUniverse:bitmapTag
 -- Adds a bitmap tag to an entity (defines the tag automatically if needed)
 do
   local world = lurek.ecs.newUniverse()
@@ -460,7 +460,7 @@ do
   lurek.log.debug("solid tag applied: " .. tostring(world:hasBitmapTag(block, "solid")), "ecs")
 end
 
---@api-stub: Universe:bitmapUntag
+--@api-stub: LUniverse:bitmapUntag
 -- Removes a bitmap tag from an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -474,7 +474,7 @@ do
   assert(not world:hasBitmapTag(hero, "invincible"))
 end
 
---@api-stub: Universe:hasBitmapTag
+--@api-stub: LUniverse:hasBitmapTag
 -- Returns true if an entity has a given bitmap tag
 do
   local world = lurek.ecs.newUniverse()
@@ -489,7 +489,7 @@ do
   end
 end
 
---@api-stub: Universe:queryBitmapTag
+--@api-stub: LUniverse:queryBitmapTag
 -- Returns all entities that have one specific bitmap tag
 do
   local world = lurek.ecs.newUniverse()
@@ -506,7 +506,7 @@ do
   end
 end
 
---@api-stub: Universe:queryBitmapAny
+--@api-stub: LUniverse:queryBitmapAny
 -- Returns entities that have ANY of the listed bitmap tags (OR query)
 do
   local world = lurek.ecs.newUniverse()
@@ -521,7 +521,7 @@ do
   lurek.log.info("dangerous entities=" .. #danger, "ai")
 end
 
---@api-stub: Universe:queryBitmapAll
+--@api-stub: LUniverse:queryBitmapAll
 -- Returns entities that have ALL of the listed bitmap tags (AND query)
 do
   local world = lurek.ecs.newUniverse()
@@ -538,7 +538,7 @@ do
   end
 end
 
---@api-stub: Universe:getBitmapTagBit
+--@api-stub: LUniverse:getBitmapTagBit
 -- Returns the bit index assigned to a bitmap tag name (or nil if undefined)
 do
   local world = lurek.ecs.newUniverse()
@@ -553,7 +553,7 @@ do
   assert(unknown == nil)
 end
 
---@api-stub: Universe:hasBlueprint
+--@api-stub: LUniverse:hasBlueprint
 -- Returns true if a named blueprint is registered in this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -566,7 +566,7 @@ do
   end
 end
 
---@api-stub: Universe:removeBlueprint
+--@api-stub: LUniverse:removeBlueprint
 -- Removes a named blueprint from this universe
 do
   local world = lurek.ecs.newUniverse()
@@ -578,7 +578,7 @@ do
   assert(not world:hasBlueprint("goblin"))
 end
 
---@api-stub: Universe:listBlueprints
+--@api-stub: LUniverse:listBlueprints
 -- Returns an array of all registered blueprint names
 do
   local world = lurek.ecs.newUniverse()
@@ -592,7 +592,7 @@ do
   end
 end
 
---@api-stub: Universe:getBlueprintComponents
+--@api-stub: LUniverse:getBlueprintComponents
 -- Returns the component table stored in a blueprint definition
 do
   local world = lurek.ecs.newUniverse()
@@ -606,7 +606,7 @@ do
   end
 end
 
---@api-stub: Universe:getParent
+--@api-stub: LUniverse:getParent
 -- Returns the parent entity id for a child (or nil if no parent)
 do
   local world = lurek.ecs.newUniverse()
@@ -621,7 +621,7 @@ do
   end
 end
 
---@api-stub: Universe:getChildren
+--@api-stub: LUniverse:getChildren
 -- Returns an array of child entity ids for a parent entity
 do
   local world = lurek.ecs.newUniverse()
@@ -639,7 +639,7 @@ do
   end
 end
 
---@api-stub: Universe:killRecursive
+--@api-stub: LUniverse:killRecursive
 -- Kills an entity and all of its descendant children recursively
 do
   local world = lurek.ecs.newUniverse()
@@ -656,7 +656,7 @@ do
   assert(not world:isAlive(cargo))
 end
 
---@api-stub: Universe:serialize
+--@api-stub: LUniverse:serialize
 -- Serializes the entire universe state into a Lua table snapshot
 do
   local world = lurek.ecs.newUniverse()
@@ -671,7 +671,7 @@ do
   lurek.log.info("snapshot entries=" .. #snapshot, "save")
 end
 
---@api-stub: Universe:deserialize
+--@api-stub: LUniverse:deserialize
 -- Replaces universe state from a previously serialized snapshot
 do
   local world = lurek.ecs.newUniverse()
@@ -689,7 +689,7 @@ do
   lurek.log.info("deserialized entity count=" .. world:getEntityCount(), "save")
 end
 
---@api-stub: Universe:flushObservers
+--@api-stub: LUniverse:flushObservers
 -- Delivers queued component add/remove events to registered observer callbacks
 do
   local world = lurek.ecs.newUniverse()
@@ -708,7 +708,7 @@ do
   world:flushObservers()
 end
 
---@api-stub: Universe:getRelated
+--@api-stub: LUniverse:getRelated
 -- Returns target entity ids linked from an entity by a named relation
 do
   local world = lurek.ecs.newUniverse()
@@ -726,7 +726,7 @@ do
   end
 end
 
---@api-stub: Universe:clearRelations
+--@api-stub: LUniverse:clearRelations
 -- Removes all targets for one named relation from an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -742,7 +742,7 @@ do
   assert(#world:getRelated(boss, "minions") == 0)
 end
 
---@api-stub: Universe:addRelation
+--@api-stub: LUniverse:addRelation
 -- Adds a named directed relation from one entity to another
 do
   local world = lurek.ecs.newUniverse()
@@ -757,7 +757,7 @@ do
   lurek.log.info("relations established", "ecs")
 end
 
---@api-stub: Universe:addSystem
+--@api-stub: LUniverse:addSystem
 -- Registers a Lua system table with optional priority, phase, name, and dependencies
 do
   local world = lurek.ecs.newUniverse()
@@ -784,7 +784,7 @@ do
   lurek.log.info("system count: " .. world:getSystemCount(), "ecs")
 end
 
---@api-stub: Universe:defineBlueprint
+--@api-stub: LUniverse:defineBlueprint
 -- Defines a named entity blueprint (template) from a component table
 do
   local world = lurek.ecs.newUniverse()
@@ -800,7 +800,7 @@ do
   lurek.log.info("enemy blueprint defined", "ecs")
 end
 
---@api-stub: Universe:each
+--@api-stub: LUniverse:each
 -- Iterates entities with one component, calling a callback for each match
 do
   local world = lurek.ecs.newUniverse()
@@ -815,7 +815,7 @@ do
   end)
 end
 
---@api-stub: Universe:extendBlueprint
+--@api-stub: LUniverse:extendBlueprint
 -- Defines a blueprint that inherits from a parent and applies overrides
 do
   local world = lurek.ecs.newUniverse()
@@ -836,7 +836,7 @@ do
   lurek.log.info("boss hp=" .. comps.health.hp, "ecs")
 end
 
---@api-stub: Universe:hasRelation
+--@api-stub: LUniverse:hasRelation
 -- Returns true if a specific directed relation exists between two entities
 do
   local world = lurek.ecs.newUniverse()
@@ -853,7 +853,7 @@ do
   assert(not world:hasRelation(b, "ally", a))
 end
 
---@api-stub: Universe:onComponentAdded
+--@api-stub: LUniverse:onComponentAdded
 -- Registers a callback fired when a specific component is added to any entity
 do
   local world = lurek.ecs.newUniverse()
@@ -870,7 +870,7 @@ do
   world:flushObservers()  -- delivers the queued event
 end
 
---@api-stub: Universe:onComponentRemoved
+--@api-stub: LUniverse:onComponentRemoved
 -- Registers a callback fired when a specific component is removed from any entity
 do
   local world = lurek.ecs.newUniverse()
@@ -887,7 +887,7 @@ do
   world:flushObservers()  -- delivers the queued remove event
 end
 
---@api-stub: Universe:queryNot
+--@api-stub: LUniverse:queryNot
 -- Returns entities matching required components but EXCLUDING forbidden ones
 do
   local world = lurek.ecs.newUniverse()
@@ -906,7 +906,7 @@ do
   lurek.log.info("active entities (alive with position)=" .. #active, "ecs")
 end
 
---@api-stub: Universe:removeRelation
+--@api-stub: LUniverse:removeRelation
 -- Removes a specific directed relation between two entities
 do
   local world = lurek.ecs.newUniverse()
@@ -921,7 +921,7 @@ do
   lurek.log.info("alliance broken", "ecs")
 end
 
---@api-stub: Universe:set
+--@api-stub: LUniverse:set
 -- Stores or replaces a component value on an entity
 do
   local world = lurek.ecs.newUniverse()
@@ -941,7 +941,7 @@ do
   lurek.log.info("position replaced, x=" .. world:get(e, "position").x, "ecs")
 end
 
---@api-stub: Universe:setParent
+--@api-stub: LUniverse:setParent
 -- Sets the parent entity for a child (or nil to detach)
 do
   local world = lurek.ecs.newUniverse()
@@ -959,7 +959,7 @@ do
   assert(world:getParent(child) == nil)
 end
 
---@api-stub: Universe:spawnBlueprint
+--@api-stub: LUniverse:spawnBlueprint
 -- Spawns an entity from a named blueprint with optional component overrides
 do
   local world = lurek.ecs.newUniverse()
@@ -979,7 +979,7 @@ do
   lurek.log.info("spawned goblin at x=" .. pos.x .. " hp=" .. hp.hp, "ecs")
 end
 
---@api-stub: Universe:spawnBulk
+--@api-stub: LUniverse:spawnBulk
 -- Spawns multiple entities from a blueprint in a single call
 do
   local world = lurek.ecs.newUniverse()
@@ -997,7 +997,7 @@ end
 
 -- Universe type introspection
 
---@api-stub: Universe:type
+--@api-stub: LUniverse:type
 -- Returns the Lua-visible type name string for this universe handle
 do
   local world = lurek.ecs.newUniverse()
@@ -1007,7 +1007,7 @@ do
   lurek.log.info("type=" .. world:type(), "ecs")
 end
 
---@api-stub: Universe:queryMulti
+--@api-stub: LUniverse:queryMulti
 -- Iterates entities matching multiple components via callback (avoids table allocation)
 do
   local world = lurek.ecs.newUniverse()
@@ -1028,7 +1028,7 @@ do
   lurek.log.info("after queryMulti: x=" .. pos.x .. " y=" .. pos.y, "ecs")
 end
 
---@api-stub: Universe:getDirtyEntities
+--@api-stub: LUniverse:getDirtyEntities
 -- Returns entity ids marked dirty by recent component mutations
 do
   local world = lurek.ecs.newUniverse()
@@ -1046,7 +1046,7 @@ do
   lurek.log.info("after flush dirty=" .. #world:getDirtyEntities(), "ecs")
 end
 
---@api-stub: Universe:updatePhase
+--@api-stub: LUniverse:updatePhase
 -- Runs only systems assigned to a specific named phase
 do
   local world = lurek.ecs.newUniverse()
@@ -1075,7 +1075,7 @@ do
   end
 end
 
---@api-stub: Universe:snapshot
+--@api-stub: LUniverse:snapshot
 -- Serializes the universe into a snapshot table (alias for serialize)
 do
   local world = lurek.ecs.newUniverse()
@@ -1091,7 +1091,7 @@ do
   lurek.log.info("restored entity count=" .. world:getEntityCount(), "ecs")
 end
 
---@api-stub: Universe:applySnapshot
+--@api-stub: LUniverse:applySnapshot
 -- Restores universe state from a previously captured snapshot table
 do
   local world = lurek.ecs.newUniverse()
@@ -1165,458 +1165,3 @@ print("content/examples/ecs.lua")
 -- -----------------------------------------------------------------------------
 -- LUniverse methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LUniverse:spawn -----------------------------------------------
---@api-stub: LUniverse:spawn
--- Creates a new entity in this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:spawn()  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:kill ------------------------------------------------
---@api-stub: LUniverse:kill
--- Deletes an entity and removes its components from this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:kill(1)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:isAlive ---------------------------------------------
---@api-stub: LUniverse:isAlive
--- Returns whether an entity id currently exists in this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:isAlive(1)  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:set -------------------------------------------------
---@api-stub: LUniverse:set
--- Stores or replaces a component value on an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:set(1, "hero", 42)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:get -------------------------------------------------
---@api-stub: LUniverse:get
--- Returns a component value from an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:get(1, "hero")  -- -> LuaValue
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:has -------------------------------------------------
---@api-stub: LUniverse:has
--- Returns whether an entity has a named component.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:has(1, "hero")  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:remove ----------------------------------------------
---@api-stub: LUniverse:remove
--- Removes a named component from an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:remove(1, "hero")
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getComponents ---------------------------------------
---@api-stub: LUniverse:getComponents
--- Returns component names currently stored on an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getComponents(1)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:query -----------------------------------------------
---@api-stub: LUniverse:query
--- Returns entities that have all component names passed as varargs.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:query(...)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:each ------------------------------------------------
---@api-stub: LUniverse:each
--- Iterates entities with one component and calls a Lua callback for each match.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:each("hero", function() end)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getEntities -----------------------------------------
---@api-stub: LUniverse:getEntities
--- Returns all live entity ids in this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getEntities()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getEntityCount --------------------------------------
---@api-stub: LUniverse:getEntityCount
--- Returns the number of live entities in this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getEntityCount()  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:addSystem -------------------------------------------
---@api-stub: LUniverse:addSystem
--- Registers a Lua system table with optional phase, priority, name, and dependency metadata.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:addSystem(system, [opts])
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:removeSystem ----------------------------------------
---@api-stub: LUniverse:removeSystem
--- Removes a previously registered Lua system table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:removeSystem(system)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:update ----------------------------------------------
---@api-stub: LUniverse:update
--- Runs registered update-phase systems with a frame delta.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:update(0.016)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:render ----------------------------------------------
---@api-stub: LUniverse:render
--- Runs registered render-phase systems using their render or draw callbacks.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:render()
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:emit ------------------------------------------------
---@api-stub: LUniverse:emit
--- Calls matching event-named functions on registered systems.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:emit(...)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getSystemCount --------------------------------------
---@api-stub: LUniverse:getSystemCount
--- Returns the number of registered systems.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getSystemCount()  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:updatePhase -----------------------------------------
---@api-stub: LUniverse:updatePhase
--- Runs registered systems assigned to a named phase.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:updatePhase(phase, 0.016)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getDirtyEntities ------------------------------------
---@api-stub: LUniverse:getDirtyEntities
--- Returns entities marked dirty by recent ECS mutations.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getDirtyEntities()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:queryMulti ------------------------------------------
---@api-stub: LUniverse:queryMulti
--- Iterates entities that have all component names from a table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:queryMulti(names_table, function() end)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:snapshot --------------------------------------------
---@api-stub: LUniverse:snapshot
--- Serializes this universe into a Lua table snapshot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:snapshot()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:applySnapshot ---------------------------------------
---@api-stub: LUniverse:applySnapshot
--- Replaces this universe state from a Lua table snapshot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:applySnapshot(snapshot)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:clear -----------------------------------------------
---@api-stub: LUniverse:clear
--- Clears all entities, components, systems, and ECS state from this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:clear()
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:release ---------------------------------------------
---@api-stub: LUniverse:release
--- Releases universe contents by clearing all ECS state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:release()
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:addTag ----------------------------------------------
---@api-stub: LUniverse:addTag
--- Adds a string tag to an entity. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:addTag(1, "enemy")
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:removeTag -------------------------------------------
---@api-stub: LUniverse:removeTag
--- Removes a string tag from an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:removeTag(1, "enemy")
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:hasTag ----------------------------------------------
---@api-stub: LUniverse:hasTag
--- Returns whether an entity has a string tag.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:hasTag(1, "enemy")  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getTags ---------------------------------------------
---@api-stub: LUniverse:getTags
--- Returns string tags assigned to an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getTags(1)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getEntitiesByTag ------------------------------------
---@api-stub: LUniverse:getEntitiesByTag
--- Returns entities that have a string tag.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getEntitiesByTag("enemy")  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:setLayer --------------------------------------------
---@api-stub: LUniverse:setLayer
--- Assigns a numeric layer to an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:setLayer(1, 1)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getLayer --------------------------------------------
---@api-stub: LUniverse:getLayer
--- Returns the numeric layer assigned to an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getLayer(1)  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getEntitiesByLayer ----------------------------------
---@api-stub: LUniverse:getEntitiesByLayer
--- Returns entities assigned to a numeric layer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getEntitiesByLayer(1)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getEntitiesSorted -----------------------------------
---@api-stub: LUniverse:getEntitiesSorted
--- Returns live entities sorted by ECS layer and stable entity ordering.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getEntitiesSorted()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:defineTag -------------------------------------------
---@api-stub: LUniverse:defineTag
--- Defines a bitmap tag name and assigns it a bit slot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:defineTag("hero")  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:bitmapTag -------------------------------------------
---@api-stub: LUniverse:bitmapTag
--- Adds a bitmap tag to an entity, defining the tag if needed.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:bitmapTag(1, "hero")  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:bitmapUntag -----------------------------------------
---@api-stub: LUniverse:bitmapUntag
--- Removes a bitmap tag from an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:bitmapUntag(1, "hero")
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:hasBitmapTag ----------------------------------------
---@api-stub: LUniverse:hasBitmapTag
--- Returns whether an entity has a bitmap tag.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:hasBitmapTag(1, "hero")  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:queryBitmapTag --------------------------------------
---@api-stub: LUniverse:queryBitmapTag
--- Returns entities with one bitmap tag.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:queryBitmapTag("hero")  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:queryBitmapAny --------------------------------------
---@api-stub: LUniverse:queryBitmapAny
--- Returns entities with at least one bitmap tag from a list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:queryBitmapAny(names)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:queryBitmapAll --------------------------------------
---@api-stub: LUniverse:queryBitmapAll
--- Returns entities that have every bitmap tag from a list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:queryBitmapAll(names)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getBitmapTagBit -------------------------------------
---@api-stub: LUniverse:getBitmapTagBit
--- Returns the bit index assigned to a bitmap tag name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getBitmapTagBit("hero")  -- -> LuaValue
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:defineBlueprint -------------------------------------
---@api-stub: LUniverse:defineBlueprint
--- Defines a named entity blueprint from a component table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:defineBlueprint("hero", components)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:extendBlueprint -------------------------------------
---@api-stub: LUniverse:extendBlueprint
--- Defines a blueprint that inherits from a parent blueprint and applies overrides.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:extendBlueprint("hero", parent, overrides)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:spawnBlueprint --------------------------------------
---@api-stub: LUniverse:spawnBlueprint
--- Spawns an entity from a named blueprint with optional component overrides.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:spawnBlueprint("hero", [overrides])  -- -> integer
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:hasBlueprint ----------------------------------------
---@api-stub: LUniverse:hasBlueprint
--- Returns whether a named blueprint exists.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:hasBlueprint("hero")  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:removeBlueprint -------------------------------------
---@api-stub: LUniverse:removeBlueprint
--- Removes a named blueprint from this universe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:removeBlueprint("hero")  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:listBlueprints --------------------------------------
---@api-stub: LUniverse:listBlueprints
--- Returns names of all registered blueprints.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:listBlueprints()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getBlueprintComponents ------------------------------
---@api-stub: LUniverse:getBlueprintComponents
--- Returns the component table stored for a blueprint.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getBlueprintComponents("hero")  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:setParent -------------------------------------------
---@api-stub: LUniverse:setParent
--- Sets or clears the parent entity for a child entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:setParent(child_id, [parent_id])
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getParent -------------------------------------------
---@api-stub: LUniverse:getParent
--- Returns the parent entity id for a child entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getParent(child_id)  -- -> LuaValue
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getChildren -----------------------------------------
---@api-stub: LUniverse:getChildren
--- Returns child entity ids for a parent entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getChildren(parent_id)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:killRecursive ---------------------------------------
---@api-stub: LUniverse:killRecursive
--- Deletes an entity and all descendant entities in its hierarchy.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:killRecursive(1)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:queryNot --------------------------------------------
---@api-stub: LUniverse:queryNot
--- Returns entities that include one component set and exclude another component set.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:queryNot(with_tbl, without_tbl)  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:serialize -------------------------------------------
---@api-stub: LUniverse:serialize
--- Serializes this universe into a Lua table snapshot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:serialize()  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:deserialize -----------------------------------------
---@api-stub: LUniverse:deserialize
--- Replaces this universe state from a serialized Lua snapshot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:deserialize(snapshot)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:onComponentAdded ------------------------------------
---@api-stub: LUniverse:onComponentAdded
--- Registers a callback for queued component-add events with a given component name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:onComponentAdded("hero", cb)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:onComponentRemoved ----------------------------------
---@api-stub: LUniverse:onComponentRemoved
--- Registers a callback for queued component-remove events with a given component name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:onComponentRemoved("hero", cb)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:flushObservers --------------------------------------
---@api-stub: LUniverse:flushObservers
--- Delivers queued component add and remove events to registered observer callbacks.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:flushObservers()
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:spawnBulk -------------------------------------------
---@api-stub: LUniverse:spawnBulk
--- Spawns multiple entities from a blueprint using shared optional overrides.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:spawnBulk("hero", 10, [overrides])  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:addRelation -----------------------------------------
---@api-stub: LUniverse:addRelation
--- Adds a named directed relation from one entity to another.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:addRelation(from, "hero", to)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:getRelated ------------------------------------------
---@api-stub: LUniverse:getRelated
--- Returns targets linked from an entity by a named relation.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:getRelated(from, "hero")  -- -> table
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:removeRelation --------------------------------------
---@api-stub: LUniverse:removeRelation
--- Removes a named directed relation between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:removeRelation(from, "hero", to)
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:clearRelations --------------------------------------
---@api-stub: LUniverse:clearRelations
--- Removes every target for one named relation from an entity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:clearRelations(from, "hero")
--- (replace lUniverse_stub with your real LUniverse instance above)
-
--- ---- Stub: LUniverse:hasRelation -----------------------------------------
---@api-stub: LUniverse:hasRelation
--- Returns whether a named directed relation exists between two entities.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lUniverse_stub:hasRelation(from, "hero", to)  -- -> boolean
--- (replace lUniverse_stub with your real LUniverse instance above)

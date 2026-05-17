@@ -64,7 +64,7 @@ end
 
 -- Mod methods
 
---@api-stub: Mod:getId
+--@api-stub: LMod:getId
 -- Returns the id of this mod.
 do
   -- getId() returns the unique dot-notation identifier set at creation.
@@ -76,7 +76,7 @@ do
   lurek.log.info("stored settings for " .. m:getId(), "mods")
 end
 
---@api-stub: Mod:getName
+--@api-stub: LMod:getName
 -- Returns the name of this mod.
 do
   -- getName() returns the human-friendly display name.
@@ -87,7 +87,7 @@ do
   lurek.log.info("listing: " .. label, "ui")
 end
 
---@api-stub: Mod:getVersion
+--@api-stub: LMod:getVersion
 -- Returns the version of this mod.
 do
   -- getVersion() returns the semver string. Use it for save compatibility
@@ -100,7 +100,7 @@ do
   end
 end
 
---@api-stub: Mod:getAuthor
+--@api-stub: LMod:getAuthor
 -- Returns the author of this mod.
 do
   -- getAuthor() returns the mod creator's name for credits or mod browser.
@@ -109,7 +109,7 @@ do
   lurek.log.info("map pack by " .. credit, "credits")
 end
 
---@api-stub: Mod:getDescription
+--@api-stub: LMod:getDescription
 -- Returns the description of this mod.
 do
   -- getDescription() provides a longer text for tooltips or mod detail panels.
@@ -118,7 +118,7 @@ do
   lurek.log.info("about: " .. detail, "ui")
 end
 
---@api-stub: Mod:getDependencies
+--@api-stub: LMod:getDependencies
 -- Returns the dependencies of this mod.
 do
   -- getDependencies() returns an array of mod ids that must be loaded first.
@@ -129,7 +129,7 @@ do
   end
 end
 
---@api-stub: Mod:getPriority
+--@api-stub: LMod:getPriority
 -- Returns the priority of this mod.
 do
   -- getPriority() returns an integer. Higher priority = loaded earlier.
@@ -142,7 +142,7 @@ do
   end
 end
 
---@api-stub: Mod:isEnabled
+--@api-stub: LMod:isEnabled
 -- Returns true if this mod is currently enabled.
 do
   -- isEnabled() reflects user preference. Disabled mods stay registered but
@@ -155,7 +155,7 @@ do
   end
 end
 
---@api-stub: Mod:setEnabled
+--@api-stub: LMod:setEnabled
 -- Sets whether this mod is enabled and accepts input.
 do
   -- setEnabled(bool) toggles the mod on/off without unregistering it.
@@ -166,7 +166,7 @@ do
   lurek.log.info(m:getId() .. " enabled=" .. tostring(m:isEnabled()), "mods")
 end
 
---@api-stub: Mod:isLoaded
+--@api-stub: LMod:isLoaded
 -- Returns true if this mod loaded.
 do
   -- isLoaded() indicates whether the mod's init script ran successfully.
@@ -177,7 +177,7 @@ do
   end
 end
 
---@api-stub: Mod:getApiVersion
+--@api-stub: LMod:getApiVersion
 -- Returns the api version of this mod.
 do
   -- getApiVersion() returns the minimum engine API version this mod requires.
@@ -191,7 +191,7 @@ do
   end
 end
 
---@api-stub: Mod:setApiVersion
+--@api-stub: LMod:setApiVersion
 -- Sets the api version of this mod.
 do
   -- setApiVersion(str) can be used to programmatically patch a mod's requirement
@@ -201,7 +201,7 @@ do
   lurek.log.debug("fixture api_version=" .. m:getApiVersion(), "test")
 end
 
---@api-stub: Mod:getCapabilities
+--@api-stub: LMod:getCapabilities
 -- Returns the capabilities of this mod.
 do
   -- getCapabilities() returns an array of subsystem names the mod accesses.
@@ -212,7 +212,7 @@ do
   end
 end
 
---@api-stub: Mod:setCapabilities
+--@api-stub: LMod:setCapabilities
 -- Sets the capabilities of this mod.
 do
   -- setCapabilities(table) replaces the entire capability list.
@@ -224,7 +224,7 @@ do
   lurek.log.debug(m:getId() .. " caps=" .. #m:getCapabilities(), "mods")
 end
 
---@api-stub: Mod:getConfigSchema
+--@api-stub: LMod:getConfigSchema
 -- Returns the config schema of this mod.
 do
   -- getConfigSchema() returns an array of {key, type, default} entries.
@@ -240,7 +240,7 @@ do
   end
 end
 
---@api-stub: Mod:setConfigSchema
+--@api-stub: LMod:setConfigSchema
 -- Sets the config schema of this mod.
 do
   -- setConfigSchema(table) replaces the schema. Each entry needs at least "key".
@@ -254,7 +254,7 @@ do
   lurek.log.debug("schema entries=" .. #m:getConfigSchema(), "mods")
 end
 
---@api-stub: Mod:getHook
+--@api-stub: LMod:getHook
 -- Returns the hook of this mod.
 do
   -- getHook(name) retrieves a previously registered callback function.
@@ -272,7 +272,7 @@ do
   assert(missing == nil)
 end
 
---@api-stub: Mod:hasHook
+--@api-stub: LMod:hasHook
 -- Returns true if this mod has a hook.
 do
   -- hasHook(name) checks existence without retrieving the function.
@@ -285,7 +285,7 @@ do
   assert(not m:hasHook("on_crouch"))
 end
 
---@api-stub: Mod:getHookNames
+--@api-stub: LMod:getHookNames
 -- Returns the hook names of this mod.
 do
   -- getHookNames() returns an array of all registered hook names.
@@ -299,7 +299,7 @@ do
   end
 end
 
---@api-stub: Mod:setConfig
+--@api-stub: LMod:setConfig
 -- Sets the config of this mod.
 do
   -- setConfig(value) stores any Lua value as the mod's runtime configuration.
@@ -309,7 +309,7 @@ do
   -- The config persists on the mod handle until releaseRefs() or game shutdown.
 end
 
---@api-stub: Mod:getConfig
+--@api-stub: LMod:getConfig
 -- Returns the config of this mod.
 do
   -- getConfig() retrieves the stored config value. Returns nil if never set.
@@ -320,7 +320,7 @@ do
   lurek.log.debug("music vol=" .. cfg.music_vol, "audio")
 end
 
---@api-stub: Mod:releaseRefs
+--@api-stub: LMod:releaseRefs
 -- Performs the release refs operation on this mod.
 do
   -- releaseRefs() drops all Lua registry references (hooks + config).
@@ -336,7 +336,7 @@ end
 
 -- ModManager methods
 
---@api-stub: ModManager:registerMod
+--@api-stub: LModManager:registerMod
 -- Performs the register mod operation on this mod manager.
 do
   -- registerMod(mod) adds a mod handle to the manager's registry.
@@ -348,7 +348,7 @@ do
   lurek.log.info("registered " .. mgr:getModCount() .. " mods", "mods")
 end
 
---@api-stub: ModManager:unregisterMod
+--@api-stub: LModManager:unregisterMod
 -- Performs the unregister mod operation on this mod manager.
 do
   -- unregisterMod(id) removes a mod from the manager.
@@ -362,7 +362,7 @@ do
   assert(noop == false)
 end
 
---@api-stub: ModManager:hasMod
+--@api-stub: LModManager:hasMod
 -- Returns true if this mod manager has a mod.
 do
   -- hasMod(id) checks whether a mod id is currently registered.
@@ -377,7 +377,7 @@ do
   end
 end
 
---@api-stub: ModManager:getModCount
+--@api-stub: LModManager:getModCount
 -- Returns the number of mod items in this mod manager.
 do
   -- getModCount() returns the total number of registered mods.
@@ -389,7 +389,7 @@ do
   lurek.log.info("loaded " .. mgr:getModCount() .. " mods", "boot")
 end
 
---@api-stub: ModManager:getAllMods
+--@api-stub: LModManager:getAllMods
 -- Returns all mods values associated with this mod manager.
 do
   -- getAllMods() returns an array of mod metadata tables (not LMod handles).
@@ -402,7 +402,7 @@ do
   end
 end
 
---@api-stub: ModManager:getLoadOrder
+--@api-stub: LModManager:getLoadOrder
 -- Returns the load order of this mod manager.
 do
   -- getLoadOrder() returns mods sorted by: explicit order > dependencies > priority.
@@ -417,7 +417,7 @@ do
   end
 end
 
---@api-stub: ModManager:getModsByCapability
+--@api-stub: LModManager:getModsByCapability
 -- Returns the mods by capability of this mod manager.
 do
   -- getModsByCapability(name) filters registered mods by declared capability.
@@ -432,7 +432,7 @@ do
   end
 end
 
---@api-stub: ModManager:validateDependencies
+--@api-stub: LModManager:validateDependencies
 -- Performs the validate dependencies operation on this mod manager.
 do
   -- validateDependencies() returns an array of error messages for mods
@@ -450,7 +450,7 @@ do
   lurek.log.info("after fix: " .. #errors2 .. " errors", "mods")
 end
 
---@api-stub: ModManager:hasCircularDependencies
+--@api-stub: LModManager:hasCircularDependencies
 -- Returns true if this mod manager has a circular dependencies.
 do
   -- hasCircularDependencies() detects cycles in the dependency graph.
@@ -463,7 +463,7 @@ do
   end
 end
 
---@api-stub: ModManager:setLoadOrder
+--@api-stub: LModManager:setLoadOrder
 -- Sets the load order of this mod manager.
 do
   -- setLoadOrder(ids) overrides the automatic priority-based order.
@@ -479,7 +479,7 @@ do
   end
 end
 
---@api-stub: ModManager:clearLoadOrder
+--@api-stub: LModManager:clearLoadOrder
 -- Clears all load order items from this mod manager.
 do
   -- clearLoadOrder() removes explicit ordering and reverts to automatic
@@ -490,7 +490,7 @@ do
   lurek.log.info("load order reset to priority-based", "mods")
 end
 
---@api-stub: ModManager:scanFolder
+--@api-stub: LModManager:scanFolder
 -- Performs the scan folder operation on this mod manager.
 do
   -- scanFolder(path) discovers mod metadata files in subdirectories.
@@ -502,7 +502,7 @@ do
   -- Discovered mods are automatically registered with the manager.
 end
 
---@api-stub: ModManager:getModPath
+--@api-stub: LModManager:getModPath
 -- Returns the mod path of this mod manager.
 do
   -- getModPath(id) returns the filesystem path for a registered mod.
@@ -517,7 +517,7 @@ do
   end
 end
 
---@api-stub: ModManager:markForReload
+--@api-stub: LModManager:markForReload
 -- Performs the mark for reload operation on this mod manager.
 do
   -- markForReload(id) queues a mod for hot-reload on the next processReloadQueue().
@@ -531,7 +531,7 @@ do
   assert(nope == false)
 end
 
---@api-stub: ModManager:getReloadQueue
+--@api-stub: LModManager:getReloadQueue
 -- Returns the reload queue of this mod manager.
 do
   -- getReloadQueue() returns an array of mod ids pending reload.
@@ -546,7 +546,7 @@ do
   end
 end
 
---@api-stub: ModManager:clearReloadQueue
+--@api-stub: LModManager:clearReloadQueue
 -- Clears all reload queue items from this mod manager.
 do
   -- clearReloadQueue() discards all pending reloads without processing them.
@@ -558,7 +558,7 @@ do
   lurek.log.debug("queue size=" .. #mgr:getReloadQueue(), "mods")   -- 0
 end
 
---@api-stub: ModManager:processReloadQueue
+--@api-stub: LModManager:processReloadQueue
 -- Performs the process reload queue operation on this mod manager.
 do
   -- processReloadQueue() processes all queued reloads and returns the ids
@@ -586,7 +586,7 @@ do
   lurek.log.debug("registry created with " .. #reg:getTypes() .. " types", "mods")
 end
 
---@api-stub: ContentRegistry:registerType
+--@api-stub: LContentRegistry:registerType
 -- Performs the register type operation on this content registry.
 do
   -- registerType(name) declares a content category.
@@ -598,7 +598,7 @@ do
   lurek.log.debug("registered " .. #reg:getTypes() .. " content types", "mods")
 end
 
---@api-stub: ContentRegistry:register
+--@api-stub: LContentRegistry:register
 -- Performs the register operation on this content registry.
 do
   -- register(type, id, value) stores any Lua value under a type+id pair.
@@ -612,7 +612,7 @@ do
   lurek.log.debug("registered 2 weapons", "mods")
 end
 
---@api-stub: ContentRegistry:get
+--@api-stub: LContentRegistry:get
 -- Returns the  of this content registry.
 do
   -- get(type, id) retrieves a single entry. Returns nil if not found.
@@ -629,7 +629,7 @@ do
   assert(missing == nil)
 end
 
---@api-stub: ContentRegistry:getAll
+--@api-stub: LContentRegistry:getAll
 -- Returns all  values associated with this content registry.
 do
   -- getAll(type) returns a table keyed by id with all entries of that type.
@@ -646,7 +646,7 @@ do
   lurek.log.debug("item count=" .. count, "mods")
 end
 
---@api-stub: ContentRegistry:getTypes
+--@api-stub: LContentRegistry:getTypes
 -- Returns the types of this content registry.
 do
   -- getTypes() returns an array of all registered type names.
@@ -659,7 +659,7 @@ do
   lurek.log.debug("type count=" .. #types, "mods")
 end
 
---@api-stub: Mod:setHook
+--@api-stub: LMod:setHook
 -- Sets the hook of this mod.
 do
   -- setHook(name, func) registers a named callback on the mod.
@@ -700,7 +700,7 @@ do
   lurek.log.info("is LContentRegistry: " .. tostring(reg:typeOf("LContentRegistry")), "mods")
 end
 
---@api-stub: LMod:type
+--@api-stub: LContentRegistry:type
 -- Returns the Lua-visible type name for this mod handle
 do
   -- type() returns "LMod" for mod handles.
@@ -710,7 +710,7 @@ do
   lurek.log.info("LMod:type = " .. t, "mods")
 end
 
---@api-stub: LMod:typeOf
+--@api-stub: LContentRegistry:typeOf
 -- Returns whether this mod handle matches a supported type name
 do
   -- typeOf(name) returns true for "LMod" and "Object".
@@ -721,7 +721,7 @@ do
   lurek.log.info("is LMod: " .. tostring(m:typeOf("LMod")), "mods")
 end
 
---@api-stub: LModManager:type
+--@api-stub: LContentRegistry:type
 -- Returns the Lua-visible type name for this mod manager handle
 do
   -- type() returns "LModManager" for mod manager handles.
@@ -731,7 +731,7 @@ do
   lurek.log.info("LModManager:type = " .. t, "mods")
 end
 
---@api-stub: LModManager:typeOf
+--@api-stub: LContentRegistry:typeOf
 -- Returns whether this mod manager handle matches a supported type name
 do
   -- typeOf(name) returns true for "LModManager" and "Object".
@@ -755,326 +755,3 @@ print("content/examples/mods.lua")
 -- -----------------------------------------------------------------------------
 -- LContentRegistry methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LContentRegistry:registerType ---------------------------------
---@api-stub: LContentRegistry:registerType
--- Registers a content type name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lContentRegistry_stub:registerType(type_name)
--- (replace lContentRegistry_stub with your real LContentRegistry instance above)
-
--- ---- Stub: LContentRegistry:register -------------------------------------
---@api-stub: LContentRegistry:register
--- Stores a Lua value under a registered content type and id.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lContentRegistry_stub:register(type_name, 1, obj)
--- (replace lContentRegistry_stub with your real LContentRegistry instance above)
-
--- ---- Stub: LContentRegistry:get ------------------------------------------
---@api-stub: LContentRegistry:get
--- Returns one stored value by content type and id.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lContentRegistry_stub:get(type_name, 1)  -- -> LuaValue
--- (replace lContentRegistry_stub with your real LContentRegistry instance above)
-
--- ---- Stub: LContentRegistry:getAll ---------------------------------------
---@api-stub: LContentRegistry:getAll
--- Returns all stored values for a content type keyed by id.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lContentRegistry_stub:getAll(type_name)  -- -> table
--- (replace lContentRegistry_stub with your real LContentRegistry instance above)
-
--- ---- Stub: LContentRegistry:getTypes -------------------------------------
---@api-stub: LContentRegistry:getTypes
--- Returns registered content type names.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lContentRegistry_stub:getTypes()  -- -> table
--- (replace lContentRegistry_stub with your real LContentRegistry instance above)
-
--- -----------------------------------------------------------------------------
--- LMod methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LMod:getId ----------------------------------------------------
---@api-stub: LMod:getId
--- Returns the mod id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getId()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getName --------------------------------------------------
---@api-stub: LMod:getName
--- Returns the mod display name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getName()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getVersion -----------------------------------------------
---@api-stub: LMod:getVersion
--- Returns the mod version. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getVersion()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getAuthor ------------------------------------------------
---@api-stub: LMod:getAuthor
--- Returns the mod author. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getAuthor()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getDescription -------------------------------------------
---@api-stub: LMod:getDescription
--- Returns the mod description. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getDescription()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getDependencies ------------------------------------------
---@api-stub: LMod:getDependencies
--- Returns mod dependency ids. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getDependencies()  -- -> table
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getPriority ----------------------------------------------
---@api-stub: LMod:getPriority
--- Returns the mod priority. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getPriority()  -- -> integer
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:isEnabled ------------------------------------------------
---@api-stub: LMod:isEnabled
--- Returns whether the mod is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:isEnabled()  -- -> boolean
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setEnabled -----------------------------------------------
---@api-stub: LMod:setEnabled
--- Sets whether the mod is enabled. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setEnabled(true)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:isLoaded -------------------------------------------------
---@api-stub: LMod:isLoaded
--- Returns whether the mod is loaded. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:isLoaded()  -- -> boolean
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getApiVersion --------------------------------------------
---@api-stub: LMod:getApiVersion
--- Returns the optional required API version.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getApiVersion()  -- -> string
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setApiVersion --------------------------------------------
---@api-stub: LMod:setApiVersion
--- Sets the required API version string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setApiVersion(api_version)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getCapabilities ------------------------------------------
---@api-stub: LMod:getCapabilities
--- Returns capability names declared by the mod.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getCapabilities()  -- -> table
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setCapabilities ------------------------------------------
---@api-stub: LMod:setCapabilities
--- Sets capability names from an array table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setCapabilities(caps)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getConfigSchema ------------------------------------------
---@api-stub: LMod:getConfigSchema
--- Returns config schema entries. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getConfigSchema()  -- -> table
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setConfigSchema ------------------------------------------
---@api-stub: LMod:setConfigSchema
--- Sets config schema entries from a Lua table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setConfigSchema(schema)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setHook --------------------------------------------------
---@api-stub: LMod:setHook
--- Stores a Lua hook function by name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setHook("hero", func)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getHook --------------------------------------------------
---@api-stub: LMod:getHook
--- Returns a stored hook function by name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getHook("hero")  -- -> function
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:hasHook --------------------------------------------------
---@api-stub: LMod:hasHook
--- Returns whether a hook name is registered.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:hasHook("hero")  -- -> boolean
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getHookNames ---------------------------------------------
---@api-stub: LMod:getHookNames
--- Returns registered hook names. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getHookNames()  -- -> table
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:setConfig ------------------------------------------------
---@api-stub: LMod:setConfig
--- Stores a Lua config value for this mod.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:setConfig(42)
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:getConfig ------------------------------------------------
---@api-stub: LMod:getConfig
--- Returns the stored Lua config value.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:getConfig()  -- -> LuaValue
--- (replace lMod_stub with your real LMod instance above)
-
--- ---- Stub: LMod:releaseRefs ----------------------------------------------
---@api-stub: LMod:releaseRefs
--- Releases stored Lua registry references for hooks and config.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lMod_stub:releaseRefs()
--- (replace lMod_stub with your real LMod instance above)
-
--- -----------------------------------------------------------------------------
--- LModManager methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LModManager:registerMod ---------------------------------------
---@api-stub: LModManager:registerMod
--- Registers a mod with the manager. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:registerMod(ud)
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:unregisterMod -------------------------------------
---@api-stub: LModManager:unregisterMod
--- Unregisters a mod by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:unregisterMod(mod_id)  -- -> boolean
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:hasMod --------------------------------------------
---@api-stub: LModManager:hasMod
--- Returns whether a mod id is registered.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:hasMod(mod_id)  -- -> boolean
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getModCount ---------------------------------------
---@api-stub: LModManager:getModCount
--- Returns the number of registered mods.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getModCount()  -- -> integer
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getAllMods ----------------------------------------
---@api-stub: LModManager:getAllMods
--- Returns metadata for all registered mods.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getAllMods()  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getModsByCapability -------------------------------
---@api-stub: LModManager:getModsByCapability
--- Returns metadata for mods declaring a capability.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getModsByCapability(capability)  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getLoadOrder --------------------------------------
---@api-stub: LModManager:getLoadOrder
--- Returns the resolved load order. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getLoadOrder()  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:validateDependencies ------------------------------
---@api-stub: LModManager:validateDependencies
--- Returns dependency validation messages.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:validateDependencies()  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:hasCircularDependencies ---------------------------
---@api-stub: LModManager:hasCircularDependencies
--- Returns whether registered mods have circular dependencies.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:hasCircularDependencies()  -- -> boolean
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:setLoadOrder --------------------------------------
---@api-stub: LModManager:setLoadOrder
--- Sets explicit load order from an array of mod ids.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:setLoadOrder(order_table)
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:clearLoadOrder ------------------------------------
---@api-stub: LModManager:clearLoadOrder
--- Clears explicit load order. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:clearLoadOrder()
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:scanFolder ----------------------------------------
---@api-stub: LModManager:scanFolder
--- Scans a folder for mod metadata. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:scanFolder("assets/hero.png")  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getModPath ----------------------------------------
---@api-stub: LModManager:getModPath
--- Returns the filesystem path for a registered mod.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getModPath(mod_id)  -- -> string
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:markForReload -------------------------------------
---@api-stub: LModManager:markForReload
--- Marks a mod id for reload. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:markForReload(mod_id)  -- -> boolean
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:getReloadQueue ------------------------------------
---@api-stub: LModManager:getReloadQueue
--- Returns mod ids waiting for reload.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:getReloadQueue()  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:clearReloadQueue ----------------------------------
---@api-stub: LModManager:clearReloadQueue
--- Clears the reload queue. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:clearReloadQueue()
--- (replace lModManager_stub with your real LModManager instance above)
-
--- ---- Stub: LModManager:processReloadQueue --------------------------------
---@api-stub: LModManager:processReloadQueue
--- Processes and clears the reload queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lModManager_stub:processReloadQueue()  -- -> table
--- (replace lModManager_stub with your real LModManager instance above)

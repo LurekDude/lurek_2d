@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs(lua_api,compute): banned Lua-side type-workaround casts in the global Copilot instructions, corrected `src/lua_api/compute_api.rs` docstrings so scalar-or-array params are documented as `any`, added source `@overload` markers plus `tools/docs/gen_luadoc.py` support for axis-dependent reduction returns, synced the compute spec, and removed matching `--[[@as LArray]]` and `--[[@as number]]` workarounds from `tests/lua/unit/test_compute_core_unit.lua`.
+
 - fix(lua_api): eliminated 33 `@return | type? |` optional-return annotation errors across `mods_api.rs`, `patterns_api.rs`, `pipeline_api.rs`, and `thread_api.rs`; replaced each with a two-line `@return | type | …` + `@return | nil | …` form per the validator contract; regenerated all doc artifacts (`lua_api_data.json`, `docs/api/lurek.lua`, `extensions/vscode/data/lurek-api.json`); `validate_lua_api.py` now exits 0 for all 27 files.
 
 - fix(lua_api): corrected 40+ Lua LSP annotation errors across 11 `src/lua_api/` files: changed `@param | value | table |` → `@param | value | any |` for dynamic-value params (`ui_api.rs`, `scene_api.rs`, `patterns_api.rs`, `thread_api.rs`); changed `@return | table |` with missing or overly-typed `@field` entries to `@return | any |` for dynamic container and context returns (`mods_api.rs`, `thread_api.rs`, `patterns_api.rs`, `pipeline_api.rs`); added missing `@field` entries to structured returns (`network_api.rs`, `pipeline_api.rs`, `procgen_api.rs`, `system_api.rs`); added missing `@param` doc to 7 `typeOf` methods in `render_api.rs`; fixed `content/examples/physics.lua` (`hit.id` → `hit.bodyId`) and `content/examples/province.lua` (`snap.terrain_type` → `snap.style.terrain_type`); regenerated `docs/api/lurek.lua`.

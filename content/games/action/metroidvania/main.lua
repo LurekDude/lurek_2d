@@ -440,11 +440,11 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.05, 0.03, 0.08)
 
     -- Input actions
-    lurek.input.bind("left",  { "a", "left" })
-    lurek.input.bind("right", { "d", "right" })
-    lurek.input.bind("jump",  { "space", "w", "up" })
-    lurek.input.bind("dash",  { "lshift", "rshift" })
-    lurek.input.bind("quit",  { "escape" })
+    lurek.input.bind("left",  "a");    lurek.input.bind("left",  "left")
+    lurek.input.bind("right", "d");    lurek.input.bind("right", "right")
+    lurek.input.bind("jump",  "space"); lurek.input.bind("jump",  "w"); lurek.input.bind("jump",  "up")
+    lurek.input.bind("dash",  "lshift"); lurek.input.bind("dash",  "rshift")
+    lurek.input.bind("quit",  "escape")
 
     -- Particle systems
     death_particles = lurek.particle.newSystem({

@@ -2307,6 +2307,9 @@ impl GpuRenderer {
                     self.render_stats.canvas_switches += 1;
                 }
                 RenderCommand::RegisterCanvas { .. } => {}
+                RenderCommand::ResetCanvas(key) => {
+                    self.canvas_needs_clear.insert(*key, true);
+                }
                 RenderCommand::DrawCanvas {
                     canvas_key,
                     x,

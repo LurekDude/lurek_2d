@@ -152,7 +152,7 @@ impl LuaUserData for LuaDataFrame {
         // -- addColumn --
         /// Adds a column with an optional default value.
         /// @param | name | string | Column name to create.
-        /// @param | default | string? | Default cell value for existing rows; nil uses empty cells.
+        /// @param | default | any | Default cell value for existing rows; nil uses empty cells.
         methods.add_method(
             "addColumn",
             |_, this, (name, default): (String, Option<LuaValue>)| {
@@ -165,7 +165,7 @@ impl LuaUserData for LuaDataFrame {
         );
         // -- removeColumn --
         /// Removes a column by name or one-based index.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         methods.add_method("removeColumn", |_, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
             this.inner
@@ -175,7 +175,7 @@ impl LuaUserData for LuaDataFrame {
         });
         // -- rename --
         /// Renames a column by name or one-based index.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @param | new_name | string | New column name.
         methods.add_method("rename", |_, this, (col, new_name): (LuaValue, String)| {
             let cr = lua_to_col_ref(col)?;
@@ -186,7 +186,7 @@ impl LuaUserData for LuaDataFrame {
         });
         // -- getColumn --
         /// Returns a column as an array table. This method is available to Lua scripts.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @return | number[] | Array table of column values.
         methods.add_method("getColumn", |lua, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;
@@ -243,7 +243,7 @@ impl LuaUserData for LuaDataFrame {
         // -- getValue --
         /// Returns one cell value by one-based row and column reference.
         /// @param | row | integer | One-based row index.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @return | number|string|boolean|nil | Cell value at the requested row and column.
         methods.add_method("getValue", |lua, this, (row, col): (usize, LuaValue)| {
             let r = validate_row(row)?;
@@ -255,8 +255,8 @@ impl LuaUserData for LuaDataFrame {
         // -- setValue --
         /// Sets one cell value by one-based row and column reference.
         /// @param | row | integer | One-based row index.
-        /// @param | col | string | Column name string or one-based column index.
-        /// @param | val | string | Cell value to store.
+        /// @param | col | any | Column name string or one-based column index.
+        /// @param | val | any | Cell value to store.
         methods.add_method(
             "setValue",
             |_, this, (row, col, val): (usize, LuaValue, LuaValue)| {
@@ -271,9 +271,9 @@ impl LuaUserData for LuaDataFrame {
         );
         // -- filter --
         /// Returns rows whose column value matches a comparison.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @param | op | string | Comparison operator string.
-        /// @param | val | string | Cell value used as the comparison target.
+        /// @param | val | any | Cell value used as the comparison target.
         /// @return | LDataFrame | New filtered dataframe.
         methods.add_method(
             "filter",
@@ -287,7 +287,7 @@ impl LuaUserData for LuaDataFrame {
         );
         // -- sort --
         /// Returns rows sorted by a column. This method is available to Lua scripts.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @param | ascending | boolean? | True for ascending order; defaults to true.
         /// @return | LDataFrame | New sorted dataframe.
         methods.add_method(
@@ -334,7 +334,7 @@ impl LuaUserData for LuaDataFrame {
         });
         // -- select --
         /// Returns a dataframe with selected columns.
-        /// @param | ... | string | Column name strings or one-based column indices to keep.
+        /// @param | ... | any | Column name strings or one-based column indices to keep.
         /// @return | LDataFrame | New dataframe containing selected columns.
         methods.add_method("select", |_, this, cols: LuaMultiValue| {
             let col_refs: Vec<ColRef> = cols
@@ -349,7 +349,7 @@ impl LuaUserData for LuaDataFrame {
         });
         // -- unique --
         /// Returns unique values from a column.
-        /// @param | col | string | Column name string or one-based column index.
+        /// @param | col | any | Column name string or one-based column index.
         /// @return | number[] | Array table of unique values.
         methods.add_method("unique", |lua, this, col: LuaValue| {
             let cr = lua_to_col_ref(col)?;

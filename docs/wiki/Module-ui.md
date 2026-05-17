@@ -6789,6 +6789,7 @@ Exact example from [ui.lua](../blob/main/content/examples/ui.lua):
 ```lua
 do
   local sbar = lurek.ui.newStatusBar()
+  ---@diagnostic disable-next-line: param-type-mismatch
   sbar:setSectionWidget(1, 1.0)
   lurek.log.info("LStatusBar:setSectionWidget applied", "ui")
 end

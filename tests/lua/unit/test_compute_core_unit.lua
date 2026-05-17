@@ -761,59 +761,54 @@ describe("reductions", function()
     it("sum along axis 1 of a 3x3 array", function()
         -- 3x3 array, sum along rows (axis 1)  each column summed
         local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
-        local s = a:sum(1)
-        assert(s)
+        local sum_result = a:sum(1)
         -- sum axis=0 (Rust 0-based)  sums over rows  {12, 15, 18}
-        expect_equal(3, s:getSize())
-        expect_near(12.0, s:get(1) --[[@as number]], 1e-5)
-        expect_near(15.0, s:get(2) --[[@as number]], 1e-5)
-        expect_near(18.0, s:get(3) --[[@as number]], 1e-5)
+        expect_equal(3, sum_result:getSize())
+        expect_near(12.0, sum_result:get(1), 1e-5)
+        expect_near(15.0, sum_result:get(2), 1e-5)
+        expect_near(18.0, sum_result:get(3), 1e-5)
     end)
 
     -- @covers LArray:sum
     -- @covers lurek.compute.fromTable
     it("sum along axis 2 of a 3x3 array", function()
         local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
-        local s = a:sum(2)
-        assert(s)
+        local sum_result = a:sum(2)
         -- sum axis=1 (Rust 0-based)  sums over cols  {6, 15, 24}
-        expect_equal(3, s:getSize())
-        expect_near(6.0, s:get(1) --[[@as number]], 1e-5)
-        expect_near(15.0, s:get(2) --[[@as number]], 1e-5)
-        expect_near(24.0, s:get(3) --[[@as number]], 1e-5)
+        expect_equal(3, sum_result:getSize())
+        expect_near(6.0, sum_result:get(1), 1e-5)
+        expect_near(15.0, sum_result:get(2), 1e-5)
+        expect_near(24.0, sum_result:get(3), 1e-5)
     end)
 
     -- @covers LArray:mean
     -- @covers lurek.compute.fromTable
     it("mean along axis", function()
         local a = lurek.compute.fromTable({2, 4, 6, 8}, {2, 2})
-        local m = a:mean(2)
-        assert(m)
-        expect_equal(2, m:getSize())
-        expect_near(3.0, m:get(1) --[[@as number]], 1e-5)
-        expect_near(7.0, m:get(2) --[[@as number]], 1e-5)
+        local mean_result = a:mean(2)
+        expect_equal(2, mean_result:getSize())
+        expect_near(3.0, mean_result:get(1), 1e-5)
+        expect_near(7.0, mean_result:get(2), 1e-5)
     end)
 
     -- @covers LArray:min
     -- @covers lurek.compute.fromTable
     it("min along axis", function()
         local a = lurek.compute.fromTable({3, 1, 2, 4}, {2, 2})
-        local m = a:min(2)
-        assert(m)
-        expect_equal(2, m:getSize())
-        expect_near(1.0, m:get(1) --[[@as number]], 1e-5)
-        expect_near(2.0, m:get(2) --[[@as number]], 1e-5)
+        local min_result = a:min(2)
+        expect_equal(2, min_result:getSize())
+        expect_near(1.0, min_result:get(1), 1e-5)
+        expect_near(2.0, min_result:get(2), 1e-5)
     end)
 
     -- @covers LArray:max
     -- @covers lurek.compute.fromTable
     it("max along axis", function()
         local a = lurek.compute.fromTable({3, 1, 2, 4}, {2, 2})
-        local m = a:max(2)
-        assert(m)
-        expect_equal(2, m:getSize())
-        expect_near(3.0, m:get(1) --[[@as number]], 1e-5)
-        expect_near(4.0, m:get(2) --[[@as number]], 1e-5)
+        local max_result = a:max(2)
+        expect_equal(2, max_result:getSize())
+        expect_near(3.0, max_result:get(1), 1e-5)
+        expect_near(4.0, max_result:get(2), 1e-5)
     end)
 end)
 

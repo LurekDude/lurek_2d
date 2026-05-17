@@ -15,27 +15,27 @@
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
   - [lurek.data.compress(format_str: string, raw_data: string, [level]: integer) -> string](#lurekdatacompressformatstr-string-rawdata-string-level-integer-string)
-  - [lurek.data.compressChunks(format_str: string, chunks: string, [level]: integer) -> string](#lurekdatacompresschunksformatstr-string-chunks-string-level-integer-string)
+  - [lurek.data.compressChunks(format_str: string, chunks: any, [level]: integer) -> string](#lurekdatacompresschunksformatstr-string-chunks-any-level-integer-string)
   - [lurek.data.crc32(raw_data: string) -> integer](#lurekdatacrc32rawdata-string-integer)
   - [lurek.data.decode(format_str: string, encoded: string) -> string](#lurekdatadecodeformatstr-string-encoded-string-string)
   - [lurek.data.decompress(format_str: string, compressed: string) -> string](#lurekdatadecompressformatstr-string-compressed-string-string)
-  - [lurek.data.decompressChunks(format_str: string, chunks: string) -> string](#lurekdatadecompresschunksformatstr-string-chunks-string-string)
+  - [lurek.data.decompressChunks(format_str: string, chunks: any) -> string](#lurekdatadecompresschunksformatstr-string-chunks-any-string)
   - [lurek.data.encode(format_str: string, raw_data: string) -> string](#lurekdataencodeformatstr-string-rawdata-string-string)
   - [lurek.data.encodeToml(tbl: table) -> string](#lurekdataencodetomltbl-table-string)
   - [lurek.data.fromMsgPack(bytes: string) -> LuaValue](#lurekdatafrommsgpackbytes-string-luavalue)
-  - [lurek.data.getPackedSize(fmt: string, ...: table) -> integer](#lurekdatagetpackedsizefmt-string-table-integer)
+  - [lurek.data.getPackedSize(fmt: string, ...: any) -> integer](#lurekdatagetpackedsizefmt-string-any-integer)
   - [lurek.data.hash(algo_str: string, raw_data: string) -> string](#lurekdatahashalgostr-string-rawdata-string-string)
-  - [lurek.data.newByteData(value: table) -> LByteData](#lurekdatanewbytedatavalue-table-lbytedata)
+  - [lurek.data.newByteData(value: any) -> LByteData](#lurekdatanewbytedatavalue-any-lbytedata)
   - [lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView](#lurekdatanewdataviewraw-string-offset-integer-size-integer-ldataview)
   - [lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer](#lurekdatanewringbuffercapacity-integer-lringbuffer)
   - [lurek.data.newWriter() -> LDataWriter](#lurekdatanewwriter-ldatawriter)
-  - [lurek.data.pack(fmt: string, ...: table) -> string](#lurekdatapackfmt-string-table-string)
+  - [lurek.data.pack(fmt: string, ...: any) -> string](#lurekdatapackfmt-string-any-string)
   - [lurek.data.parseToml(text: string) -> table](#lurekdataparsetomltext-string-table)
   - [lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue](#lurekdatareadfmt-string-raw-string-offset-integer-luavalue)
   - [lurek.data.size(fmt: string) -> integer](#lurekdatasizefmt-string-integer)
   - [lurek.data.toMsgPack(value: table) -> string](#lurekdatatomsgpackvalue-table-string)
   - [lurek.data.unpack(fmt: string, raw: string, [offset]: integer) -> LuaValue](#lurekdataunpackfmt-string-raw-string-offset-integer-luavalue)
-  - [lurek.data.write(fmt: string, ...: table) -> string](#lurekdatawritefmt-string-table-string)
+  - [lurek.data.write(fmt: string, ...: any) -> string](#lurekdatawritefmt-string-any-string)
 - [Types and Methods](#types-and-methods)
   - [LByteData](#lbytedata)
   - [LByteData:clone() -> LByteData](#lbytedataclone-lbytedata)
@@ -87,7 +87,7 @@
   - [LRingBuffer:peek() -> LuaValue](#lringbufferpeek-luavalue)
   - [LRingBuffer:peekNewest() -> LuaValue](#lringbufferpeeknewest-luavalue)
   - [LRingBuffer:pop() -> LuaValue](#lringbufferpop-luavalue)
-  - [LRingBuffer:push(value: table) -> boolean](#lringbufferpushvalue-table-boolean)
+  - [LRingBuffer:push(value: any) -> boolean](#lringbufferpushvalue-any-boolean)
   - [LRingBuffer:toTable() -> number[]](#lringbuffertotable-number)
   - [LRingBuffer:type() -> string](#lringbuffertype-string)
   - [LRingBuffer:typeOf(name: string) -> boolean](#lringbuffertypeofname-string-boolean)
@@ -178,21 +178,21 @@ do
 
 ```lua
 lurek.data.compress(format_str: string, raw_data: string, [level]: integer) -> string -- Compresses a binary string using a named compression format.
-lurek.data.compressChunks(format_str: string, chunks: string, [level]: integer) -> string -- Compresses a string or table of strings as a chunked byte stream.
+lurek.data.compressChunks(format_str: string, chunks: any, [level]: integer) -> string -- Compresses a string or table of strings as a chunked byte stream.
 lurek.data.crc32(raw_data: string) -> integer -- Computes CRC32 for a binary string.
 lurek.data.decode(format_str: string, encoded: string) -> string -- Decodes a string using a named text encoding format.
 lurek.data.decompress(format_str: string, compressed: string) -> string -- Decompresses a binary string using a named compression format.
-lurek.data.decompressChunks(format_str: string, chunks: string) -> string -- Decompresses a string or table of strings as a chunked byte stream.
+lurek.data.decompressChunks(format_str: string, chunks: any) -> string -- Decompresses a string or table of strings as a chunked byte stream.
 lurek.data.encode(format_str: string, raw_data: string) -> string -- Encodes a binary string using a named text encoding format.
 lurek.data.encodeToml(tbl: table) -> string -- Encodes a Lua table into a TOML document string.
 lurek.data.fromMsgPack(bytes: string) -> LuaValue -- Decodes a structured binary interchange payload back into Lua values.
-lurek.data.getPackedSize(fmt: string, ...: table) -> integer -- Computes the packed byte size for values and a format string.
+lurek.data.getPackedSize(fmt: string, ...: any) -> integer -- Computes the packed byte size for values and a format string.
 lurek.data.hash(algo_str: string, raw_data: string) -> string -- Hashes a binary string with a named algorithm.
-lurek.data.newByteData(value: table) -> LByteData -- Creates ByteData from a size or string.
+lurek.data.newByteData(value: any) -> LByteData -- Creates ByteData from a size or string.
 lurek.data.newDataView(raw: string, [offset]: integer, [size]: integer) -> LDataView -- Creates a DataView over a binary string slice.
 lurek.data.newRingBuffer(capacity: integer) -> LRingBuffer -- Creates a fixed-capacity ring buffer for Lua values.
 lurek.data.newWriter() -> LDataWriter -- Creates an empty binary data writer.
-lurek.data.pack(fmt: string, ...: table) -> string -- Packs Lua values into a binary string using a format string.
+lurek.data.pack(fmt: string, ...: any) -> string -- Packs Lua values into a binary string using a format string.
 lurek.data.parseToml(text: string) -> table -- Parses TOML text into Lua tables and scalar values.
 lurek.data.read(fmt: string, raw: string, [offset]: integer) -> LuaValue -- Reads binary values from a byte string using a format string.
 -- ... 4 more module functions
@@ -228,14 +228,14 @@ do
 end
 ```
 
-### `lurek.data.compressChunks(format_str: string, chunks: string, [level]: integer) -> string`
+### `lurek.data.compressChunks(format_str: string, chunks: any, [level]: integer) -> string`
 
 Compresses a string or table of strings as a chunked byte stream.
 
 **Parameters**
 
 - `format_str` (`string`, required) - Compression format name.
-- `chunks` (`string`, required) - Binary string or array table of binary strings.
+- `chunks` (`any`, required) - Binary string or array table of binary strings.
 - `level` (`integer`, optional) - Optional compression level; defaults to 6.
 
 **Returns**: `string` - Compressed binary byte string.
@@ -330,14 +330,14 @@ do
 end
 ```
 
-### `lurek.data.decompressChunks(format_str: string, chunks: string) -> string`
+### `lurek.data.decompressChunks(format_str: string, chunks: any) -> string`
 
 Decompresses a string or table of strings as a chunked byte stream.
 
 **Parameters**
 
 - `format_str` (`string`, required) - Compression format name.
-- `chunks` (`string`, required) - Binary string or array table of binary strings.
+- `chunks` (`any`, required) - Binary string or array table of binary strings.
 
 **Returns**: `string` - Decompressed binary byte string.
 
@@ -434,14 +434,14 @@ do
 end
 ```
 
-### `lurek.data.getPackedSize(fmt: string, ...: table) -> integer`
+### `lurek.data.getPackedSize(fmt: string, ...: any) -> integer`
 
 Computes the packed byte size for values and a format string.
 
 **Parameters**
 
 - `fmt` (`string`, required) - Binary pack format string.
-- `...` (`table`, required) - Values measured according to the format.
+- `...` (`any`, required) - Values measured according to the format.
 
 **Returns**: `integer` - Packed byte size.
 
@@ -487,13 +487,13 @@ do
 end
 ```
 
-### `lurek.data.newByteData(value: table) -> LByteData`
+### `lurek.data.newByteData(value: any) -> LByteData`
 
 Creates ByteData from a size or string.
 
 **Parameters**
 
-- `value` (`table`, required) - Integer size for zeroed bytes, or string used as initial bytes.
+- `value` (`any`, required) - Integer size for zeroed bytes, or string used as initial bytes.
 
 **Returns**: `LByteData` - New LByteData userdata.
 
@@ -588,14 +588,14 @@ do
 end
 ```
 
-### `lurek.data.pack(fmt: string, ...: table) -> string`
+### `lurek.data.pack(fmt: string, ...: any) -> string`
 
 Packs Lua values into a binary string using a format string.
 
 **Parameters**
 
 - `fmt` (`string`, required) - Binary pack format string.
-- `...` (`table`, required) - Values to pack according to the format.
+- `...` (`any`, required) - Values to pack according to the format.
 
 **Returns**: `string` - Packed binary byte string.
 
@@ -746,14 +746,14 @@ do
 end
 ```
 
-### `lurek.data.write(fmt: string, ...: table) -> string`
+### `lurek.data.write(fmt: string, ...: any) -> string`
 
 Writes binary values into a byte string using a format string.
 
 **Parameters**
 
 - `fmt` (`string`, required) - Binary writer format string.
-- `...` (`table`, required) - Values to write according to the format.
+- `...` (`any`, required) - Values to write according to the format.
 
 **Returns**: `string` - Binary byte string containing written values.
 
@@ -1955,13 +1955,13 @@ do
 end
 ```
 
-### `LRingBuffer:push(value: table) -> boolean`
+### `LRingBuffer:push(value: any) -> boolean`
 
 Pushes a value into the ring buffer and evicts the oldest value when full.
 
 **Parameters**
 
-- `value` (`table`, required) - Lua value to store in the buffer.
+- `value` (`any`, required) - Lua value to store in the buffer.
 
 **Returns**: `boolean` - True when the push evicted an older value.
 

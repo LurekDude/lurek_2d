@@ -14,7 +14,7 @@
 - [Key Types](#key-types)
 - [API Overview](#api-overview)
 - [Module Functions](#module-functions)
-  - [lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise](#lurekthreadasynccodeorfunc-stringfunction-table-lpromise)
+  - [lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise](#lurekthreadasynccodeorfunc-stringfunction-any-lpromise)
   - [lurek.thread.getChannel(name: string) -> LChannel](#lurekthreadgetchannelname-string-lchannel)
   - [lurek.thread.getWorkerCapabilities() -> string[]](#lurekthreadgetworkercapabilities-string)
   - [lurek.thread.newBoundedChannel(capacity: integer) -> LChannel](#lurekthreadnewboundedchannelcapacity-integer-lchannel)
@@ -32,15 +32,15 @@
   - [LChannel:pop() -> table](#lchannelpop-table)
   - [LChannel:popBytes() -> string](#lchannelpopbytes-string)
   - [LChannel:popTable() -> table](#lchannelpoptable-table)
-  - [LChannel:push(value: table) -> integer](#lchannelpushvalue-table-integer)
+  - [LChannel:push(value: any) -> integer](#lchannelpushvalue-any-integer)
   - [LChannel:pushBytes(data: string) -> integer](#lchannelpushbytesdata-string-integer)
   - [LChannel:pushTable(value: table) -> integer](#lchannelpushtablevalue-table-integer)
-  - [LChannel:supply(value: table) -> boolean](#lchannelsupplyvalue-table-boolean)
-  - [LChannel:tryPush(value: table) -> boolean](#lchanneltrypushvalue-table-boolean)
+  - [LChannel:supply(value: any) -> boolean](#lchannelsupplyvalue-any-boolean)
+  - [LChannel:tryPush(value: any) -> boolean](#lchanneltrypushvalue-any-boolean)
   - [LChannel:type() -> string](#lchanneltype-string)
   - [LChannel:typeOf(name: string) -> boolean](#lchanneltypeofname-string-boolean)
   - [LPromise](#lpromise)
-  - [LPromise:chain(code: string, ...: table) -> LPromise](#lpromisechaincode-string-table-lpromise)
+  - [LPromise:chain(code: string, ...: any) -> LPromise](#lpromisechaincode-string-any-lpromise)
   - [LPromise:getError() -> string](#lpromisegeterror-string)
   - [LPromise:isDone() -> boolean](#lpromiseisdone-boolean)
   - [LPromise:result() -> table](#lpromiseresult-table)
@@ -49,7 +49,7 @@
   - [LThread](#lthread)
   - [LThread:getError() -> string](#lthreadgeterror-string)
   - [LThread:isRunning() -> boolean](#lthreadisrunning-boolean)
-  - [LThread:start(...: table)](#lthreadstart-table)
+  - [LThread:start(...: any)](#lthreadstart-any)
   - [LThread:type() -> string](#lthreadtype-string)
   - [LThread:typeOf(name: string) -> boolean](#lthreadtypeofname-string-boolean)
   - [LThread:wait()](#lthreadwait)
@@ -59,7 +59,7 @@
   - [LThreadPool:getOutputChannel() -> LChannel](#lthreadpoolgetoutputchannel-lchannel)
   - [LThreadPool:join([timeout]: number) -> boolean](#lthreadpooljointimeout-number-boolean)
   - [LThreadPool:size() -> integer](#lthreadpoolsize-integer)
-  - [LThreadPool:submit(value: table)](#lthreadpoolsubmitvalue-table)
+  - [LThreadPool:submit(value: any)](#lthreadpoolsubmitvalue-any)
   - [LThreadPool:type() -> string](#lthreadpooltype-string)
   - [LThreadPool:typeOf(name: string) -> boolean](#lthreadpooltypeofname-string-boolean)
 - [Examples](#examples)
@@ -148,7 +148,7 @@ do
 - Source spec: [docs/specs/thread.md](../blob/main/docs/specs/thread.md)
 
 ```lua
-lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
+lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise -- Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for th...
 lurek.thread.getChannel(name: string) -> LChannel -- Returns a named shared channel, creating it on first access. Repeated calls with the same name return the s...
 lurek.thread.getWorkerCapabilities() -> string[] -- Returns a list of capability names available inside worker VMs (e.g. which `lurek.*` modules are accessible).
 lurek.thread.newBoundedChannel(capacity: integer) -> LChannel -- Creates a new bounded channel with a fixed capacity, blocking pushes when full.
@@ -159,14 +159,14 @@ lurek.thread.newThread(code: string) -> LThread -- Creates a new worker thread t
 
 ## Module Functions
 
-### `lurek.thread.async(codeOrFunc: string|function, ...: table) -> LPromise`
+### `lurek.thread.async(codeOrFunc: string|function, ...: any) -> LPromise`
 
 Runs a Lua code string or dumped function asynchronously on a new worker thread, returning a promise for the result.
 
 **Parameters**
 
 - `codeOrFunc` (`string|function`, required) - Lua source code or a dumpable Lua function to execute.
-- `...` (`table`, required) - Additional arguments forwarded to the worker.
+- `...` (`any`, required) - Additional arguments forwarded to the worker.
 
 **Returns**: `LPromise` - A promise that resolves to the worker's return value.
 
@@ -571,13 +571,13 @@ do
 end
 ```
 
-### `LChannel:push(value: table) -> integer`
+### `LChannel:push(value: any) -> integer`
 
 Pushes a value onto the channel. Blocks on bounded channels if the channel is full.
 
 **Parameters**
 
-- `value` (`table`, required) - The message table to send.
+- `value` (`any`, required) - The message to send.
 
 **Returns**: `integer` - The message sequence ID assigned to this push.
 
@@ -644,13 +644,13 @@ do
 end
 ```
 
-### `LChannel:supply(value: table) -> boolean`
+### `LChannel:supply(value: any) -> boolean`
 
 Pushes a value and blocks until a consumer pops it (synchronous handoff).
 
 **Parameters**
 
-- `value` (`table`, required) - The message table to send.
+- `value` (`any`, required) - The message to send.
 
 **Returns**: `boolean` - true when the value has been consumed.
 
@@ -670,13 +670,13 @@ do
 end
 ```
 
-### `LChannel:tryPush(value: table) -> boolean`
+### `LChannel:tryPush(value: any) -> boolean`
 
 Attempts to push a value onto a bounded channel without blocking.
 
 **Parameters**
 
-- `value` (`table`, required) - The message table to send.
+- `value` (`any`, required) - The message to send.
 
 **Returns**: `boolean` - true if the value was enqueued, false if the channel is full.
 
@@ -761,14 +761,14 @@ do
 end
 ```
 
-### `LPromise:chain(code: string, ...: table) -> LPromise`
+### `LPromise:chain(code: string, ...: any) -> LPromise`
 
 Creates a new promise that runs the given code with the parent promise's result as its first argument.
 
 **Parameters**
 
 - `code` (`string`, required) - Lua source code to execute in the chained worker thread.
-- `...` (`table`, required) - Additional arguments forwarded after the parent result.
+- `...` (`any`, required) - Additional arguments forwarded after the parent result.
 
 **Returns**: `LPromise` - A new promise representing the chained computation.
 
@@ -965,13 +965,13 @@ do
 end
 ```
 
-### `LThread:start(...: table)`
+### `LThread:start(...: any)`
 
 Launches the worker thread, executing the Lua code string supplied at creation time.
 
 **Parameters**
 
-- `...` (`table`, required) - Zero or more arguments forwarded to the worker as the `arg` table.
+- `...` (`any`, required) - Zero or more arguments forwarded to the worker as the `arg` table.
 
 #### Example
 
@@ -1198,13 +1198,13 @@ do
 end
 ```
 
-### `LThreadPool:submit(value: table)`
+### `LThreadPool:submit(value: any)`
 
 Pushes a value into the pool's input channel for processing by a worker thread.
 
 **Parameters**
 
-- `value` (`table`, required) - The message table to send.
+- `value` (`any`, required) - The message to send.
 
 #### Example
 

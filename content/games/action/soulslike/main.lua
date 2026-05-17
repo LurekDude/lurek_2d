@@ -498,17 +498,17 @@ function lurek.init()
     _cam = lurek.camera.new(SCREEN_W, SCREEN_H)
 
     -- Input actions
-    lurek.input.bind("left",        {"a", "left"})
-    lurek.input.bind("right",       {"d", "right"})
-    lurek.input.bind("up",          {"w", "up"})
-    lurek.input.bind("down",        {"s", "down"})
-    lurek.input.bind("light_attack",{"j"})
-    lurek.input.bind("heavy_attack",{"k"})
-    lurek.input.bind("dodge",       {"l"})
-    lurek.input.bind("block",       {"space"})
-    lurek.input.bind("heal",        {"e"})
-    lurek.input.bind("start",       {"return"})
-    lurek.input.bind("quit",        {"escape"})
+    lurek.input.bind("left",        "a");    lurek.input.bind("left",        "left")
+    lurek.input.bind("right",       "d");    lurek.input.bind("right",       "right")
+    lurek.input.bind("up",          "w");    lurek.input.bind("up",          "up")
+    lurek.input.bind("down",        "s");    lurek.input.bind("down",        "down")
+    lurek.input.bind("light_attack","j")
+    lurek.input.bind("heavy_attack","k")
+    lurek.input.bind("dodge",       "l")
+    lurek.input.bind("block",       "space")
+    lurek.input.bind("heal",        "e")
+    lurek.input.bind("start",       "return")
+    lurek.input.bind("quit",        "escape")
 
     -- Particle systems
     hit_ps    = lurek.particle.newSystem({ maxParticles = 30, lifetime = 0.25,

@@ -33,6 +33,8 @@
 - TST-06 One test file per module per layer: test_<module>_<layer>.lua.
 - **Never edit docs/api/lurek.lua** — auto-generated. Fix at source (`src/lua_api/*_api.rs`), then regenerate with `python tools/gen_all_docs.py`.
 - **Never add warning suppressions** to .vscode/settings.json to hide problems.
+- **Never add `---@diagnostic disable` or `---@diagnostic disable-next-line` to Lua files.** Fix the source docs in `src/lua_api/*_api.rs` and regenerate the API artifacts.
+- **Never add Lua-side type workarounds for `lurek.*` APIs** like `---@cast`, `--[[@as ...]]`, or assert narrowing. Put all Lua-visible params, returns, and fields in `src/lua_api/*_api.rs` and generate `docs/api/lurek.lua`. If an API accepts multiple value kinds, document the source param as `any` instead of patching Lua call sites.
 
 ## Cross-Artifact Sync
 Update all linked artifacts in the same commit:

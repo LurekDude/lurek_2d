@@ -625,7 +625,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- setData --
     /// Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
     /// @param | key | string | The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
-    /// @param | value | table | Value to store (a table with your game data).
+    /// @param | value | any | Value to store under the scene data key.
     let st = state.clone();
     tbl.set(
         "setData",

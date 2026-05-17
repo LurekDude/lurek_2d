@@ -66,7 +66,7 @@ end
 
 -- Step methods
 
---@api-stub: Step:getName
+--@api-stub: LPipeline:getName
 -- Returns the name of this step.
 do
   -- getName() is useful for logging which step is currently executing,
@@ -75,7 +75,7 @@ do
   lurek.log.info("registering step: " .. step:getName(), "boot")
 end
 
---@api-stub: Step:setCallback
+--@api-stub: LPipelineStep:setCallback
 -- Sets the callback of this step.
 do
   -- setCallback() replaces the step's execution function.
@@ -91,7 +91,7 @@ do
   end)
 end
 
---@api-stub: Step:setCondition
+--@api-stub: LPipelineStep:setCondition
 -- Sets the condition of this step.
 do
   -- setCondition() takes a predicate function receiving the context.
@@ -106,7 +106,7 @@ do
   end)
 end
 
---@api-stub: Step:setDelay
+--@api-stub: LPipelineStep:setDelay
 -- Sets the delay of this step.
 do
   -- setDelay(seconds) adds a wait before the step executes (after deps are met).
@@ -116,7 +116,7 @@ do
   step:setDelay(2.0)  -- Wait 2 seconds before running (e.g., show splash screen)
 end
 
---@api-stub: Step:getDelay
+--@api-stub: LPipelineStep:getDelay
 -- Returns the delay of this step.
 do
   local step = lurek.pipeline.newStep("fade_in")
@@ -125,7 +125,7 @@ do
   lurek.log.debug("fade_in waits " .. step:getDelay() .. "s before executing", "boot")
 end
 
---@api-stub: Step:setTimeout
+--@api-stub: LPipelineStep:setTimeout
 -- Sets the timeout of this step.
 do
   -- setTimeout(seconds) sets a maximum wall-clock time for this step.
@@ -136,7 +136,7 @@ do
   step:setRetryCount(2) -- Retry up to 2 times on timeout
 end
 
---@api-stub: Step:getTimeout
+--@api-stub: LPipelineStep:getTimeout
 -- Returns the timeout of this step.
 do
   local step = lurek.pipeline.newStep("download_dlc")
@@ -147,7 +147,7 @@ do
   end
 end
 
---@api-stub: Step:setRetryCount
+--@api-stub: LPipelineStep:setRetryCount
 -- Sets the retry count of this step.
 do
   -- setRetryCount(n) means the step will attempt execution up to n+1 times total.
@@ -160,7 +160,7 @@ do
   step:setRetryDelay(0.5)  -- Wait 0.5s between each retry
 end
 
---@api-stub: Step:getRetryCount
+--@api-stub: LPipelineStep:getRetryCount
 -- Returns the number of retry items in this step.
 do
   local step = lurek.pipeline.newStep("publish_score")
@@ -169,7 +169,7 @@ do
   lurek.log.info("publish_score will retry " .. step:getRetryCount() .. " times on failure", "net")
 end
 
---@api-stub: Step:setRetryDelay
+--@api-stub: LPipelineStep:setRetryDelay
 -- Sets the retry delay of this step.
 do
   -- setRetryDelay(seconds) sets the pause between retry attempts.
@@ -179,7 +179,7 @@ do
   step:setRetryDelay(2.0)  -- 2 seconds between each login attempt
 end
 
---@api-stub: Step:setAsync
+--@api-stub: LPipelineStep:setAsync
 -- Sets the async of this step.
 do
   -- setAsync(true) marks the step for coroutine-based execution.
@@ -197,7 +197,7 @@ do
   step:setAsync(true)
 end
 
---@api-stub: Step:isAsync
+--@api-stub: LPipelineStep:isAsync
 -- Returns true if this step async.
 do
   local step = lurek.pipeline.newStep("stream_chunks")
@@ -206,7 +206,7 @@ do
   lurek.log.info("async=" .. tostring(step:isAsync()), "pipeline")
 end
 
---@api-stub: Step:setOptional
+--@api-stub: LPipelineStep:setOptional
 -- Sets the optional of this step.
 do
   -- setOptional(true) means this step's failure will NOT abort the pipeline.
@@ -218,7 +218,7 @@ do
   step:setOptional(true)
 end
 
---@api-stub: Step:isOptional
+--@api-stub: LPipelineStep:isOptional
 -- Returns true if this step optional.
 do
   local step = lurek.pipeline.newStep("achievements_sync")
@@ -229,7 +229,7 @@ do
   end
 end
 
---@api-stub: Step:setOnError
+--@api-stub: LPipelineStep:setOnError
 -- Sets the on error of this step.
 do
   -- setOnError() registers a handler called after all retries are exhausted.
@@ -243,7 +243,7 @@ do
   end)
 end
 
---@api-stub: Step:setData
+--@api-stub: LPipelineStep:setData
 -- Sets the data of this step.
 do
   -- setData(key, value) stores metadata on the step itself (separate from the pipeline context).
@@ -255,7 +255,7 @@ do
   step:setData("checkpoint", "bridge_crossing")
 end
 
---@api-stub: Step:getData
+--@api-stub: LPipelineStep:getData
 -- Returns the data of this step.
 do
   local step = lurek.pipeline.newStep("load_level")
@@ -265,7 +265,7 @@ do
   lurek.log.info("loading scene: " .. scene, "scene")
 end
 
---@api-stub: Step:setTag
+--@api-stub: LPipelineStep:setTag
 -- Sets the tag of this step.
 do
   -- setTag(tag) assigns a category to the step for grouping.
@@ -275,7 +275,7 @@ do
   step:setTag("gpu")
 end
 
---@api-stub: Step:getTag
+--@api-stub: LPipelineStep:getTag
 -- Returns the tag of this step.
 do
   local step = lurek.pipeline.newStep("warm_audio")
@@ -285,7 +285,7 @@ do
   lurek.log.debug(step:getName() .. " tag=" .. tag, "boot")
 end
 
---@api-stub: Step:dependsOn
+--@api-stub: LPipelineStep:dependsOn
 -- Performs the depends on operation on this step.
 do
   -- dependsOn() declares that this step must wait for another step to complete.
@@ -302,7 +302,7 @@ do
   render:dependsOn("load_assets")
 end
 
---@api-stub: Step:getDependencies
+--@api-stub: LPipelineStep:getDependencies
 -- Returns the dependencies of this step.
 do
   local step = lurek.pipeline.newStep("present_frame")
@@ -315,7 +315,7 @@ do
   end
 end
 
---@api-stub: Step:getDependencyCount
+--@api-stub: LPipelineStep:getDependencyCount
 -- Returns the number of dependency items in this step.
 do
   local step = lurek.pipeline.newStep("commit_save")
@@ -329,7 +329,7 @@ do
   end
 end
 
---@api-stub: Step:getStatus
+--@api-stub: LPipelineStep:getStatus
 -- Returns the status of this step.
 do
   -- getStatus() returns one of: "pending", "waiting", "running", "completed", "failed", "skipped", "cancelled"
@@ -342,7 +342,7 @@ do
   lurek.log.info("after run: " .. s:getStatus(), "boot")   -- "completed"
 end
 
---@api-stub: Step:getError
+--@api-stub: LPipelineStep:getError
 -- Returns the error of this step.
 do
   -- getError() returns nil if the step has not failed, or the error message string.
@@ -358,7 +358,7 @@ do
   end
 end
 
---@api-stub: Step:getDuration
+--@api-stub: LPipelineStep:getDuration
 -- Returns the duration of this step.
 do
   -- getDuration() returns wall-clock execution time in seconds.
@@ -374,7 +374,7 @@ do
   lurek.log.info(string.format("navmesh generation took %.4fs", step:getDuration()), "perf")
 end
 
---@api-stub: Step:getAttempt
+--@api-stub: LPipelineStep:getAttempt
 -- Returns the attempt of this step.
 do
   -- getAttempt() returns the 1-based attempt number.
@@ -388,7 +388,7 @@ do
   lurek.log.debug("flaky_network completed on attempt " .. step:getAttempt(), "net")
 end
 
---@api-stub: Step:type
+--@api-stub: LPipeline:type
 -- Returns the Lua-visible type name string for this step handle.
 do
   -- type() returns "LPipelineStep" — useful for type-checking userdata
@@ -396,7 +396,7 @@ do
   assert(step:type() == "LPipelineStep", "unexpected type")
 end
 
---@api-stub: Step:typeOf
+--@api-stub: LPipeline:typeOf
 -- Returns true if this step handle matches the given type name string.
 do
   -- typeOf() accepts "LPipelineStep", "PipelineStep", or "Object"
@@ -409,7 +409,7 @@ end
 
 -- Pipeline methods
 
---@api-stub: Pipeline:addStep
+--@api-stub: LPipeline:addStep
 -- Adds a step to this pipeline.
 do
   -- addStep() returns self, so you can chain calls for concise pipeline construction.
@@ -426,7 +426,7 @@ do
     end))
 end
 
---@api-stub: Pipeline:removeStep
+--@api-stub: LPipeline:removeStep
 -- Removes a step from this pipeline.
 do
   -- removeStep(name) removes a step by name.
@@ -439,7 +439,7 @@ do
   pl:removeStep("legacy_drm_check")
 end
 
---@api-stub: Pipeline:getStep
+--@api-stub: LPipeline:getStep
 -- Returns the step of this pipeline.
 do
   -- getStep(name) retrieves an LPipelineStep by name, or nil if not found.
@@ -456,7 +456,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getSteps
+--@api-stub: LPipeline:getSteps
 -- Returns the steps of this pipeline.
 do
   -- getSteps() returns an array of all LPipelineStep objects in the pipeline.
@@ -470,7 +470,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getStepCount
+--@api-stub: LPipeline:getStepCount
 -- Returns the number of step items in this pipeline.
 do
   -- getStepCount() returns how many steps are in the pipeline.
@@ -481,7 +481,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getStepsByTag
+--@api-stub: LPipeline:getStepsByTag
 -- Returns the steps by tag of this pipeline.
 do
   -- getStepsByTag(tag) filters steps by their assigned tag.
@@ -497,7 +497,7 @@ do
   end
 end
 
---@api-stub: Pipeline:clear
+--@api-stub: LPipeline:clear
 -- Clears all items from this pipeline.
 do
   -- clear() removes all steps, resetting the pipeline to empty.
@@ -509,7 +509,7 @@ do
   pl:addStep(lurek.pipeline.newStep("new_level", function() end))
 end
 
---@api-stub: Pipeline:validate
+--@api-stub: LPipeline:validate
 -- Performs the validate operation on this pipeline.
 do
   -- validate() checks for missing dependencies and circular references.
@@ -528,7 +528,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getExecutionOrder
+--@api-stub: LPipeline:getExecutionOrder
 -- Returns the execution order of this pipeline.
 do
   -- getExecutionOrder() computes topological sort of all steps.
@@ -548,7 +548,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getParallelGroups
+--@api-stub: LPipeline:getParallelGroups
 -- Returns the parallel groups of this pipeline.
 do
   -- getParallelGroups() groups steps into tiers that can run concurrently.
@@ -565,7 +565,7 @@ do
   end
 end
 
---@api-stub: Pipeline:run
+--@api-stub: LPipeline:run
 -- Starts the operation managed by this pipeline.
 do
   -- run(context?) executes all steps synchronously in dependency order.
@@ -582,7 +582,7 @@ do
     .. " duration=" .. string.format("%.3fs", result.totalDuration), "boot")
 end
 
---@api-stub: Pipeline:runAsync
+--@api-stub: LPipeline:runAsync
 -- Performs the run async operation on this pipeline.
 do
   -- runAsync(context?) starts coroutine-based execution.
@@ -597,7 +597,7 @@ do
   -- In a real game, update() would be called from lurek.process(dt)
 end
 
---@api-stub: Pipeline:update
+--@api-stub: LPipeline:update
 -- Advances this pipeline by the given delta time.
 do
   -- update(dt) advances the async pipeline by one frame.
@@ -617,7 +617,7 @@ do
   end
 end
 
---@api-stub: Pipeline:cancel
+--@api-stub: LPipeline:cancel
 -- Cancels the current operation of this pipeline.
 do
   -- cancel() stops all pending/waiting steps. Already-running or completed steps are unaffected.
@@ -630,7 +630,7 @@ do
   pl:cancel()
 end
 
---@api-stub: Pipeline:reset
+--@api-stub: LPipeline:reset
 -- Resets this pipeline to its default state.
 do
   -- reset() clears all step statuses back to "pending" and removes context.
@@ -643,7 +643,7 @@ do
   pl:run({ level = 2 })
 end
 
---@api-stub: Pipeline:isRunning
+--@api-stub: LPipeline:isRunning
 -- Returns true if this pipeline is currently running.
 do
   -- isRunning() returns true between runAsync() and completion.
@@ -656,7 +656,7 @@ do
   end
 end
 
---@api-stub: Pipeline:isComplete
+--@api-stub: LPipeline:isComplete
 -- Returns true if this pipeline complete.
 do
   -- isComplete() returns true when all steps are in a terminal state
@@ -667,7 +667,7 @@ do
   assert(pl:isComplete(), "pipeline should be done after synchronous run()")
 end
 
---@api-stub: Pipeline:setErrorMode
+--@api-stub: LPipeline:setErrorMode
 -- Sets the error mode of this pipeline.
 do
   -- setErrorMode("abort"|"continue") controls failure behavior.
@@ -680,7 +680,7 @@ do
   pl:addStep(lurek.pipeline.newStep("load_sfx", function() end))
 end
 
---@api-stub: Pipeline:getErrorMode
+--@api-stub: LPipeline:getErrorMode
 -- Returns the error mode of this pipeline.
 do
   local pl = lurek.pipeline.newPipeline("boot")
@@ -689,7 +689,7 @@ do
   lurek.log.info("error mode: " .. pl:getErrorMode(), "boot")
 end
 
---@api-stub: Pipeline:getResult
+--@api-stub: LPipeline:getResult
 -- Returns the result of this pipeline.
 do
   -- getResult() returns the result summary table after (or during async) execution.
@@ -705,7 +705,7 @@ do
   end
 end
 
---@api-stub: Pipeline:getContext
+--@api-stub: LPipeline:getContext
 -- Returns the context of this pipeline.
 do
   -- getContext() returns the shared table used by the current/most recent run.
@@ -721,7 +721,7 @@ do
   end
 end
 
---@api-stub: Pipeline:setOnComplete
+--@api-stub: LPipeline:setOnComplete
 -- Sets the on complete of this pipeline.
 do
   -- setOnComplete(callback) registers a handler called when the entire pipeline finishes.
@@ -739,7 +739,7 @@ do
   pl:run()
 end
 
---@api-stub: Pipeline:setOnStepComplete
+--@api-stub: LPipeline:setOnStepComplete
 -- Sets the on step complete of this pipeline.
 do
   -- setOnStepComplete(callback) fires after each step succeeds.
@@ -758,7 +758,7 @@ do
   pl:run()
 end
 
---@api-stub: Pipeline:setOnStepError
+--@api-stub: LPipeline:setOnStepError
 -- Sets the on step error of this pipeline.
 do
   -- setOnStepError(callback) fires when any step fails.
@@ -773,7 +773,7 @@ do
   pl:run()
 end
 
---@api-stub: Pipeline:getName
+--@api-stub: LPipeline:getName
 -- Returns the name of this pipeline.
 do
   local pl = lurek.pipeline.newPipeline("save_routine")
@@ -781,7 +781,7 @@ do
   lurek.log.info("executing pipeline: " .. pl:getName(), "save")
 end
 
---@api-stub: Pipeline:setName
+--@api-stub: LPipeline:setName
 -- Sets the name of this pipeline.
 do
   -- setName() changes the pipeline's name at runtime.
@@ -791,7 +791,7 @@ do
   lurek.log.debug("pipeline renamed to: " .. pl:getName(), "scene")
 end
 
---@api-stub: Pipeline:toTable
+--@api-stub: LPipeline:toTable
 -- Performs the to table operation on this pipeline.
 do
   -- toTable() serializes the pipeline configuration for inspection or persistence.
@@ -804,7 +804,7 @@ do
   lurek.log.info("serialized: name=" .. t.name .. ", steps=" .. #t.steps, "debug")
 end
 
---@api-stub: Pipeline:type
+--@api-stub: LPipeline:type
 -- Returns the Lua-visible type name string for this pipeline handle.
 do
   local pl = lurek.pipeline.newPipeline("boot")
@@ -812,7 +812,7 @@ do
   assert(pl:type() == "LPipeline")
 end
 
---@api-stub: Pipeline:onProgress
+--@api-stub: LPipeline:onProgress
 -- Fires the callback registered for the progress event on this pipeline.
 do
   -- onProgress(callback) fires after each step finishes (any outcome).
@@ -827,7 +827,7 @@ do
   pl:run()
 end
 
---@api-stub: Pipeline:onEvent
+--@api-stub: LPipeline:onEvent
 -- Fires the callback registered for the event event on this pipeline.
 do
   -- onEvent(callback) is a low-level lifecycle hook for all pipeline events.
@@ -842,7 +842,7 @@ do
   pl:run()
 end
 
---@api-stub: Pipeline:toAscii
+--@api-stub: LPipeline:toAscii
 -- Performs the to ascii operation on this pipeline.
 do
   -- toAscii() returns an ASCII-art diagram of the pipeline's dependency graph.
@@ -855,7 +855,7 @@ do
   lurek.log.info("\n" .. pl:toAscii(), "pipeline")
 end
 
---@api-stub: Pipeline:typeOf
+--@api-stub: LPipeline:typeOf
 -- Returns true if this pipeline handle matches the given type name string.
 do
   -- typeOf() accepts "LPipeline", "Pipeline", or "Object"
@@ -866,7 +866,7 @@ do
 end
 
 
---@api-stub: Pipeline:addConditional
+--@api-stub: LPipeline:addConditional
 -- Adds a conditional to this pipeline.
 do
   -- addConditional(name, deps, callback, condition) is a convenience for:
@@ -888,7 +888,7 @@ do
   pipe:run({ debug_build = true })
 end
 
---@api-stub: Pipeline:addBranch
+--@api-stub: LPipeline:addBranch
 -- Adds a branch to this pipeline.
 do
   -- addBranch(name, deps, when, thenFn, elseFn?) creates an if/else branch in the pipeline.
@@ -917,7 +917,7 @@ do
   lurek.log.info("build mode selected: " .. mode_selected, "build")
 end
 
---@api-stub: Pipeline:addSubPipeline
+--@api-stub: LPipeline:addSubPipeline
 -- Adds a sub pipeline to this pipeline.
 do
   -- addSubPipeline(subPipeline, alias, deps?) embeds another pipeline's steps.
@@ -940,7 +940,7 @@ end
 -- LPipelineStep methods
 -- -----------------------------------------------------------------------------
 
---@api-stub: LPipelineStep:getName
+--@api-stub: LPipeline:getName
 -- Returns the unique name of this pipeline step
 do
   -- Identical to Step:getName — included here for the LPipelineStep class reference.
@@ -1130,13 +1130,13 @@ do
   local step = lurek.pipeline.newStep("login", function() end)
   lurek.log.info("attempt=" .. step:getAttempt(), "pipeline")
 end
---@api-stub: LPipelineStep:type
+--@api-stub: LPipeline:type
 -- Returns the type name of this object ("LPipelineStep")
 do
   local step = lurek.pipeline.newStep("test_step", function() end)
   assert(step:type() == "LPipelineStep")
 end
---@api-stub: LPipelineStep:typeOf
+--@api-stub: LPipeline:typeOf
 -- Checks whether this object is of a given type name
 do
   -- Accepts "LPipelineStep", "PipelineStep", or "Object"
@@ -1180,248 +1180,3 @@ print("content/examples/pipeline.lua")
 -- -----------------------------------------------------------------------------
 -- LPipeline methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LPipeline:addStep ---------------------------------------------
---@api-stub: LPipeline:addStep
--- Adds an existing step object to this pipeline. The step will be scheduled according to its declared dependencies.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:addStep(step_ud)  -- -> LPipeline
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:removeStep ------------------------------------------
---@api-stub: LPipeline:removeStep
--- Removes a step from the pipeline by name. Any other steps that depend on it may fail or be skipped.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:removeStep("hero")
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getStep ---------------------------------------------
---@api-stub: LPipeline:getStep
--- Retrieves a step object by name, or nil if no step with that name exists in this pipeline.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getStep("hero")  -- -> LPipelineStep
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getSteps --------------------------------------------
---@api-stub: LPipeline:getSteps
--- Returns a table containing all step objects currently in this pipeline.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getSteps()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getStepCount ----------------------------------------
---@api-stub: LPipeline:getStepCount
--- Returns the total number of steps in this pipeline.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getStepCount()  -- -> number
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getStepsByTag ---------------------------------------
---@api-stub: LPipeline:getStepsByTag
--- Returns all steps that have the specified tag assigned.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getStepsByTag("enemy")  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:clear -----------------------------------------------
---@api-stub: LPipeline:clear
--- Removes all steps from the pipeline, resetting it to an empty state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:clear()
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:validate --------------------------------------------
---@api-stub: LPipeline:validate
--- Validates the pipeline structure, checking for missing dependencies and circular references.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:validate()  -- -> boolean
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getExecutionOrder -----------------------------------
---@api-stub: LPipeline:getExecutionOrder
--- Computes the topologically sorted execution order of all steps, respecting dependencies.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getExecutionOrder()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getParallelGroups -----------------------------------
---@api-stub: LPipeline:getParallelGroups
--- Groups steps into parallel execution tiers. Steps within the same group have no mutual dependencies and can run concurrently.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getParallelGroups()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:run -------------------------------------------------
---@api-stub: LPipeline:run
--- Executes all pipeline steps synchronously in dependency order. Blocks until all steps complete, fail, or are cancelled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:run([context])  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:runAsync --------------------------------------------
---@api-stub: LPipeline:runAsync
--- Starts asynchronous (coroutine-based) execution of the pipeline. Call update(dt) each frame to advance steps.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:runAsync([context])
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:update ----------------------------------------------
---@api-stub: LPipeline:update
--- Advances an async pipeline by one frame tick. Resumes coroutines, checks dependencies, and fires callbacks. Call every frame after runAsync().
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:update(0.016)  -- -> boolean
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:cancel ----------------------------------------------
---@api-stub: LPipeline:cancel
--- Cancels all pending and waiting steps. Steps already running or completed are unaffected.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:cancel()
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:reset -----------------------------------------------
---@api-stub: LPipeline:reset
--- Resets the pipeline and all steps back to their initial pending state, clearing context and async state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:reset()
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:isRunning -------------------------------------------
---@api-stub: LPipeline:isRunning
--- Returns whether the pipeline is currently in async execution mode (started via runAsync and not yet finished).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:isRunning()  -- -> boolean
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:isComplete ------------------------------------------
---@api-stub: LPipeline:isComplete
--- Returns whether all steps have reached a terminal state (completed, failed, skipped, or cancelled).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:isComplete()  -- -> boolean
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:setErrorMode ----------------------------------------
---@api-stub: LPipeline:setErrorMode
--- Sets how the pipeline handles step failures. "abort" stops on first failure; "continue" runs remaining steps.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:setErrorMode(mode)
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getErrorMode ----------------------------------------
---@api-stub: LPipeline:getErrorMode
--- Returns the current error mode of the pipeline as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getErrorMode()  -- -> string
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getResult -------------------------------------------
---@api-stub: LPipeline:getResult
--- Returns the current pipeline result summary table, or nil if no steps exist. Useful for inspecting state after run or during async execution.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getResult()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getContext ------------------------------------------
---@api-stub: LPipeline:getContext
--- Returns the shared context table used by the current or most recent pipeline execution, or nil if none exists.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getContext()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:setOnComplete ---------------------------------------
---@api-stub: LPipeline:setOnComplete
--- Registers a callback invoked when the entire pipeline finishes execution. Receives the result table.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:setOnComplete([cb])
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:setOnStepComplete -----------------------------------
---@api-stub: LPipeline:setOnStepComplete
--- Registers a callback invoked each time any step completes successfully. Receives (stepName, context).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:setOnStepComplete([cb])
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:setOnStepError --------------------------------------
---@api-stub: LPipeline:setOnStepError
--- Registers a callback invoked each time any step fails. Receives (stepName, errorMessage).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:setOnStepError([cb])
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:getName ---------------------------------------------
---@api-stub: LPipeline:getName
--- Returns the name of this pipeline. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:getName()  -- -> string
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:setName ---------------------------------------------
---@api-stub: LPipeline:setName
--- Changes the name of this pipeline. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:setName("hero")
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:toTable ---------------------------------------------
---@api-stub: LPipeline:toTable
--- Serializes the pipeline configuration into a plain Lua table for inspection or persistence.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:toTable()  -- -> table
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:type ------------------------------------------------
---@api-stub: LPipeline:type
--- Returns the type name of this object ("LPipeline").
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:type()  -- -> string
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:addConditional --------------------------------------
---@api-stub: LPipeline:addConditional
--- Convenience method to create and add a step with dependencies and a condition in one call.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:addConditional("hero", deps_tbl, cb, cond)  -- -> LPipeline
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:addBranch -------------------------------------------
---@api-stub: LPipeline:addBranch
--- Adds a branching construct: evaluates a predicate, then runs either the "then" or "else" callback based on the result.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:addBranch()  -- -> LPipeline
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:onProgress ------------------------------------------
---@api-stub: LPipeline:onProgress
--- Registers a progress callback invoked after each step finishes (regardless of outcome). Receives (stepName, statusString).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:onProgress(cb)
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:onEvent ---------------------------------------------
---@api-stub: LPipeline:onEvent
--- Registers a low-level event callback for all pipeline lifecycle events. Receives (eventName, stepName, status, detail).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:onEvent(cb)
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:toAscii ---------------------------------------------
---@api-stub: LPipeline:toAscii
--- Returns an ASCII art diagram of the pipeline's dependency graph for debugging and visualization.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:toAscii()  -- -> string
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:addSubPipeline --------------------------------------
---@api-stub: LPipeline:addSubPipeline
--- Embeds another pipeline's steps into this pipeline under an alias prefix, with optional outer dependencies.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:addSubPipeline(sub_ud, alias, [deps_tbl])
--- (replace lPipeline_stub with your real LPipeline instance above)
-
--- ---- Stub: LPipeline:typeOf ----------------------------------------------
---@api-stub: LPipeline:typeOf
--- Checks whether this object is of a given type name. Accepts "LPipeline", "Pipeline", or "Object".
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPipeline_stub:typeOf("hero")  -- -> boolean
--- (replace lPipeline_stub with your real LPipeline instance above)

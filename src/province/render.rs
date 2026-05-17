@@ -126,58 +126,93 @@ pub fn generate_render_commands(
             let c = resolve_color(opts.map_mode, style);
             cmds.push(RenderCommand::SetColor(c[0], c[1], c[2], c[3]));
             if let Some(spans) = registry.spans_for(id) {
-                for &(y, x0, x1) in spans {
+                // Merge vertically-adjacent spans with same x0,x1 into taller rectangles
+                let mut i = 0;
+                while i < spans.len() {
+                    let (y, x0, x1) = spans[i];
+                    if (y as f32) > bottom || (x1 as f32) <= left || (x0 as f32) >= right {
+                        i += 1;
+                        continue;
+                    }
                     if (y as f32) < top {
+                        i += 1;
                         continue;
                     }
-                    if (y as f32) > bottom {
-                        continue;
-                    }
-                    if (x1 as f32) <= left {
-                        continue;
-                    }
-                    if (x0 as f32) >= right {
-                        continue;
+                    // Try to merge consecutive spans with same x0, x1
+                    let mut height: u32 = 1;
+                    while i + (height as usize) < spans.len() {
+                        let (ny, nx0, nx1) = spans[i + height as usize];
+                        if nx0 == x0 && nx1 == x1 && ny == y + height {
+                            height += 1;
+                            if (ny as f32) > bottom {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
                     }
                     cmds.push(RenderCommand::Rectangle {
                         mode: DrawMode::Fill,
                         x: x0 as f32 * opts.pixel_size,
                         y: y as f32 * opts.pixel_size,
                         w: (x1 - x0) as f32 * opts.pixel_size,
-                        h: opts.pixel_size,
+                        h: height as f32 * opts.pixel_size,
                     });
+                    i += height as usize;
                 }
             }
         }
     }
     if opts.draw_borders {
-        cmds.push(RenderCommand::SetLineWidth(opts.border_width.max(1.0)));
-        for &(a, b, x0, y0, x1, y1) in registry.border_segments() {
-            let min_x = x0.min(x1) as f32;
-            let max_x = x0.max(x1) as f32;
-            let min_y = y0.min(y1) as f32;
-            let max_y = y0.max(y1) as f32;
-            if max_x < left || min_x > right || max_y < top || min_y > bottom {
-                continue;
-            }
-            let class = if let Some(c) = registry.get_border_class(a, b) {
-                c
+        let effective_scale = opts.zoom * opts.pixel_size;
+        // LOD: skip all borders when they'd be sub-pixel
+        if effective_scale >= 0.5 {
+            cmds.push(RenderCommand::SetLineWidth(opts.border_width.max(1.0)));
+            // Group border segments by class to minimize SetColor calls.
+            // At low zoom, skip LandLand borders (invisible at sub-2px scale).
+            let skip_land_land = effective_scale < 2.0;
+            let classes = if skip_land_land {
+                &[BorderClass::Coast, BorderClass::SeaSea, BorderClass::Special][..]
             } else {
-                let sa = registry.style_for(a);
-                let sb = registry.style_for(b);
-                match (sa, sb) {
-                    (Some(sa), Some(sb)) => classify_border(sa, sb),
-                    _ => BorderClass::LandLand,
-                }
+                &[
+                    BorderClass::LandLand,
+                    BorderClass::Coast,
+                    BorderClass::SeaSea,
+                    BorderClass::Special,
+                ][..]
             };
-            let c = border_color(class);
-            cmds.push(RenderCommand::SetColor(c[0], c[1], c[2], c[3]));
-            cmds.push(RenderCommand::Line {
-                x1: x0 as f32 * opts.pixel_size,
-                y1: y0 as f32 * opts.pixel_size,
-                x2: x1 as f32 * opts.pixel_size,
-                y2: y1 as f32 * opts.pixel_size,
-            });
+            for &class in classes {
+                let c = border_color(class);
+                cmds.push(RenderCommand::SetColor(c[0], c[1], c[2], c[3]));
+                for &(a, b, x0, y0, x1, y1) in registry.border_segments() {
+                    let min_x = x0.min(x1) as f32;
+                    let max_x = x0.max(x1) as f32;
+                    let min_y = y0.min(y1) as f32;
+                    let max_y = y0.max(y1) as f32;
+                    if max_x < left || min_x > right || max_y < top || min_y > bottom {
+                        continue;
+                    }
+                    let seg_class = if let Some(c) = registry.get_border_class(a, b) {
+                        c
+                    } else {
+                        let sa = registry.style_for(a);
+                        let sb = registry.style_for(b);
+                        match (sa, sb) {
+                            (Some(sa), Some(sb)) => classify_border(sa, sb),
+                            _ => BorderClass::LandLand,
+                        }
+                    };
+                    if seg_class != class {
+                        continue;
+                    }
+                    cmds.push(RenderCommand::Line {
+                        x1: x0 as f32 * opts.pixel_size,
+                        y1: y0 as f32 * opts.pixel_size,
+                        x2: x1 as f32 * opts.pixel_size,
+                        y2: y1 as f32 * opts.pixel_size,
+                    });
+                }
+            }
         }
     }
     if opts.draw_capitals {

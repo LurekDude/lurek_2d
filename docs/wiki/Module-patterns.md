@@ -83,7 +83,7 @@
   - [LEventBus](#leventbus)
   - [LEventBus:clear(event: string)](#leventbusclearevent-string)
   - [LEventBus:clearAll()](#leventbusclearall)
-  - [LEventBus:emit(event: string, ...: table)](#leventbusemitevent-string-table)
+  - [LEventBus:emit(event: string, ...: any)](#leventbusemitevent-string-any)
   - [LEventBus:getEvents() -> string[]](#leventbusgetevents-string)
   - [LEventBus:getListenerCount(event: string) -> number](#leventbusgetlistenercountevent-string-number)
   - [LEventBus:off(id: integer)](#leventbusoffid-integer)
@@ -91,7 +91,7 @@
   - [LFactory](#lfactory)
   - [LFactory:alias(alias: string, canonical: string)](#lfactoryaliasalias-string-canonical-string)
   - [LFactory:clearAll()](#lfactoryclearall)
-  - [LFactory:create(typeName: string, ...: table) -> table](#lfactorycreatetypename-string-table-table)
+  - [LFactory:create(typeName: string, ...: any) -> table](#lfactorycreatetypename-string-any-table)
   - [LFactory:getTypes() -> string[]](#lfactorygettypes-string)
   - [LFactory:has(typeName: string) -> boolean](#lfactoryhastypename-string-boolean)
   - [LFactory:register(typeName: string, ctor: function)](#lfactoryregistertypename-string-ctor-function)
@@ -134,22 +134,22 @@
   - [LMap:set(key: string, value: string)](#lmapsetkey-string-value-string)
   - [LMap:values() -> number[]](#lmapvalues-number)
   - [LMediator](#lmediator)
-  - [LMediator:broadcast(...: table)](#lmediatorbroadcast-table)
+  - [LMediator:broadcast(...: any)](#lmediatorbroadcast-any)
   - [LMediator:channels() -> string[]](#lmediatorchannels-string)
   - [LMediator:clear()](#lmediatorclear)
   - [LMediator:handlerCount(channel: string) -> number](#lmediatorhandlercountchannel-string-number)
   - [LMediator:off(channel: string, id: integer)](#lmediatoroffchannel-string-id-integer)
   - [LMediator:on(channel: string, callback: function) -> number](#lmediatoronchannel-string-callback-function-number)
   - [LMediator:removeChannel(channel: string)](#lmediatorremovechannelchannel-string)
-  - [LMediator:send(channel: string, ...: table)](#lmediatorsendchannel-string-table)
+  - [LMediator:send(channel: string, ...: any)](#lmediatorsendchannel-string-any)
   - [LObjectPool](#lobjectpool)
   - [LObjectPool:acquire() -> table](#lobjectpoolacquire-table)
-  - [LObjectPool:add(value: table)](#lobjectpooladdvalue-table)
+  - [LObjectPool:add(value: any)](#lobjectpooladdvalue-any)
   - [LObjectPool:clearAll()](#lobjectpoolclearall)
   - [LObjectPool:getActiveCount() -> number](#lobjectpoolgetactivecount-number)
   - [LObjectPool:getAvailableCount() -> number](#lobjectpoolgetavailablecount-number)
   - [LObjectPool:getTotalCount() -> number](#lobjectpoolgettotalcount-number)
-  - [LObjectPool:release(value: table)](#lobjectpoolreleasevalue-table)
+  - [LObjectPool:release(value: any)](#lobjectpoolreleasevalue-any)
   - [LObserver](#lobserver)
   - [LObserver:get(key: string) -> number](#lobservergetkey-string-number)
   - [LObserver:getCount() -> number](#lobservergetcount-number)
@@ -158,7 +158,7 @@
   - [LObserver:unsubscribe(id: integer)](#lobserverunsubscribeid-integer)
   - [LPatternGraph](#lpatterngraph)
   - [LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number](#lpatterngraphaddedgefrom-integer-to-integer-weight-number-label-string-number)
-  - [LPatternGraph:addNode([label]: string, [value]: table) -> number](#lpatterngraphaddnodelabel-string-value-table-number)
+  - [LPatternGraph:addNode([label]: string, [value]: any) -> number](#lpatterngraphaddnodelabel-string-value-any-number)
   - [LPatternGraph:bfs(start: integer) -> integer[]](#lpatterngraphbfsstart-integer-integer)
   - [LPatternGraph:clearAll()](#lpatterngraphclearall)
   - [LPatternGraph:dfs(start: integer) -> integer[]](#lpatterngraphdfsstart-integer-integer)
@@ -176,7 +176,7 @@
   - [LPriorityQueue:len() -> number](#lpriorityqueuelen-number)
   - [LPriorityQueue:peek() -> table](#lpriorityqueuepeek-table)
   - [LPriorityQueue:pop() -> table](#lpriorityqueuepop-table)
-  - [LPriorityQueue:push(priority: integer, value: table, [label]: string) -> number](#lpriorityqueuepushpriority-integer-value-table-label-string-number)
+  - [LPriorityQueue:push(priority: integer, value: any, [label]: string) -> number](#lpriorityqueuepushpriority-integer-value-any-label-string-number)
   - [LQueue](#lqueue)
   - [LQueue:back() -> string](#lqueueback-string)
   - [LQueue:clear()](#lqueueclear)
@@ -217,7 +217,7 @@
   - [LServiceLocator:getServices() -> string[]](#lservicelocatorgetservices-string)
   - [LServiceLocator:has(name: string) -> boolean](#lservicelocatorhasname-string-boolean)
   - [LServiceLocator:locate(name: string) -> table](#lservicelocatorlocatename-string-table)
-  - [LServiceLocator:provide(name: string, value: table)](#lservicelocatorprovidename-string-value-table)
+  - [LServiceLocator:provide(name: string, value: any)](#lservicelocatorprovidename-string-value-any)
   - [LServiceLocator:remove(name: string)](#lservicelocatorremovename-string)
   - [LSet](#lset)
   - [LSet:add(key: string) -> boolean](#lsetaddkey-string-boolean)
@@ -256,7 +256,7 @@
   - [LStack:toArray() -> number[]](#lstacktoarray-number)
   - [LStrategy](#lstrategy)
   - [LStrategy:clear()](#lstrategyclear)
-  - [LStrategy:execute(...: table) -> table](#lstrategyexecute-table-table)
+  - [LStrategy:execute(...: any) -> table](#lstrategyexecute-any-table)
   - [LStrategy:getCurrent() -> string](#lstrategygetcurrent-string)
   - [LStrategy:has(name: string) -> boolean](#lstrategyhasname-string-boolean)
   - [LStrategy:names() -> string[]](#lstrategynames-string)
@@ -2308,14 +2308,14 @@ do
 end
 ```
 
-### `LEventBus:emit(event: string, ...: table)`
+### `LEventBus:emit(event: string, ...: any)`
 
 Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
 
 **Parameters**
 
 - `event` (`string`, required) - The event name to emit.
-- `...` (`table`, required) - Additional arguments passed to each listener callback.
+- `...` (`any`, required) - Additional arguments passed to each listener callback.
 
 #### Example
 
@@ -2519,14 +2519,14 @@ do
 end
 ```
 
-### `LFactory:create(typeName: string, ...: table) -> table`
+### `LFactory:create(typeName: string, ...: any) -> table`
 
 Create a new object by type name, passing additional arguments to the constructor.
 
 **Parameters**
 
 - `typeName` (`string`, required) - The registered type to instantiate.
-- `...` (`table`, required) - Extra arguments forwarded to the constructor.
+- `...` (`any`, required) - Extra arguments forwarded to the constructor.
 
 **Returns**: `table` - The created object table.
 
@@ -3516,13 +3516,13 @@ do
 end
 ```
 
-### `LMediator:broadcast(...: table)`
+### `LMediator:broadcast(...: any)`
 
 Send a message to all handlers on all channels. Every registered handler receives the payload.
 
 **Parameters**
 
-- `...` (`table`, required) - Arguments passed to every handler.
+- `...` (`any`, required) - Arguments passed to every handler.
 
 #### Example
 
@@ -3679,14 +3679,14 @@ do
 end
 ```
 
-### `LMediator:send(channel: string, ...: table)`
+### `LMediator:send(channel: string, ...: any)`
 
 Send a message to all handlers on a specific channel with optional payload arguments.
 
 **Parameters**
 
 - `channel` (`string`, required) - The target channel name.
-- `...` (`table`, required) - Additional arguments passed to each handler.
+- `...` (`any`, required) - Additional arguments passed to each handler.
 
 #### Example
 
@@ -3764,13 +3764,13 @@ do
 end
 ```
 
-### `LObjectPool:add(value: table)`
+### `LObjectPool:add(value: any)`
 
 Add an object to the pool's idle set, making it available for future acquisition.
 
 **Parameters**
 
-- `value` (`table`, required) - The object table to store in the pool.
+- `value` (`any`, required) - The object to store in the pool.
 
 #### Example
 
@@ -3875,13 +3875,13 @@ do
 end
 ```
 
-### `LObjectPool:release(value: table)`
+### `LObjectPool:release(value: any)`
 
 Return an active object back to the pool's idle set so it can be reused.
 
 **Parameters**
 
-- `value` (`table`, required) - The object table to release back into the pool.
+- `value` (`any`, required) - The object to release back into the pool.
 
 #### Example
 
@@ -4153,14 +4153,14 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:addNode([label]: string, [value]: table) -> number`
+### `LPatternGraph:addNode([label]: string, [value]: any) -> number`
 
 Add a node to the graph with an optional label and payload value.
 
 **Parameters**
 
 - `label` (`string`, optional) - Optional node label.
-- `value` (`table`, optional) - Optional payload stored with the node.
+- `value` (`any`, optional) - Optional payload stored with the node.
 
 **Returns**: `number` - The new node's ID.
 
@@ -5043,14 +5043,14 @@ do
 end
 ```
 
-### `LPriorityQueue:push(priority: integer, value: table, [label]: string) -> number`
+### `LPriorityQueue:push(priority: integer, value: any, [label]: string) -> number`
 
 Add an item with a numeric priority. Higher priority items are dequeued first.
 
 **Parameters**
 
 - `priority` (`integer`, required) - The priority value (higher = dequeued sooner).
-- `value` (`table`, required) - The payload table to store.
+- `value` (`any`, required) - The payload to store.
 - `label` (`string`, optional) - Optional human-readable label for debugging.
 
 **Returns**: `number` - The internal ID of the enqueued item.
@@ -6000,14 +6000,14 @@ do
 end
 ```
 
-### `LServiceLocator:provide(name: string, value: table)`
+### `LServiceLocator:provide(name: string, value: any)`
 
 Register a service instance under a given name. Replaces any previously registered service with the same name.
 
 **Parameters**
 
 - `name` (`string`, required) - Unique identifier for the service.
-- `value` (`table`, required) - The service table to register.
+- `value` (`any`, required) - The service to register.
 
 #### Example
 
@@ -6918,13 +6918,13 @@ do
 end
 ```
 
-### `LStrategy:execute(...: table) -> table`
+### `LStrategy:execute(...: any) -> table`
 
 Execute the currently active strategy, passing through all arguments and returning its results.
 
 **Parameters**
 
-- `...` (`table`, required) - Arguments forwarded to the active strategy function.
+- `...` (`any`, required) - Arguments forwarded to the active strategy function.
 
 **Returns**: `table` - Return value from the strategy function.
 

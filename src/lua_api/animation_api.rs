@@ -847,11 +847,11 @@ impl LuaUserData for LuaAnimSyncGroup {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Adds an animation-like handle to the sync group.
-        /// @param | handle | table | Animation handle accepted by future sync group implementations.
+        /// @param | handle | integer | Animation handle accepted by future sync group implementations.
         methods.add_method_mut("add", |_, _this, _handle: LuaValue| Ok(()));
         // -- remove --
         /// Removes an animation-like handle from the sync group.
-        /// @param | handle | table | Animation handle accepted by future sync group implementations.
+        /// @param | handle | integer | Animation handle accepted by future sync group implementations.
         methods.add_method_mut("remove", |_, _this, _handle: LuaValue| Ok(()));
         // -- clear --
         /// Removes all members from the sync group.

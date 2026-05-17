@@ -329,6 +329,8 @@ pub enum RenderCommand {
         width: u32,
         height: u32,
     },
+    /// Mark a canvas as needing a full clear before its next render pass.
+    ResetCanvas(CanvasKey),
     /// Draw a list of screen-space points.
     Points { points: Vec<(f32, f32)> },
     /// Set the point-sprite size in pixels.

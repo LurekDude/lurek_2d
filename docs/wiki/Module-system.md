@@ -721,6 +721,7 @@ do
   }
   -- stopOnError skips remaining tasks after the first failure
   local results = lurek.runtime.runBatch(tasks, { stopOnError = true })
+  ---@diagnostic disable-next-line: undefined-field
   lurek.log.info("batch completed: warmup=" .. results.warmup_cache.status, "boot")
 end
 ```

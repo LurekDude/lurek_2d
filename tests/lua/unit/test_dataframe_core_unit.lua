@@ -306,7 +306,7 @@ describe("column operations", function()
     -- @covers LDataFrame:getColumn
     it("getColumn by index works", function()
         local df = make_test_df()
-        local names = df:getColumn(1)
+        local names = df:getColumn(1 --[[@as string]])
         expect_equal(3, #names)
         expect_equal("Alice", names[1])
     end)
@@ -384,7 +384,7 @@ describe("cell access", function()
     -- @covers LDataFrame:getValue
     it("getValue by column index", function()
         local df = make_test_df()
-        expect_equal("Alice", df:getValue(1, 1))
+        expect_equal("Alice", df:getValue(1, 1 --[[@as string]]))
     end)
 
     -- @covers LDataFrame:getValue
@@ -641,7 +641,7 @@ describe("select", function()
     -- @covers LDataFrame:select
     it("select by column index", function()
         local df = make_test_df()
-        local s = df:select(1, 3)
+        local s = df:select(1 --[[@as string]], 3 --[[@as string]])
         expect_equal(2, s:ncols())
     end)
 
@@ -809,7 +809,7 @@ describe("countBy", function()
         -- Sum of all counts should equal total rows
         local total = 0
         for i = 1, result:nrows() do
-            total = total + result:getValue(i, 2)
+            total = total + result:getValue(i, 2 --[[@as string]])
         end
         expect_near(5, total, 1e-5)
     end)
@@ -967,7 +967,7 @@ describe("analytics", function()
     it("analytics by column index", function()
         local df = make_test_df()
         -- column 2 = age, sum = 90
-        expect_near(90, df:sum(2), 1e-5)
+        expect_near(90, df:sum(2 --[[@as string]]), 1e-5)
     end)
 end)
 

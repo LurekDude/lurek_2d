@@ -6,14 +6,14 @@
 ]]
 
 -- Action inputs
-lurek.input.bind("aim_up", {"w", "up"})
-lurek.input.bind("aim_down", {"s", "down"})
-lurek.input.bind("aim_left", {"a", "left"})
-lurek.input.bind("aim_right", {"d", "right"})
-lurek.input.bind("fire", {"space"})
-lurek.input.bind("hold_breath", {"lshift", "rshift"})
-lurek.input.bind("quit", {"escape"})
-lurek.input.bind("start", {"return"})
+lurek.input.bind("aim_up", "w");         lurek.input.bind("aim_up", "up")
+lurek.input.bind("aim_down", "s");       lurek.input.bind("aim_down", "down")
+lurek.input.bind("aim_left", "a");       lurek.input.bind("aim_left", "left")
+lurek.input.bind("aim_right", "d");      lurek.input.bind("aim_right", "right")
+lurek.input.bind("fire", "space")
+lurek.input.bind("hold_breath", "lshift"); lurek.input.bind("hold_breath", "rshift")
+lurek.input.bind("quit", "escape")
+lurek.input.bind("start", "return")
 
 -- Constants
 local W, H = 800, 600

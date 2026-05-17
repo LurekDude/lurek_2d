@@ -6,7 +6,7 @@
 -- Module-level functions
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: lurek.globe.new
+--@api-stub: LGlobeRegistry:new
 -- Creates a named globe with optional specification fields in the module registry
 do
   -- lurek.globe.new(name, spec_tbl?) -> LGlobe
@@ -22,7 +22,7 @@ do
   lurek.log.info("created globe '" .. g:getName() .. "' with borders enabled", "globe")
 end
 
---@api-stub: lurek.globe.get
+--@api-stub: LGlobeRegistry:get
 -- Returns a globe from the module registry by name
 do
   -- lurek.globe.get(name) -> LGlobe | nil
@@ -141,7 +141,7 @@ end
 -- Province management
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:addProvince
+--@api-stub: LGlobe:addProvince
 -- Adds a province to this globe.
 do
   -- Globe:addProvince(table) -> boolean
@@ -173,7 +173,7 @@ do
   })
 end
 
---@api-stub: Globe:removeProvince
+--@api-stub: LGlobe:removeProvince
 -- Removes a province from this globe.
 do
   -- Globe:removeProvince(id) -> boolean
@@ -187,7 +187,7 @@ do
     tostring(existed), count_before, g:provinceCount()), "globe")
 end
 
---@api-stub: Globe:provinceCount
+--@api-stub: LGlobe:provinceCount
 -- Returns the number of provinces currently in this globe.
 do
   -- Globe:provinceCount() -> integer
@@ -199,7 +199,7 @@ do
   lurek.log.info("total provinces = " .. g:provinceCount(), "globe")
 end
 
---@api-stub: Globe:getNeighbors
+--@api-stub: LGlobe:getNeighbors
 -- Returns the neighbor province ids for a given province.
 do
   -- Globe:getNeighbors(id) -> {id, id, ...}
@@ -215,7 +215,7 @@ do
   lurek.log.info("province 1 borders " .. #nbrs .. " neighbors: " .. table.concat(nbrs, ", "), "globe")
 end
 
---@api-stub: Globe:getProvinceAttr
+--@api-stub: LGlobe:getProvinceAttr
 -- Returns a string attribute stored on a province.
 do
   -- Globe:getProvinceAttr(id, key) -> string | nil
@@ -231,7 +231,7 @@ do
   lurek.log.info(string.format("province 1: owner=%s, terrain=%s", owner, terrain), "globe")
 end
 
---@api-stub: Globe:setProvinceAttr
+--@api-stub: LGlobe:setProvinceAttr
 -- Sets a string attribute on a province.
 do
   -- Globe:setProvinceAttr(id, key, value) -> boolean
@@ -248,7 +248,7 @@ do
   lurek.log.info("province 3 population = " .. g:getProvinceAttr(3, "population"), "globe")
 end
 
---@api-stub: Globe:setProvinceTexture
+--@api-stub: LGlobe:setProvinceTexture
 -- Sets a raw texture handle and UV rectangle on a province for textured rendering.
 do
   -- Globe:setProvinceTexture(id, tex_raw, u0, v0, u1, v1) -> boolean
@@ -262,7 +262,7 @@ do
   g:setProvinceTexture(1, 0, 0.0, 0.0, 0.5, 0.5)
 end
 
---@api-stub: Globe:clearProvinceTexture
+--@api-stub: LGlobe:clearProvinceTexture
 -- Clears texture metadata from a province, reverting to base color rendering.
 do
   -- Globe:clearProvinceTexture(id) -> boolean
@@ -279,7 +279,7 @@ end
 -- Camera and navigation
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:pan
+--@api-stub: LGlobe:pan
 -- Pans the globe camera by latitude and longitude deltas.
 do
   -- Globe:pan(dlat, dlon) -> nil
@@ -297,7 +297,7 @@ do
   end
 end
 
---@api-stub: Globe:zoom
+--@api-stub: LGlobe:zoom
 -- Multiplies the globe camera zoom by a factor.
 do
   -- Globe:zoom(factor) -> nil
@@ -316,7 +316,7 @@ do
   end
 end
 
---@api-stub: Globe:setCamera
+--@api-stub: LGlobe:setCamera
 -- Sets the camera latitude, longitude, and zoom directly.
 do
   -- Globe:setCamera(lat, lon, zoom) -> nil
@@ -330,7 +330,7 @@ do
   lurek.log.info(string.format("camera at (%.2f, %.2f) zoom=%.1f", lat, lon, z), "globe")
 end
 
---@api-stub: Globe:getCamera
+--@api-stub: LGlobe:getCamera
 -- Returns the camera latitude, longitude, and zoom as three values.
 do
   -- Globe:getCamera() -> lat, lon, zoom
@@ -345,7 +345,7 @@ do
   lurek.log.info("camera state saved: " .. save_data, "globe")
 end
 
---@api-stub: Globe:getLod
+--@api-stub: LGlobe:getLod
 -- Returns the current level-of-detail tier based on camera zoom.
 do
   -- Globe:getLod() -> "far" | "mid" | "near"
@@ -365,7 +365,7 @@ do
   end
 end
 
---@api-stub: Globe:setRotation
+--@api-stub: LGlobe:setRotation
 -- Sets the globe rotation angle in degrees.
 do
   -- Globe:setRotation(deg) -> nil
@@ -394,7 +394,7 @@ end
 -- Picking and interaction
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:pick
+--@api-stub: LGlobe:pick
 -- Picks a province at screen coordinates using the fastest internal method.
 do
   -- Globe:pick(sx, sy) -> province_id | nil
@@ -416,7 +416,7 @@ do
   end
 end
 
---@api-stub: Globe:pickLatLon
+--@api-stub: LGlobe:pickLatLon
 -- Picks at screen coordinates and returns the hit province centroid in screen space.
 do
   -- Globe:pickLatLon(sx, sy) -> centroid_x, centroid_y | nil, nil
@@ -438,7 +438,7 @@ do
   end
 end
 
---@api-stub: Globe:pickRaycast
+--@api-stub: LGlobe:pickRaycast
 -- Performs a raycast pick by sampling along a screen ray from center to target.
 do
   -- Globe:pickRaycast(sx, sy, steps?) -> province_id | nil
@@ -459,7 +459,7 @@ end
 -- Fog of war
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:setActiveViewer
+--@api-stub: LGlobe:setActiveViewer
 -- Sets the active fog-of-war viewer name for rendering.
 do
   -- Globe:setActiveViewer(viewer?) -> nil
@@ -476,7 +476,7 @@ do
   lurek.log.info("viewing world as blue_faction", "globe")
 end
 
---@api-stub: Globe:revealProvince
+--@api-stub: LGlobe:revealProvince
 -- Reveals a single province for one fog-of-war viewer.
 do
   -- Globe:revealProvince(viewer, id) -> nil
@@ -492,7 +492,7 @@ do
   lurek.log.info("blue scouted provinces 12 and 13", "globe")
 end
 
---@api-stub: Globe:hideProvince
+--@api-stub: LGlobe:hideProvince
 -- Hides a province for one fog-of-war viewer (re-fogs it).
 do
   -- Globe:hideProvince(viewer, id) -> nil
@@ -506,7 +506,7 @@ do
   lurek.log.info("province 5 re-fogged for blue (enemy jammer active)", "globe")
 end
 
---@api-stub: Globe:isVisible
+--@api-stub: LGlobe:isVisible
 -- Returns whether a province is currently visible to a fog-of-war viewer.
 do
   -- Globe:isVisible(viewer, id) -> boolean
@@ -522,7 +522,7 @@ do
   end
 end
 
---@api-stub: Globe:revealAll
+--@api-stub: LGlobe:revealAll
 -- Reveals every province for one fog-of-war viewer.
 do
   -- Globe:revealAll(viewer) -> nil
@@ -609,7 +609,7 @@ end
 -- Markers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:addMarker
+--@api-stub: LGlobe:addMarker
 -- Adds a marker at latitude and longitude with an optional label.
 do
   -- Globe:addMarker(type, lat, lon, label?) -> marker_id
@@ -623,7 +623,7 @@ do
   lurek.log.info("placed marker id=" .. mid .. " at province 5 centroid", "globe")
 end
 
---@api-stub: Globe:removeMarker
+--@api-stub: LGlobe:removeMarker
 -- Removes a marker from this globe by id.
 do
   -- Globe:removeMarker(id) -> boolean
@@ -636,7 +636,7 @@ do
   lurek.log.info("marker " .. id .. " removed=" .. tostring(ok), "globe")
 end
 
---@api-stub: Globe:moveMarker
+--@api-stub: LGlobe:moveMarker
 -- Moves an existing marker to new latitude and longitude coordinates.
 do
   -- Globe:moveMarker(id, lat, lon) -> boolean
@@ -652,7 +652,7 @@ do
   end
 end
 
---@api-stub: Globe:setMarkerVisible
+--@api-stub: LGlobe:setMarkerVisible
 -- Shows or hides a marker without removing it.
 do
   -- Globe:setMarkerVisible(id, visible) -> boolean
@@ -666,7 +666,7 @@ do
   -- Re-show after cutscene: g:setMarkerVisible(hq_id, true)
 end
 
---@api-stub: Globe:getMarkerAttr
+--@api-stub: LGlobe:getMarkerAttr
 -- Returns a string attribute stored on a marker.
 do
   -- Globe:getMarkerAttr(id, key) -> string | nil
@@ -680,7 +680,7 @@ do
   lurek.log.info("Alpha Squad fuel = " .. fuel .. "%", "globe")
 end
 
---@api-stub: Globe:setMarkerAttr
+--@api-stub: LGlobe:setMarkerAttr
 -- Sets a string attribute on a marker for storing game state.
 do
   -- Globe:setMarkerAttr(id, key, value) -> boolean
@@ -726,7 +726,7 @@ end
 -- Labels
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:addLabel
+--@api-stub: LGlobe:addLabel
 -- Adds a text label at latitude and longitude on the globe.
 do
   -- Globe:addLabel(type, lat, lon, text) -> label_id
@@ -740,7 +740,7 @@ do
   lurek.log.info("placed city label id=" .. city_id, "globe")
 end
 
---@api-stub: Globe:setLabelText
+--@api-stub: LGlobe:setLabelText
 -- Changes the text of an existing label.
 do
   -- Globe:setLabelText(id, new_text) -> boolean
@@ -753,7 +753,7 @@ do
   lurek.log.info("city " .. id .. " renamed", "globe")
 end
 
---@api-stub: Globe:setLabelVisible
+--@api-stub: LGlobe:setLabelVisible
 -- Shows or hides a label based on visibility flag.
 do
   -- Globe:setLabelVisible(id, visible) -> boolean
@@ -767,7 +767,7 @@ do
   lurek.log.info("label visible = " .. tostring(show) .. " (LOD=" .. g:getLod() .. ")", "globe")
 end
 
---@api-stub: Globe:removeLabel
+--@api-stub: LGlobe:removeLabel
 -- Removes a label from this globe by id.
 do
   -- Globe:removeLabel(id) -> boolean
@@ -783,7 +783,7 @@ end
 -- Render layers
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:addLayer
+--@api-stub: LGlobe:addLayer
 -- Adds a named render layer with optional z-order for province color overlays.
 do
   -- Globe:addLayer(name, z_order?) -> nil
@@ -798,7 +798,7 @@ do
   lurek.log.info("3 render layers configured", "globe")
 end
 
---@api-stub: Globe:removeLayer
+--@api-stub: LGlobe:removeLayer
 -- Removes a render layer from this globe by name.
 do
   -- Globe:removeLayer(name) -> boolean
@@ -809,7 +809,7 @@ do
   lurek.log.info("weather layer removed=" .. tostring(ok), "globe")
 end
 
---@api-stub: Globe:setLayerVisible
+--@api-stub: LGlobe:setLayerVisible
 -- Shows or hides a render layer by name.
 do
   -- Globe:setLayerVisible(name, visible) -> boolean
@@ -822,7 +822,7 @@ do
   lurek.log.info("political overlay hidden", "globe")
 end
 
---@api-stub: Globe:setLayerAlpha
+--@api-stub: LGlobe:setLayerAlpha
 -- Sets the opacity of a render layer (0.0 = transparent, 1.0 = opaque).
 do
   -- Globe:setLayerAlpha(name, alpha) -> boolean
@@ -837,7 +837,7 @@ do
   end
 end
 
---@api-stub: Globe:setLayerColor
+--@api-stub: LGlobe:setLayerColor
 -- Sets a per-province color override inside a specific render layer.
 do
   -- Globe:setLayerColor(layer_name, province_id, r, g, b, a) -> boolean
@@ -858,7 +858,7 @@ end
 -- Arcs (route visualization)
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:addArc
+--@api-stub: LGlobe:addArc
 -- Adds a visible route arc between two lat/lon points on the globe.
 do
   -- Globe:addArc(lat1, lon1, lat2, lon2, steps?) -> arc_id
@@ -873,7 +873,7 @@ do
   lurek.log.info("trade route arc id=" .. arc_id, "globe")
 end
 
---@api-stub: Globe:removeArc
+--@api-stub: LGlobe:removeArc
 -- Removes a route arc from this globe by id.
 do
   -- Globe:removeArc(id) -> boolean
@@ -972,7 +972,7 @@ end
 -- Time of day and simulation
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:setTimeOfDay
+--@api-stub: LGlobe:setTimeOfDay
 -- Sets the globe time of day (0-24 hours) for day/night rendering.
 do
   -- Globe:setTimeOfDay(hours) -> nil
@@ -986,7 +986,7 @@ do
   end
 end
 
---@api-stub: Globe:getTimeOfDay
+--@api-stub: LGlobe:getTimeOfDay
 -- Returns the current globe time of day in hours (0-24).
 do
   -- Globe:getTimeOfDay() -> number
@@ -1002,7 +1002,7 @@ do
   end
 end
 
---@api-stub: Globe:update
+--@api-stub: LGlobe:update
 -- Advances globe simulation (rotation, marker animations, timers) by delta time.
 do
   -- Globe:update(dt) -> nil
@@ -1017,7 +1017,7 @@ do
   end
 end
 
---@api-stub: Globe:setBorders
+--@api-stub: LGlobe:setBorders
 -- Enables or disables province border rendering.
 do
   -- Globe:setBorders(show) -> nil
@@ -1038,7 +1038,7 @@ end
 -- Pathfinding and reachability
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:findPath
+--@api-stub: LGlobe:findPath
 -- Finds the shortest province path between two province ids using default costs.
 do
   -- Globe:findPath(from_id, to_id) -> {id, id, ...} | nil
@@ -1058,7 +1058,7 @@ do
   end
 end
 
---@api-stub: Globe:reachable
+--@api-stub: LGlobe:reachable
 -- Returns all provinces reachable from a start province within a cost budget.
 do
   -- Globe:reachable(start_id, max_cost) -> {[id] = cost, ...}
@@ -1113,7 +1113,7 @@ end
 -- Export and utility
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:exportProvinceMeshOBJ
+--@api-stub: LGlobe:exportProvinceMeshOBJ
 -- Exports all province geometry as a Wavefront OBJ string for external tools.
 do
   -- Globe:exportProvinceMeshOBJ() -> string
@@ -1128,7 +1128,7 @@ do
   lurek.log.info("exported " .. #obj_text .. " bytes of OBJ mesh", "globe")
 end
 
---@api-stub: Globe:getName
+--@api-stub: LGlobe:getName
 -- Returns the registry name of this globe.
 do
   -- Globe:getName() -> string
@@ -1144,7 +1144,7 @@ end
 -- Globe Registry
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: GlobeRegistry:new
+--@api-stub: LGlobeRegistry:new
 -- Creates and returns a new named globe in the shared registry.
 do
   -- lurek.globe.new(name, spec_tbl?) -> LGlobe
@@ -1154,7 +1154,7 @@ do
   lurek.log.info("registry globe '" .. g:getName() .. "' created", "globe")
 end
 
---@api-stub: GlobeRegistry:get
+--@api-stub: LGlobeRegistry:get
 -- Returns a globe from the registry by name, or nil if not found.
 do
   -- lurek.globe.get(name) -> LGlobe | nil
@@ -1166,7 +1166,7 @@ do
   end
 end
 
---@api-stub: GlobeRegistry:remove
+--@api-stub: LGlobeRegistry:remove
 -- Removes a globe from the registry by name.
 do
   -- Currently the globe is dropped when no Lua handles remain.
@@ -1178,7 +1178,7 @@ do
   end
 end
 
---@api-stub: GlobeRegistry:names
+--@api-stub: LGlobeRegistry:names
 -- Returns all globe names currently stored in the registry.
 do
   -- Useful for debugging or building a globe-selection UI.
@@ -1193,7 +1193,7 @@ end
 -- Type introspection
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: LGlobe:type
+--@api-stub: LGlobeRegistry:type
 -- Returns the Lua-visible type name for this globe handle
 do
   -- Globe:type() -> "LGlobe"
@@ -1203,7 +1203,7 @@ do
   lurek.log.info("LGlobe:type() = " .. t, "globe")
 end
 
---@api-stub: LGlobe:typeOf
+--@api-stub: LGlobeRegistry:typeOf
 -- Returns whether this globe handle matches a supported type name
 do
   -- Globe:typeOf(name) -> boolean
@@ -1245,364 +1245,3 @@ print("content/examples/globe.lua")
 -- -----------------------------------------------------------------------------
 -- LGlobe methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LGlobe:addProvince --------------------------------------------
---@api-stub: LGlobe:addProvince
--- Adds a province described by id, centroid, vertices, neighbors, and optional base color.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:addProvince(p)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:removeProvince -----------------------------------------
---@api-stub: LGlobe:removeProvince
--- Removes a province by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:removeProvince(1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:provinceCount ------------------------------------------
---@api-stub: LGlobe:provinceCount
--- Returns the number of provinces in this globe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:provinceCount()  -- -> integer
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getNeighbors -------------------------------------------
---@api-stub: LGlobe:getNeighbors
--- Returns neighboring province ids for a province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getNeighbors(1)  -- -> table
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setProvinceAttr ----------------------------------------
---@api-stub: LGlobe:setProvinceAttr
--- Sets a string attribute on a province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setProvinceAttr(1, "player_score", val)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getProvinceAttr ----------------------------------------
---@api-stub: LGlobe:getProvinceAttr
--- Reads a string attribute from a province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getProvinceAttr(1, "player_score")  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setProvinceTexture -------------------------------------
---@api-stub: LGlobe:setProvinceTexture
--- Assigns a raw texture handle and UV rectangle to a province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setProvinceTexture(1, tex_raw, u0, v0, u1, v1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:clearProvinceTexture -----------------------------------
---@api-stub: LGlobe:clearProvinceTexture
--- Removes texture metadata from a province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:clearProvinceTexture(1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:pan ----------------------------------------------------
---@api-stub: LGlobe:pan
--- Pans the globe camera by latitude and longitude deltas.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:pan(dlat, dlon)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:zoom ---------------------------------------------------
---@api-stub: LGlobe:zoom
--- Multiplies the globe camera zoom by a factor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:zoom(factor)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setCamera ----------------------------------------------
---@api-stub: LGlobe:setCamera
--- Sets camera latitude, longitude, and zoom.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setCamera(lat, lon, 0)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getCamera ----------------------------------------------
---@api-stub: LGlobe:getCamera
--- Returns camera latitude, longitude, and zoom.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getCamera()  -- -> number
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getLod -------------------------------------------------
---@api-stub: LGlobe:getLod
--- Returns the camera-derived level-of-detail tier name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getLod()  -- -> string
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:pick ---------------------------------------------------
---@api-stub: LGlobe:pick
--- Picks a province at screen coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:pick(1.0, 1.0)  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:pickRaycast --------------------------------------------
---@api-stub: LGlobe:pickRaycast
--- Samples along a screen ray from the camera center and returns the first hit province.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:pickRaycast(1.0, 1.0, [steps])  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:pickLatLon ---------------------------------------------
---@api-stub: LGlobe:pickLatLon
--- Picks at screen coordinates and returns the hit province centroid screen coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:pickLatLon(1.0, 1.0)  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setActiveViewer ----------------------------------------
---@api-stub: LGlobe:setActiveViewer
--- Sets the active fog-of-war viewer name or clears it.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setActiveViewer([viewer])
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:revealProvince -----------------------------------------
---@api-stub: LGlobe:revealProvince
--- Reveals a province for one fog-of-war viewer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:revealProvince(viewer, 1)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:hideProvince -------------------------------------------
---@api-stub: LGlobe:hideProvince
--- Hides a province for one fog-of-war viewer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:hideProvince(viewer, 1)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:isVisible ----------------------------------------------
---@api-stub: LGlobe:isVisible
--- Returns whether a province is visible for one fog-of-war viewer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:isVisible(viewer, 1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:revealAll ----------------------------------------------
---@api-stub: LGlobe:revealAll
--- Reveals every province for one fog-of-war viewer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:revealAll(viewer)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:addMarker ----------------------------------------------
---@api-stub: LGlobe:addMarker
--- Adds a marker at latitude and longitude with an optional label.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:addMarker(mtype, lat, lon, [label])  -- -> integer
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:removeMarker -------------------------------------------
---@api-stub: LGlobe:removeMarker
--- Removes a marker by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:removeMarker(1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:moveMarker ---------------------------------------------
---@api-stub: LGlobe:moveMarker
--- Moves a marker to latitude and longitude coordinates.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:moveMarker(1, lat, lon)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setMarkerVisible ---------------------------------------
---@api-stub: LGlobe:setMarkerVisible
--- Shows or hides a marker. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setMarkerVisible(1, vis)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setMarkerAttr ------------------------------------------
---@api-stub: LGlobe:setMarkerAttr
--- Sets a string attribute on a marker.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setMarkerAttr(1, "player_score", val)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getMarkerAttr ------------------------------------------
---@api-stub: LGlobe:getMarkerAttr
--- Reads a string attribute from a marker.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getMarkerAttr(1, "player_score")  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:addLabel -----------------------------------------------
---@api-stub: LGlobe:addLabel
--- Adds a text label at latitude and longitude.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:addLabel(ltype, lat, lon, "Hello, world!")  -- -> integer
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setLabelText -------------------------------------------
---@api-stub: LGlobe:setLabelText
--- Changes text for an existing label.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setLabelText(1, "Hello, world!")  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setLabelVisible ----------------------------------------
---@api-stub: LGlobe:setLabelVisible
--- Shows or hides a label. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setLabelVisible(1, vis)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:removeLabel --------------------------------------------
---@api-stub: LGlobe:removeLabel
--- Removes a label by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:removeLabel(1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:addLayer -----------------------------------------------
---@api-stub: LGlobe:addLayer
--- Adds a render layer with optional z-order.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:addLayer("hero", [z_order])
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:removeLayer --------------------------------------------
---@api-stub: LGlobe:removeLayer
--- Removes a render layer by name. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:removeLayer("hero")  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setLayerColor ------------------------------------------
---@api-stub: LGlobe:setLayerColor
--- Sets a province color override inside a render layer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setLayerColor(1, 1, 1.0, 0.8, 0.2, 1.0)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setLayerVisible ----------------------------------------
---@api-stub: LGlobe:setLayerVisible
--- Shows or hides a render layer. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setLayerVisible("hero", vis)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setLayerAlpha ------------------------------------------
---@api-stub: LGlobe:setLayerAlpha
--- Sets render layer alpha. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setLayerAlpha("hero", alpha)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setTimeOfDay -------------------------------------------
---@api-stub: LGlobe:setTimeOfDay
--- Sets globe time of day modulo 24 hours.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setTimeOfDay(t)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getTimeOfDay -------------------------------------------
---@api-stub: LGlobe:getTimeOfDay
--- Returns globe time of day. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getTimeOfDay()  -- -> number
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setRotation --------------------------------------------
---@api-stub: LGlobe:setRotation
--- Sets globe rotation angle. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setRotation(deg)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:update -------------------------------------------------
---@api-stub: LGlobe:update
--- Advances globe simulation timers and animated state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:update(0.016)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:setBorders ---------------------------------------------
---@api-stub: LGlobe:setBorders
--- Enables or disables province border rendering.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:setBorders(show)
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:findPath -----------------------------------------------
---@api-stub: LGlobe:findPath
--- Finds a default-cost province path between two province ids.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:findPath(from_id, to_id)  -- -> LuaValue
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:reachable ----------------------------------------------
---@api-stub: LGlobe:reachable
--- Returns provinces reachable from a start province within a cost budget.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:reachable(start_id, max_cost)  -- -> table
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:exportProvinceMeshOBJ ----------------------------------
---@api-stub: LGlobe:exportProvinceMeshOBJ
--- Exports province geometry as Wavefront OBJ text.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:exportProvinceMeshOBJ()  -- -> string
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:addArc -------------------------------------------------
---@api-stub: LGlobe:addArc
--- Adds a visible route arc between two latitude and longitude points.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:addArc(lat1, lon1, lat2, lon2, [steps])  -- -> integer
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:removeArc ----------------------------------------------
---@api-stub: LGlobe:removeArc
--- Removes an arc by id. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:removeArc(1)  -- -> boolean
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- ---- Stub: LGlobe:getName ------------------------------------------------
---@api-stub: LGlobe:getName
--- Returns the registry name of this globe.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobe_stub:getName()  -- -> string
--- (replace lGlobe_stub with your real LGlobe instance above)
-
--- -----------------------------------------------------------------------------
--- LGlobeRegistry methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LGlobeRegistry:new --------------------------------------------
---@api-stub: LGlobeRegistry:new
--- Creates a named globe with optional specification fields.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobeRegistry_stub:new("hero", [spec_tbl])  -- -> LGlobe
--- (replace lGlobeRegistry_stub with your real LGlobeRegistry instance above)
-
--- ---- Stub: LGlobeRegistry:get --------------------------------------------
---@api-stub: LGlobeRegistry:get
--- Returns a globe handle by registry name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobeRegistry_stub:get("hero")  -- -> LuaValue
--- (replace lGlobeRegistry_stub with your real LGlobeRegistry instance above)
-
--- ---- Stub: LGlobeRegistry:remove -----------------------------------------
---@api-stub: LGlobeRegistry:remove
--- Removes a globe from the registry by name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobeRegistry_stub:remove("hero")  -- -> boolean
--- (replace lGlobeRegistry_stub with your real LGlobeRegistry instance above)
-
--- ---- Stub: LGlobeRegistry:names ------------------------------------------
---@api-stub: LGlobeRegistry:names
--- Returns all globe names currently stored in this registry.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGlobeRegistry_stub:names()  -- -> table
--- (replace lGlobeRegistry_stub with your real LGlobeRegistry instance above)

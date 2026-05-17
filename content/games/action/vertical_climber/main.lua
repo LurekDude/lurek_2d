@@ -293,10 +293,10 @@ function lurek.init()
     lurek.render.setBackgroundColor(0.6, 0.75, 0.9)
 
     -- Input actions
-    lurek.input.bind("left",  {"a", "left"})
-    lurek.input.bind("right", {"d", "right"})
-    lurek.input.bind("shoot", {"space", "w"})
-    lurek.input.bind("quit",  {"escape"})
+    lurek.input.bind("left",  "a");    lurek.input.bind("left",  "left")
+    lurek.input.bind("right", "d");    lurek.input.bind("right", "right")
+    lurek.input.bind("shoot", "space"); lurek.input.bind("shoot", "w")
+    lurek.input.bind("quit",  "escape")
 
     -- Camera
     cam = lurek.camera.new(SCREEN_W, SCREEN_H)

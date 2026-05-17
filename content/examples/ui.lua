@@ -79,7 +79,7 @@ do
   dialog:cancelAnimations()
 end
 
---@api-stub: lurek.ui.setPosition
+--@api-stub: LUiWidget:setPosition
 -- Sets the position of this ui widget.
 do
   -- setPosition is a method on each widget instance (not a lurek.ui global).
@@ -88,7 +88,7 @@ do
   label:setPosition(100, 200)
 end
 
---@api-stub: lurek.ui.getPosition
+--@api-stub: LUiWidget:getPosition
 -- Returns the position of this ui widget.
 do
   -- getPosition is also a widget method; use colon syntax.
@@ -98,7 +98,7 @@ do
   print("Widget at:", x, y)
 end
 
---@api-stub: lurek.ui.setSize
+--@api-stub: LUiWidget:setSize
 -- Sets the size of this ui.
 do
   -- Resize the dialog box to fit varying amounts of NPC dialogue text.
@@ -107,7 +107,7 @@ do
   _w:setSize(320, 80)
 end
 
---@api-stub: lurek.ui.getSize
+--@api-stub: LUiWidget:getSize
 -- Returns the size of this ui.
 do
   -- Query the panel size to center a child element manually.
@@ -116,7 +116,7 @@ do
   print("Panel size:", w, "x", h)
 end
 
---@api-stub: lurek.ui.getRect
+--@api-stub: LUiWidget:getRect
 -- Returns the rect of this ui.
 do
   -- Get the bounding rectangle (x, y, w, h) for hit-testing or overlap checks.
@@ -126,7 +126,7 @@ do
   print("Bounding rect:", rect)
 end
 
---@api-stub: lurek.ui.setVisible
+--@api-stub: LUiWidget:setVisible
 -- Sets the visibility flag for this ui.
 do
   -- Show the game-over screen when the player's HP reaches zero.
@@ -135,7 +135,7 @@ do
   _w:setVisible(true)
 end
 
---@api-stub: lurek.ui.isVisible
+--@api-stub: LUiWidget:isVisible
 -- Returns true if this ui is currently visible.
 do
   -- Check visibility before toggling — avoids redundant show/hide calls.
@@ -144,7 +144,7 @@ do
   print("Currently visible:", shown)
 end
 
---@api-stub: lurek.ui.setEnabled
+--@api-stub: LUiWidget:setEnabled
 -- Sets whether this ui is enabled and accepts input.
 do
   -- Disable the "Buy" button when the player lacks enough gold.
@@ -153,7 +153,7 @@ do
   _w:setEnabled(true)
 end
 
---@api-stub: lurek.ui.isEnabled
+--@api-stub: LUiWidget:isEnabled
 -- Returns true if this ui is currently enabled.
 do
   -- Guard input handlers — skip processing if the widget is disabled.
@@ -162,7 +162,7 @@ do
   print("Accepts input:", active)
 end
 
---@api-stub: lurek.ui.setId
+--@api-stub: LUiWidget:setId
 -- Sets the id of this ui.
 do
   -- Assign a unique string ID for later lookup with findById().
@@ -171,7 +171,7 @@ do
   _w:setId("hud_health_bar")
 end
 
---@api-stub: lurek.ui.getId
+--@api-stub: LUiWidget:getId
 -- Returns the id of this ui.
 do
   -- Retrieve the ID to log which widget received a click event.
@@ -180,7 +180,7 @@ do
   print("Clicked widget ID:", id)
 end
 
---@api-stub: lurek.ui.setTooltip
+--@api-stub: LUiWidget:setTooltip
 -- Sets the tooltip of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -188,7 +188,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getTooltip
+--@api-stub: LUiWidget:getTooltip
 -- Returns the tooltip of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -197,7 +197,7 @@ do
   print("getTooltip:", v)
 end
 
---@api-stub: lurek.ui.getState
+--@api-stub: LUiWidget:getState
 -- Returns the state of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -205,7 +205,7 @@ do
   print("getState:", v)
 end
 
---@api-stub: lurek.ui.addChild
+--@api-stub: LUiWidget:addChild
 -- Adds a child to this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -213,7 +213,7 @@ do
   print("added")
 end
 
---@api-stub: lurek.ui.removeChild
+--@api-stub: LUiWidget:removeChild
 -- Removes a child from this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -221,7 +221,7 @@ do
   print("done")
 end
 
---@api-stub: lurek.ui.getChildCount
+--@api-stub: LUiWidget:getChildCount
 -- Returns the number of child items in this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -229,7 +229,7 @@ do
   print("getChildCount:", v)
 end
 
---@api-stub: lurek.ui.getChildren
+--@api-stub: LUiWidget:getChildren
 -- Returns the children of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -237,7 +237,7 @@ do
   print("getChildren:", v)
 end
 
---@api-stub: lurek.ui.findById
+--@api-stub: LUiWidget:findById
 -- Finds and returns the by id in this ui by name or id.
 do
   -- Retrieve a widget reference by its unique ID string.
@@ -247,7 +247,7 @@ do
   print("findById:", v)
 end
 
---@api-stub: lurek.ui.setOnClick
+--@api-stub: LMenuItem:setOnClick
 -- Sets the on click of this ui.
 do
   -- Register a click handler — fires when the player clicks/taps this widget.
@@ -259,7 +259,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this ui.
 do
   -- Fires when the widget value changes (slider moved, checkbox toggled, text typed).
@@ -271,7 +271,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.setOnDraw
+--@api-stub: LUiWidget:setOnDraw
 -- Sets the on draw of this ui.
 do
   -- Custom draw callback — invoked every frame for this widget.
@@ -283,7 +283,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.containsPoint
+--@api-stub: LUiWidget:containsPoint
 -- Performs the contains point operation on this ui.
 do
   -- Hit-test: returns true if (x, y) is inside the widget bounds.
@@ -293,7 +293,7 @@ do
   print("containsPoint:", v)
 end
 
---@api-stub: lurek.ui.setPadding
+--@api-stub: LUiWidget:setPadding
 -- Sets the padding of this ui.
 do
   -- Inner spacing between widget border and content (in pixels).
@@ -303,7 +303,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getPadding
+--@api-stub: LUiWidget:getPadding
 -- Returns the padding of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -311,7 +311,7 @@ do
   print("getPadding:", v)
 end
 
---@api-stub: lurek.ui.setMargin
+--@api-stub: LUiWidget:setMargin
 -- Sets the margin of this ui.
 do
   -- Outer spacing between this widget and its neighbors (in pixels).
@@ -321,7 +321,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getMargin
+--@api-stub: LUiWidget:getMargin
 -- Returns the margin of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -329,7 +329,7 @@ do
   print("getMargin:", v)
 end
 
---@api-stub: lurek.ui.setZOrder
+--@api-stub: LUiWidget:setZOrder
 -- Sets the z order of this ui.
 do
   -- Controls draw order: higher z = drawn on top.
@@ -339,7 +339,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getZOrder
+--@api-stub: LUiWidget:getZOrder
 -- Returns the z order of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -347,7 +347,7 @@ do
   print("getZOrder:", v)
 end
 
---@api-stub: lurek.ui.setMinSize
+--@api-stub: LUiWidget:setMinSize
 -- Sets the min size of this ui.
 do
   -- Prevents the widget from shrinking below this size during layout.
@@ -357,7 +357,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getMinSize
+--@api-stub: LUiWidget:getMinSize
 -- Returns the min size of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -365,7 +365,7 @@ do
   print("getMinSize:", v)
 end
 
---@api-stub: lurek.ui.setMaxSize
+--@api-stub: LUiWidget:setMaxSize
 -- Sets the max size of this ui.
 do
   -- Caps the widget size — prevents expansion beyond this limit.
@@ -375,7 +375,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getMaxSize
+--@api-stub: LUiWidget:getMaxSize
 -- Returns the max size of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -383,7 +383,7 @@ do
   print("getMaxSize:", v)
 end
 
---@api-stub: lurek.ui.setAnchor
+--@api-stub: LUiWidget:setAnchor
 -- Sets the anchor of this ui.
 do
   -- Pins widget edges to parent with pixel offsets (top, right, bottom, left).
@@ -393,7 +393,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.setAnchorCenter
+--@api-stub: LUiWidget:setAnchorCenter
 -- Sets the anchor center of this ui.
 do
   -- Centers the widget in its parent with an optional pixel offset.
@@ -403,7 +403,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.clearAnchor
+--@api-stub: LUiWidget:clearAnchor
 -- Clears all anchor items from this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -411,7 +411,7 @@ do
   print("done")
 end
 
---@api-stub: lurek.ui.setFlexGrow
+--@api-stub: LUiWidget:setFlexGrow
 -- Sets the flex grow of this ui.
 do
   -- Flex grow factor: how much extra space this widget claims.
@@ -421,7 +421,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getFlexGrow
+--@api-stub: LUiWidget:getFlexGrow
 -- Returns the flex grow of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -429,7 +429,7 @@ do
   print("getFlexGrow:", v)
 end
 
---@api-stub: lurek.ui.setFlexShrink
+--@api-stub: LUiWidget:setFlexShrink
 -- Sets the flex shrink of this ui.
 do
   -- Flex shrink factor: how much this widget can compress when space is tight.
@@ -439,7 +439,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getFlexShrink
+--@api-stub: LUiWidget:getFlexShrink
 -- Returns the flex shrink of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -447,7 +447,7 @@ do
   print("getFlexShrink:", v)
 end
 
---@api-stub: lurek.ui.bind
+--@api-stub: LUiWidget:bind
 -- Performs the bind operation on this ui.
 do
   -- Binds this widget to a data key for reactive updates.
@@ -457,7 +457,7 @@ do
   print("bind called")
 end
 
---@api-stub: lurek.ui.unbind
+--@api-stub: LUiWidget:unbind
 -- Performs the unbind operation on this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -465,7 +465,7 @@ do
   print("unbind called")
 end
 
---@api-stub: lurek.ui.setAlpha
+--@api-stub: LUiWidget:setAlpha
 -- Sets the alpha of this ui.
 do
   -- Opacity from 0.0 (invisible) to 1.0 (fully opaque).
@@ -475,7 +475,7 @@ do
   print("applied")
 end
 
---@api-stub: lurek.ui.getAlpha
+--@api-stub: LUiWidget:getAlpha
 -- Returns the alpha of this ui.
 do
   local _w = lurek.ui.newLabel("ui")
@@ -483,7 +483,7 @@ do
   print("getAlpha:", v)
 end
 
---@api-stub: lurek.ui.fadeIn
+--@api-stub: LUiWidget:fadeIn
 -- Performs the fade in operation on this ui.
 do
   -- Smoothly transitions alpha from 0 to 1.
@@ -493,7 +493,7 @@ do
   print("fadeIn called")
 end
 
---@api-stub: lurek.ui.fadeOut
+--@api-stub: LUiWidget:fadeOut
 -- Performs the fade out operation on this ui.
 do
   -- Smoothly transitions alpha from 1 to 0, then hides the widget.
@@ -503,7 +503,7 @@ do
   print("fadeOut called")
 end
 
---@api-stub: lurek.ui.slideIn
+--@api-stub: LUiWidget:slideIn
 -- Performs the slide in operation on this ui.
 do
   -- Animates the widget in from an offset (dx, dy) to its final position.
@@ -513,7 +513,7 @@ do
   print("slideIn called")
 end
 
---@api-stub: lurek.ui.slideOut
+--@api-stub: LUiWidget:slideOut
 -- Performs the slide out operation on this ui.
 do
   -- Animates the widget out to the given offset and hides it.
@@ -523,7 +523,7 @@ do
   print("slideOut called")
 end
 
---@api-stub: lurek.ui.attachToEntity
+--@api-stub: LUiWidget:attachToEntity
 -- Performs the attach to entity operation on this ui.
 do
   -- Pins this widget above a game entity so it follows movement.
@@ -533,7 +533,7 @@ do
   print("attachToEntity called")
 end
 
---@api-stub: lurek.ui.detachFromEntity
+--@api-stub: LUiWidget:detachFromEntity
 -- Performs the detach from entity operation on this ui.
 do
   -- Releases entity tracking — widget stays at its last screen position.
@@ -549,7 +549,7 @@ local function new_example_image_widget()
   return {}
 end
 
---@api-stub: Button:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this button.
 do
   -- Change button label at runtime — e.g. toggle "Pause" / "Resume".
@@ -557,7 +557,7 @@ do
   btn:setText("Hello")
 end
 
---@api-stub: Button:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this button.
 do
   local btn = lurek.ui.newButton("Play")
@@ -567,14 +567,14 @@ end
 
 -- Label methods
 
---@api-stub: Label:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this label.
 do
   local lbl = lurek.ui.newLabel("Score: 0")
   lbl:setText("Hello")
 end
 
---@api-stub: Label:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this label.
 do
   local lbl = lurek.ui.newLabel("Score: 0")
@@ -584,14 +584,14 @@ end
 
 -- Text_Input methods
 
---@api-stub: Text_Input:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this text_input.
 do
   local ti = lurek.ui.newTextInput()
   ti:setText("Hello")
 end
 
---@api-stub: Text_Input:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this text_input.
 do
   local ti = lurek.ui.newTextInput()
@@ -599,14 +599,14 @@ do
   print("getText:", v)
 end
 
---@api-stub: Text_Input:setPlaceholder
+--@api-stub: LTextInput:setPlaceholder
 -- Sets the placeholder of this text_input.
 do
   local ti = lurek.ui.newTextInput()
   ti:setPlaceholder("Hello")
 end
 
---@api-stub: Text_Input:getPlaceholder
+--@api-stub: LTextInput:getPlaceholder
 -- Returns the placeholder of this text_input.
 do
   local ti = lurek.ui.newTextInput()
@@ -614,14 +614,14 @@ do
   print("getPlaceholder:", v)
 end
 
---@api-stub: Text_Input:setMaxLength
+--@api-stub: LTextInput:setMaxLength
 -- Sets the max length of this text_input.
 do
   local ti = lurek.ui.newTextInput()
   ti:setMaxLength(100)
 end
 
---@api-stub: Text_Input:isFocused
+--@api-stub: LTextInput:isFocused
 -- Returns true if this text_input focused.
 do
   local ti = lurek.ui.newTextInput()
@@ -629,7 +629,7 @@ do
   print("isFocused:", v)
 end
 
---@api-stub: Text_Input:getCursorPosition
+--@api-stub: LTextInput:getCursorPosition
 -- Returns the cursor position of this text_input.
 do
   local ti = lurek.ui.newTextInput()
@@ -639,14 +639,14 @@ end
 
 -- Checkbox methods
 
---@api-stub: Checkbox:setChecked
+--@api-stub: LMenuItem:setChecked
 -- Sets the checked of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Sound")
   cb:setChecked(true)
 end
 
---@api-stub: Checkbox:isChecked
+--@api-stub: LMenuItem:isChecked
 -- Returns true if this checkbox checked.
 do
   local cb = lurek.ui.newCheckbox("Sound")
@@ -654,14 +654,14 @@ do
   print("isChecked:", v)
 end
 
---@api-stub: Checkbox:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Sound")
   cb:setText("Hello")
 end
 
---@api-stub: Checkbox:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Sound")
@@ -671,14 +671,14 @@ end
 
 -- Slider methods
 
---@api-stub: Slider:setValue
+--@api-stub: LSpinBox:setValue
 -- Sets the value of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
   sl:setValue(0.5)
 end
 
---@api-stub: Slider:getValue
+--@api-stub: LSpinBox:getValue
 -- Returns the value of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
@@ -686,21 +686,21 @@ do
   print("getValue:", v)
 end
 
---@api-stub: Slider:setRange
+--@api-stub: LSpinBox:setRange
 -- Sets the range of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
   sl:setRange(0, 100)
 end
 
---@api-stub: Slider:setStep
+--@api-stub: LSpinBox:setStep
 -- Sets the step of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
   sl:setStep(1)
 end
 
---@api-stub: Slider:getMin
+--@api-stub: LProgressBar:getMin
 -- Returns the min of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
@@ -708,7 +708,7 @@ do
   print("getMin:", v)
 end
 
---@api-stub: Slider:getMax
+--@api-stub: LProgressBar:getMax
 -- Returns the max of this slider.
 do
   local sl = lurek.ui.newSlider(0, 100)
@@ -718,14 +718,14 @@ end
 
 -- Progress_Bar methods
 
---@api-stub: Progress_Bar:setValue
+--@api-stub: LSpinBox:setValue
 -- Sets the value of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
   pb:setValue(0.5)
 end
 
---@api-stub: Progress_Bar:getValue
+--@api-stub: LSpinBox:getValue
 -- Returns the value of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
@@ -733,7 +733,7 @@ do
   print("getValue:", v)
 end
 
---@api-stub: Progress_Bar:getProgress
+--@api-stub: LToast:getProgress
 -- Returns the progress of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
@@ -741,14 +741,14 @@ do
   print("getProgress:", v)
 end
 
---@api-stub: Progress_Bar:setRange
+--@api-stub: LSpinBox:setRange
 -- Sets the range of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
   pb:setRange(0, 100)
 end
 
---@api-stub: Progress_Bar:getMin
+--@api-stub: LProgressBar:getMin
 -- Returns the min of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
@@ -756,7 +756,7 @@ do
   print("getMin:", v)
 end
 
---@api-stub: Progress_Bar:getMax
+--@api-stub: LProgressBar:getMax
 -- Returns the max of this progress_bar.
 do
   local pb = lurek.ui.newProgressBar()
@@ -766,7 +766,7 @@ end
 
 -- Combo_Box methods
 
---@api-stub: Combo_Box:addItem
+--@api-stub: LListBox:addItem
 -- Adds a item to this combo_box.
 do
   -- ComboBox items can be added at runtime — useful for populating
@@ -775,21 +775,21 @@ do
   cb:addItem("Nightmare") -- append a new option discovered from DLC or unlocks
 end
 
---@api-stub: Combo_Box:removeItem
+--@api-stub: LListBox:removeItem
 -- Removes a item from this combo_box.
 do
   local cb = lurek.ui.newComboBox()
   cb:removeItem(1)
 end
 
---@api-stub: Combo_Box:clearItems
+--@api-stub: LListBox:clearItems
 -- Clears all items items from this combo_box.
 do
   local cb = lurek.ui.newComboBox()
   cb:clearItems()
 end
 
---@api-stub: Combo_Box:getItemCount
+--@api-stub: LListBox:getItemCount
 -- Returns the number of item items in this combo_box.
 do
   local cb = lurek.ui.newComboBox()
@@ -797,7 +797,7 @@ do
   print("getItemCount:", v)
 end
 
---@api-stub: Combo_Box:getItem
+--@api-stub: LListBox:getItem
 -- Returns the item of this combo_box.
 do
   local cb = lurek.ui.newComboBox()
@@ -805,7 +805,7 @@ do
   print("getItem:", v)
 end
 
---@api-stub: Combo_Box:setSelectedIndex
+--@api-stub: LListBox:setSelectedIndex
 -- Sets the selected index of this combo_box.
 do
   -- Programmatically select an item — e.g. restore the player's
@@ -814,7 +814,7 @@ do
   cb:setSelectedIndex(2) -- select "Normal" (1-based index)
 end
 
---@api-stub: Combo_Box:getSelectedIndex
+--@api-stub: LListBox:getSelectedIndex
 -- Returns the selected index of this combo_box.
 do
   local cb = lurek.ui.newComboBox()
@@ -822,7 +822,7 @@ do
   print("getSelectedIndex:", v)
 end
 
---@api-stub: Combo_Box:getSelectedItem
+--@api-stub: LComboBox:getSelectedItem
 -- Returns the selected item of this combo_box.
 do
   local cb = lurek.ui.newComboBox()
@@ -832,28 +832,28 @@ end
 
 -- List_Box methods
 
---@api-stub: List_Box:addItem
+--@api-stub: LListBox:addItem
 -- Adds a item to this list_box.
 do
   local w = lurek.ui.newList()
   w:addItem("item_1")
 end
 
---@api-stub: List_Box:removeItem
+--@api-stub: LListBox:removeItem
 -- Removes a item from this list_box.
 do
   local w = lurek.ui.newList()
   w:removeItem(1)
 end
 
---@api-stub: List_Box:clearItems
+--@api-stub: LListBox:clearItems
 -- Clears all items items from this list_box.
 do
   local w = lurek.ui.newList()
   w:clearItems()
 end
 
---@api-stub: List_Box:getItemCount
+--@api-stub: LListBox:getItemCount
 -- Returns the number of item items in this list_box.
 do
   local w = lurek.ui.newList()
@@ -861,7 +861,7 @@ do
   print("getItemCount:", v)
 end
 
---@api-stub: List_Box:getItem
+--@api-stub: LListBox:getItem
 -- Returns the item of this list_box.
 do
   local w = lurek.ui.newList()
@@ -869,14 +869,14 @@ do
   print("getItem:", v)
 end
 
---@api-stub: List_Box:setSelectedIndex
+--@api-stub: LListBox:setSelectedIndex
 -- Sets the selected index of this list_box.
 do
   local w = lurek.ui.newList()
   w:setSelectedIndex(1)
 end
 
---@api-stub: List_Box:getSelectedIndex
+--@api-stub: LListBox:getSelectedIndex
 -- Returns the selected index of this list_box.
 do
   local w = lurek.ui.newList()
@@ -884,7 +884,7 @@ do
   print("getSelectedIndex:", v)
 end
 
---@api-stub: List_Box:setItemHeight
+--@api-stub: LListBox:setItemHeight
 -- Sets the item height of this list_box.
 do
   local w = lurek.ui.newList()
@@ -893,7 +893,7 @@ end
 
 -- Tab_Bar methods
 
---@api-stub: Tab_Bar:addTab
+--@api-stub: LTabBar:addTab
 -- Adds a tab to this tab_bar.
 do
   -- TabBars hold child widgets as tab content. Each tab can contain
@@ -902,7 +902,7 @@ do
   tabs:addTab("Journal") -- dynamically add a tab unlocked mid-game
 end
 
---@api-stub: Tab_Bar:removeTab
+--@api-stub: LTabBar:removeTab
 -- Removes a tab from this tab_bar.
 do
   local tabs = lurek.ui.newTabBar()
@@ -910,7 +910,7 @@ do
   tabs:removeTab(1)
 end
 
---@api-stub: Tab_Bar:getTab
+--@api-stub: LTabBar:getTab
 -- Returns the tab of this tab_bar.
 do
   local tabs = lurek.ui.newTabBar()
@@ -919,7 +919,7 @@ do
   print("getTab:", v)
 end
 
---@api-stub: Tab_Bar:getTabCount
+--@api-stub: LTabBar:getTabCount
 -- Returns the number of tab items in this tab_bar.
 do
   local tabs = lurek.ui.newTabBar()
@@ -927,7 +927,7 @@ do
   print("getTabCount:", v)
 end
 
---@api-stub: Tab_Bar:setActiveTab
+--@api-stub: LTabBar:setActiveTab
 -- Sets the active tab of this tab_bar.
 do
   -- Switch the visible tab programmatically — e.g. open the Map tab
@@ -936,7 +936,7 @@ do
   tabs:setActiveTab(3) -- jump directly to the Map tab
 end
 
---@api-stub: Tab_Bar:getActiveTab
+--@api-stub: LTabBar:getActiveTab
 -- Returns the active tab of this tab_bar.
 do
   local tabs = lurek.ui.newTabBar()
@@ -946,14 +946,14 @@ end
 
 -- Spin_Box methods
 
---@api-stub: Spin_Box:setValue
+--@api-stub: LSpinBox:setValue
 -- Sets the value of this spin_box.
 do
   local spin = lurek.ui.newSpinBox()
   spin:setValue(0.5)
 end
 
---@api-stub: Spin_Box:getValue
+--@api-stub: LSpinBox:getValue
 -- Returns the value of this spin_box.
 do
   local spin = lurek.ui.newSpinBox()
@@ -961,21 +961,21 @@ do
   print("getValue:", v)
 end
 
---@api-stub: Spin_Box:increment
+--@api-stub: LSpinBox:increment
 -- Increments the value of this spin_box by one step.
 do
   local spin = lurek.ui.newSpinBox()
   spin:increment()
 end
 
---@api-stub: Spin_Box:decrement
+--@api-stub: LSpinBox:decrement
 -- Decrements the value of this spin_box by one step.
 do
   local spin = lurek.ui.newSpinBox()
   spin:decrement()
 end
 
---@api-stub: Spin_Box:setRange
+--@api-stub: LSpinBox:setRange
 -- Sets the range of this spin_box.
 do
   -- Clamp the spin box to valid bounds — prevents players from
@@ -984,7 +984,7 @@ do
   spin:setRange(1, 99) -- min=1 (e.g. at least 1 party member)
 end
 
---@api-stub: Spin_Box:setStep
+--@api-stub: LSpinBox:setStep
 -- Sets the step of this spin_box.
 do
   -- Step controls the increment per click/arrow press.
@@ -995,14 +995,14 @@ end
 
 -- Switch methods
 
---@api-stub: Switch:setOn
+--@api-stub: LSwitch:setOn
 -- Sets the on of this switch.
 do
   local sw = lurek.ui.newSwitch()
   sw:setOn(true)
 end
 
---@api-stub: Switch:isOn
+--@api-stub: LSwitch:isOn
 -- Returns true if this switch on.
 do
   local sw = lurek.ui.newSwitch()
@@ -1010,7 +1010,7 @@ do
   print("isOn:", v)
 end
 
---@api-stub: Switch:toggle
+--@api-stub: LSwitch:toggle
 -- Toggles the  state of this switch.
 do
   -- Toggle flips on↔off without knowing current state.
@@ -1021,14 +1021,14 @@ end
 
 -- Badge methods
 
---@api-stub: Badge:setCount
+--@api-stub: LBadge:setCount
 -- Sets the count of this badge.
 do
   local badge = lurek.ui.newBadge(3)
   badge:setCount(4)
 end
 
---@api-stub: Badge:getCount
+--@api-stub: LBadge:getCount
 -- Returns the total count of items held by this badge.
 do
   local badge = lurek.ui.newBadge(3)
@@ -1036,7 +1036,7 @@ do
   print("getCount:", v)
 end
 
---@api-stub: Badge:getDisplayText
+--@api-stub: LBadge:getDisplayText
 -- Returns the display text of this badge.
 do
   local badge = lurek.ui.newBadge(3)
@@ -1046,7 +1046,7 @@ end
 
 -- Panel methods
 
---@api-stub: Panel:setTitle
+--@api-stub: LDialog:setTitle
 -- Sets the title of this panel.
 do
   -- Panels are titled containers — use them for inventory windows,
@@ -1055,7 +1055,7 @@ do
   panel:setTitle("Inventory") -- shown in the panel's header area
 end
 
---@api-stub: Panel:getTitle
+--@api-stub: LDialog:getTitle
 -- Returns the title of this panel.
 do
   local panel = lurek.ui.newPanel()
@@ -1063,7 +1063,7 @@ do
   print("getTitle:", v)
 end
 
---@api-stub: Panel:setScrollable
+--@api-stub: LPanel:setScrollable
 -- Sets the scrollable of this panel.
 do
   -- Enable scrolling when panel content exceeds visible area.
@@ -1074,7 +1074,7 @@ end
 
 -- Layout methods
 
---@api-stub: Layout:setDirection
+--@api-stub: LLayout:setDirection
 -- Sets the direction of this layout.
 do
   -- Direction controls child stacking: "vertical" for menus/lists,
@@ -1083,7 +1083,7 @@ do
   layout:setDirection("horizontal") -- switch to toolbar-style row
 end
 
---@api-stub: Layout:getDirection
+--@api-stub: LLayout:getDirection
 -- Returns the direction of this layout.
 do
   local layout = lurek.ui.newLayout("vertical")
@@ -1091,7 +1091,7 @@ do
   print("getDirection:", v)
 end
 
---@api-stub: Layout:setSpacing
+--@api-stub: LLayout:setSpacing
 -- Sets the spacing of this layout.
 do
   -- Spacing is the gap (in pixels) between each child widget.
@@ -1100,7 +1100,7 @@ do
   layout:setSpacing(8) -- 8px gap between each menu button
 end
 
---@api-stub: Layout:getSpacing
+--@api-stub: LLayout:getSpacing
 -- Returns the spacing of this layout.
 do
   local layout = lurek.ui.newLayout("vertical")
@@ -1108,7 +1108,7 @@ do
   print("getSpacing:", v)
 end
 
---@api-stub: Layout:setColumns
+--@api-stub: LLayout:setColumns
 -- Sets the columns of this layout.
 do
   -- Columns turn a layout into a grid. Use 4-6 columns for
@@ -1117,7 +1117,7 @@ do
   layout:setColumns(4) -- 4-column inventory grid
 end
 
---@api-stub: Layout:setWrap
+--@api-stub: LLayout:setWrap
 -- Sets the wrap of this layout.
 do
   -- Wrap moves overflow children to the next row/column,
@@ -1126,7 +1126,7 @@ do
   layout:setWrap(true) -- items flow to next row when row is full
 end
 
---@api-stub: Layout:getWrap
+--@api-stub: LLayout:getWrap
 -- Returns the wrap of this layout.
 do
   local layout = lurek.ui.newLayout("vertical")
@@ -1134,7 +1134,7 @@ do
   print("getWrap:", v)
 end
 
---@api-stub: Layout:setAlign
+--@api-stub: LLayout:setAlign
 -- Sets the align of this layout.
 do
   -- Align controls cross-axis placement: "center" for centered
@@ -1143,7 +1143,7 @@ do
   layout:setAlign("center") -- center children horizontally
 end
 
---@api-stub: Layout:getAlign
+--@api-stub: LLayout:getAlign
 -- Returns the align of this layout.
 do
   local layout = lurek.ui.newLayout("vertical")
@@ -1151,7 +1151,7 @@ do
   print("getAlign:", v)
 end
 
---@api-stub: Layout:setJustify
+--@api-stub: LLayout:setJustify
 -- Sets the justify of this layout.
 do
   -- Justify distributes children along the main axis:
@@ -1160,7 +1160,7 @@ do
   layout:setJustify("space-between") -- spread items evenly
 end
 
---@api-stub: Layout:getJustify
+--@api-stub: LLayout:getJustify
 -- Returns the justify of this layout.
 do
   local layout = lurek.ui.newLayout("vertical")
@@ -1170,7 +1170,7 @@ end
 
 -- Scroll_Panel methods
 
---@api-stub: Scroll_Panel:setContentSize
+--@api-stub: LScrollBar:setContentSize
 -- Sets the content size of this scroll_panel.
 do
   -- Content size defines the virtual scrollable area.
@@ -1179,7 +1179,7 @@ do
   sp:setContentSize(800, 2000) -- tall virtual area for a quest log
 end
 
---@api-stub: Scroll_Panel:getContentSize
+--@api-stub: LScrollBar:getContentSize
 -- Returns the content size of this scroll_panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -1187,7 +1187,7 @@ do
   print("getContentSize:", v)
 end
 
---@api-stub: Scroll_Panel:setScrollPosition
+--@api-stub: LScrollBar:setScrollPosition
 -- Sets the scroll position of this scroll_panel.
 do
   -- Programmatic scroll — jump to a specific entry, e.g.
@@ -1196,7 +1196,7 @@ do
   sp:setScrollPosition(0, 200) -- scroll down 200px
 end
 
---@api-stub: Scroll_Panel:getScrollPosition
+--@api-stub: LScrollBar:getScrollPosition
 -- Returns the scroll position of this scroll_panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -1204,7 +1204,7 @@ do
   print("getScrollPosition:", v)
 end
 
---@api-stub: Scroll_Panel:getMaxScroll
+--@api-stub: LScrollPanel:getMaxScroll
 -- Returns the max scroll of this scroll_panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -1212,14 +1212,14 @@ do
   print("getMaxScroll:", v)
 end
 
---@api-stub: Scroll_Panel:setScrollSpeed
+--@api-stub: LScrollPanel:setScrollSpeed
 -- Sets the scroll speed of this scroll_panel.
 do
   local sp = lurek.ui.newScrollPanel()
   sp:setScrollSpeed(1)
 end
 
---@api-stub: Scroll_Panel:getScrollSpeed
+--@api-stub: LScrollPanel:getScrollSpeed
 -- Returns the scroll speed of this scroll_panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -1229,7 +1229,7 @@ end
 
 -- Nine_Patch methods
 
---@api-stub: Nine_Patch:setInsets
+--@api-stub: LNinePatch:setInsets
 -- Sets the insets of this nine_patch.
 do
   -- Insets define the non-stretchable border regions of a 9-patch.
@@ -1238,7 +1238,7 @@ do
   np:setInsets(8, 8, 8, 8) -- 8px fixed border on all sides
 end
 
---@api-stub: Nine_Patch:getInsets
+--@api-stub: LNinePatch:getInsets
 -- Returns the insets of this nine_patch.
 do
   local np = lurek.ui.newNinePatch()
@@ -1246,14 +1246,14 @@ do
   print("getInsets:", v)
 end
 
---@api-stub: Nine_Patch:setImageDimensions
+--@api-stub: LNinePatch:setImageDimensions
 -- Sets the image dimensions of this nine_patch.
 do
   local np = lurek.ui.newNinePatch()
   np:setImageDimensions(64, 64)
 end
 
---@api-stub: Nine_Patch:getImageDimensions
+--@api-stub: LNinePatch:getImageDimensions
 -- Returns the image dimensions of this nine_patch.
 do
   local np = lurek.ui.newNinePatch()
@@ -1261,7 +1261,7 @@ do
   print("getImageDimensions:", v)
 end
 
---@api-stub: Nine_Patch:getSlices
+--@api-stub: LNinePatch:getSlices
 -- Returns the slices of this nine_patch.
 do
   local np = lurek.ui.newNinePatch()
@@ -1271,14 +1271,14 @@ end
 
 -- Toast methods
 
---@api-stub: Toast:setMessage
+--@api-stub: LToast:setMessage
 -- Sets the message of this toast.
 do
   local toast = lurek.ui.newToast("Saved.", 2.0)
   toast:setMessage("Level Up!")
 end
 
---@api-stub: Toast:getMessage
+--@api-stub: LToast:getMessage
 -- Returns the message of this toast.
 do
   local toast = lurek.ui.newToast("Saved.", 2.0)
@@ -1286,7 +1286,7 @@ do
   print("getMessage:", v)
 end
 
---@api-stub: Toast:setDuration
+--@api-stub: LToast:setDuration
 -- Sets the duration of this toast.
 do
   -- Duration is how long (seconds) the toast stays visible.
@@ -1295,7 +1295,7 @@ do
   toast:setDuration(3.0) -- show for 3 seconds before fading
 end
 
---@api-stub: Toast:getDuration
+--@api-stub: LToast:getDuration
 -- Returns the duration of this toast.
 do
   local toast = lurek.ui.newToast("Saved.", 2.0)
@@ -1303,7 +1303,7 @@ do
   print("getDuration:", v)
 end
 
---@api-stub: Toast:getProgress
+--@api-stub: LToast:getProgress
 -- Returns the progress of this toast.
 do
   local toast = lurek.ui.newToast("Saved.", 2.0)
@@ -1311,7 +1311,7 @@ do
   print("getProgress:", v)
 end
 
---@api-stub: Toast:isExpired
+--@api-stub: LToast:isExpired
 -- Returns true if this toast expired.
 do
   local toast = lurek.ui.newToast("Saved.", 2.0)
@@ -1321,14 +1321,14 @@ end
 
 -- Separator methods
 
---@api-stub: Separator:setVertical
+--@api-stub: LSeparator:setVertical
 -- Sets the vertical of this separator.
 do
   local sep = lurek.ui.newSeparator(false)
   sep:setVertical(true)
 end
 
---@api-stub: Separator:isVertical
+--@api-stub: LScrollBar:isVertical
 -- Returns true if this separator vertical.
 do
   local sep = lurek.ui.newSeparator(false)
@@ -1336,14 +1336,14 @@ do
   print("isVertical:", v)
 end
 
---@api-stub: Separator:setThickness
+--@api-stub: LSeparator:setThickness
 -- Sets the thickness of this separator.
 do
   local sep = lurek.ui.newSeparator(false)
   sep:setThickness(1)
 end
 
---@api-stub: Separator:getThickness
+--@api-stub: LSeparator:getThickness
 -- Returns the thickness of this separator.
 do
   local sep = lurek.ui.newSeparator(false)
@@ -1353,7 +1353,7 @@ end
 
 -- Tree_View methods
 
---@api-stub: Tree_View:addNode
+--@api-stub: LTreeView:addNode
 -- Adds a node to this tree_view.
 do
   -- TreeViews display hierarchical data: skill trees, file browsers,
@@ -1362,14 +1362,14 @@ do
   tree:addNode("Swordsmanship") -- add a child node to the root
 end
 
---@api-stub: Tree_View:toggleNode
+--@api-stub: LTreeView:toggleNode
 -- Toggles the node state of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Root"); tree:toggleNode(1)
 end
 
---@api-stub: Tree_View:isExpanded
+--@api-stub: LTreeView:isExpanded
 -- Returns true if this tree_view expanded.
 do
   local tree = lurek.ui.newTreeView()
@@ -1377,7 +1377,7 @@ do
   print("isExpanded:", v)
 end
 
---@api-stub: Tree_View:getNodeCount
+--@api-stub: LTreeView:getNodeCount
 -- Returns the number of node items in this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1385,21 +1385,21 @@ do
   print("getNodeCount:", v)
 end
 
---@api-stub: Tree_View:removeNode
+--@api-stub: LTreeView:removeNode
 -- Removes a node from this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:removeNode(1)
 end
 
---@api-stub: Tree_View:clearNodes
+--@api-stub: LTreeView:clearNodes
 -- Clears all nodes items from this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:clearNodes()
 end
 
---@api-stub: Tree_View:getNodeText
+--@api-stub: LTreeView:getNodeText
 -- Returns the node text of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1407,35 +1407,35 @@ do
   print("getNodeText:", v)
 end
 
---@api-stub: Tree_View:setNodeText
+--@api-stub: LTreeView:setNodeText
 -- Sets the node text of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Node"); tree:setNodeText(1, "Hello")
 end
 
---@api-stub: Tree_View:setNodeIcon
+--@api-stub: LTreeView:setNodeIcon
 -- Sets the node icon of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Node"); tree:setNodeIcon(1, "assets/icon.png")
 end
 
---@api-stub: Tree_View:expandNode
+--@api-stub: LTreeView:expandNode
 -- Expands this tree_view to show its children or content.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Node"); tree:expandNode(1)
 end
 
---@api-stub: Tree_View:collapseNode
+--@api-stub: LTreeView:collapseNode
 -- Collapses this tree_view to hide its children or content.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Node"); tree:collapseNode(1)
 end
 
---@api-stub: Tree_View:isNodeExpanded
+--@api-stub: LTreeView:isNodeExpanded
 -- Returns true if this tree_view node expanded.
 do
   local tree = lurek.ui.newTreeView()
@@ -1443,28 +1443,28 @@ do
   print("isNodeExpanded:", v)
 end
 
---@api-stub: Tree_View:expandAll
+--@api-stub: LTreeView:expandAll
 -- Expands this tree_view to show its children or content.
 do
   local tree = lurek.ui.newTreeView()
   tree:expandAll()
 end
 
---@api-stub: Tree_View:collapseAll
+--@api-stub: LTreeView:collapseAll
 -- Collapses this tree_view to hide its children or content.
 do
   local tree = lurek.ui.newTreeView()
   tree:collapseAll()
 end
 
---@api-stub: Tree_View:setSelectedNode
+--@api-stub: LTreeView:setSelectedNode
 -- Sets the selected node of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
   tree:addNode("Node"); tree:setSelectedNode(1)
 end
 
---@api-stub: Tree_View:getSelectedNode
+--@api-stub: LTreeView:getSelectedNode
 -- Returns the selected node of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1472,7 +1472,7 @@ do
   print("getSelectedNode:", v)
 end
 
---@api-stub: Tree_View:getChildNodes
+--@api-stub: LTreeView:getChildNodes
 -- Returns the child nodes of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1480,7 +1480,7 @@ do
   print("getChildNodes:", v)
 end
 
---@api-stub: Tree_View:getParentNode
+--@api-stub: LTreeView:getParentNode
 -- Returns the parent node of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1488,7 +1488,7 @@ do
   print("getParentNode:", v)
 end
 
---@api-stub: Tree_View:getNodeDepth
+--@api-stub: LTreeView:getNodeDepth
 -- Returns the node depth of this tree_view.
 do
   local tree = lurek.ui.newTreeView()
@@ -1498,7 +1498,7 @@ end
 
 -- Radio_Button methods
 
---@api-stub: Radio_Button:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
@@ -1506,14 +1506,14 @@ do
   print("getText:", v)
 end
 
---@api-stub: Radio_Button:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
   rb:setText("Hello")
 end
 
---@api-stub: Radio_Button:isSelected
+--@api-stub: LRadioButton:isSelected
 -- Returns true if this radio_button selected.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
@@ -1521,14 +1521,14 @@ do
   print("isSelected:", v)
 end
 
---@api-stub: Radio_Button:setSelected
+--@api-stub: LRadioButton:setSelected
 -- Sets the selected of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
   rb:setSelected(true)
 end
 
---@api-stub: Radio_Button:getGroup
+--@api-stub: LRadioButton:getGroup
 -- Returns the group of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
@@ -1536,14 +1536,14 @@ do
   print("getGroup:", v)
 end
 
---@api-stub: Radio_Button:setGroup
+--@api-stub: LRadioButton:setGroup
 -- Sets the group of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
   rb:setGroup("group1")
 end
 
---@api-stub: Radio_Button:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this radio_button.
 do
   local rb = lurek.ui.newRadioButton("Easy", "diff")
@@ -1552,7 +1552,7 @@ end
 
 -- Scroll_Bar methods
 
---@api-stub: Scroll_Bar:getScrollPosition
+--@api-stub: LScrollBar:getScrollPosition
 -- Returns the scroll position of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
@@ -1560,14 +1560,14 @@ do
   print("getScrollPosition:", v)
 end
 
---@api-stub: Scroll_Bar:setScrollPosition
+--@api-stub: LScrollBar:setScrollPosition
 -- Sets the scroll position of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
   sb:setScrollPosition(100)
 end
 
---@api-stub: Scroll_Bar:getContentSize
+--@api-stub: LScrollBar:getContentSize
 -- Returns the content size of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
@@ -1575,14 +1575,14 @@ do
   print("getContentSize:", v)
 end
 
---@api-stub: Scroll_Bar:setContentSize
+--@api-stub: LScrollBar:setContentSize
 -- Sets the content size of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
   sb:setContentSize(200)
 end
 
---@api-stub: Scroll_Bar:getViewSize
+--@api-stub: LScrollBar:getViewSize
 -- Returns the view size of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
@@ -1590,14 +1590,14 @@ do
   print("getViewSize:", v)
 end
 
---@api-stub: Scroll_Bar:setViewSize
+--@api-stub: LScrollBar:setViewSize
 -- Sets the view size of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
   sb:setViewSize(200)
 end
 
---@api-stub: Scroll_Bar:isVertical
+--@api-stub: LScrollBar:isVertical
 -- Returns true if this scroll_bar vertical.
 do
   local sb = lurek.ui.newScrollBar(true)
@@ -1605,7 +1605,7 @@ do
   print("isVertical:", v)
 end
 
---@api-stub: Scroll_Bar:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this scroll_bar.
 do
   local sb = lurek.ui.newScrollBar(true)
@@ -1614,7 +1614,7 @@ end
 
 -- Gui_Window methods
 
---@api-stub: Gui_Window:getTitle
+--@api-stub: LDialog:getTitle
 -- Returns the title of this gui_window.
 do
   local w = lurek.ui.newPanel()
@@ -1622,14 +1622,14 @@ do
   print("getTitle:", v)
 end
 
---@api-stub: Gui_Window:setTitle
+--@api-stub: LDialog:setTitle
 -- Sets the title of this gui_window.
 do
   local w = lurek.ui.newWindow()
   w:setTitle("Hello")
 end
 
---@api-stub: Gui_Window:isCloseable
+--@api-stub: LGuiWindow:isCloseable
 -- Returns true if this gui_window closeable.
 do
   local w = lurek.ui.newWindow()
@@ -1637,14 +1637,14 @@ do
   print("isCloseable:", v)
 end
 
---@api-stub: Gui_Window:setCloseable
+--@api-stub: LGuiWindow:setCloseable
 -- Sets the closeable of this gui_window.
 do
   local w = lurek.ui.newWindow()
   w:setCloseable(true)
 end
 
---@api-stub: Gui_Window:isDraggable
+--@api-stub: LGuiWindow:isDraggable
 -- Returns true if this gui_window draggable.
 do
   local w = lurek.ui.newWindow()
@@ -1652,14 +1652,14 @@ do
   print("isDraggable:", v)
 end
 
---@api-stub: Gui_Window:setDraggable
+--@api-stub: LGuiWindow:setDraggable
 -- Sets the draggable of this gui_window.
 do
   local w = lurek.ui.newWindow()
   w:setDraggable(true)
 end
 
---@api-stub: Gui_Window:isResizable
+--@api-stub: LGuiWindow:isResizable
 -- Returns true if this gui_window resizable.
 do
   local w = lurek.ui.newWindow()
@@ -1667,14 +1667,14 @@ do
   print("isResizable:", v)
 end
 
---@api-stub: Gui_Window:setResizable
+--@api-stub: LGuiWindow:setResizable
 -- Sets the resizable of this gui_window.
 do
   local w = lurek.ui.newWindow()
   w:setResizable(true)
 end
 
---@api-stub: Gui_Window:setOnClose
+--@api-stub: LDialog:setOnClose
 -- Sets the on close of this gui_window.
 do
   local w = lurek.ui.newWindow()
@@ -1683,7 +1683,7 @@ end
 
 -- Split_Panel methods
 
---@api-stub: Split_Panel:getOrientation
+--@api-stub: LToolbar:getOrientation
 -- Returns the orientation of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
@@ -1691,14 +1691,14 @@ do
   print("getOrientation:", v)
 end
 
---@api-stub: Split_Panel:setOrientation
+--@api-stub: LToolbar:setOrientation
 -- Sets the orientation of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
   split:setOrientation("horizontal")
 end
 
---@api-stub: Split_Panel:getSplitPosition
+--@api-stub: LSplitPanel:getSplitPosition
 -- Returns the split position of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
@@ -1706,14 +1706,14 @@ do
   print("getSplitPosition:", v)
 end
 
---@api-stub: Split_Panel:setSplitPosition
+--@api-stub: LSplitPanel:setSplitPosition
 -- Sets the split position of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
   split:setSplitPosition(0.5)
 end
 
---@api-stub: Split_Panel:getMinPanelSize
+--@api-stub: LSplitPanel:getMinPanelSize
 -- Returns the min panel size of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
@@ -1721,28 +1721,28 @@ do
   print("getMinPanelSize:", v)
 end
 
---@api-stub: Split_Panel:setMinPanelSize
+--@api-stub: LSplitPanel:setMinPanelSize
 -- Sets the min panel size of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
   split:setMinPanelSize(50)
 end
 
---@api-stub: Split_Panel:setFirstChild
+--@api-stub: LSplitPanel:setFirstChild
 -- Sets the first child of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
   split:setFirstChild(1)
 end
 
---@api-stub: Split_Panel:setSecondChild
+--@api-stub: LSplitPanel:setSecondChild
 -- Sets the second child of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
   split:setSecondChild(1)
 end
 
---@api-stub: Split_Panel:getFirstChild
+--@api-stub: LSplitPanel:getFirstChild
 -- Returns the first child of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
@@ -1750,7 +1750,7 @@ do
   print("getFirstChild:", v)
 end
 
---@api-stub: Split_Panel:getSecondChild
+--@api-stub: LSplitPanel:getSecondChild
 -- Returns the second child of this split_panel.
 do
   local split = lurek.ui.newSplitPanel("horizontal")
@@ -1760,21 +1760,21 @@ end
 
 -- Dock_Panel methods
 
---@api-stub: Dock_Panel:dock
+--@api-stub: LDockPanel:dock
 -- Docks a child widget into this dock_panel panel.
 do
   local dock = lurek.ui.newDockPanel()
   dock:dock(1, "left")
 end
 
---@api-stub: Dock_Panel:undock
+--@api-stub: LDockPanel:undock
 -- Undocks a previously docked widget from this dock_panel panel.
 do
   local dock = lurek.ui.newDockPanel()
   dock:undock(1)
 end
 
---@api-stub: Dock_Panel:getDockedCount
+--@api-stub: LDockPanel:getDockedCount
 -- Returns the number of docked items in this dock_panel.
 do
   local dock = lurek.ui.newDockPanel()
@@ -1782,14 +1782,14 @@ do
   print("getDockedCount:", v)
 end
 
---@api-stub: Dock_Panel:setSplitSize
+--@api-stub: LDockPanel:setSplitSize
 -- Sets the split size of this dock_panel.
 do
   local dock = lurek.ui.newDockPanel()
   dock:setSplitSize("left", 200)
 end
 
---@api-stub: Dock_Panel:getSplitSize
+--@api-stub: LDockPanel:getSplitSize
 -- Returns the split size of this dock_panel.
 do
   local dock = lurek.ui.newDockPanel()
@@ -1799,7 +1799,7 @@ end
 
 -- Toolbar methods
 
---@api-stub: Toolbar:getOrientation
+--@api-stub: LToolbar:getOrientation
 -- Returns the orientation of this toolbar.
 do
   local tb = lurek.ui.newToolbar()
@@ -1807,35 +1807,35 @@ do
   print("getOrientation:", v)
 end
 
---@api-stub: Toolbar:setOrientation
+--@api-stub: LToolbar:setOrientation
 -- Sets the orientation of this toolbar.
 do
   local tb = lurek.ui.newToolbar()
   tb:setOrientation("horizontal")
 end
 
---@api-stub: Toolbar:addButton
+--@api-stub: LDialog:addButton
 -- Adds a button to this toolbar.
 do
   local tb = lurek.ui.newToolbar()
   tb:addButton("file")
 end
 
---@api-stub: Toolbar:addSeparator
+--@api-stub: LToolbar:addSeparator
 -- Adds a separator to this toolbar.
 do
   local tb = lurek.ui.newToolbar()
   tb:addSeparator()
 end
 
---@api-stub: Toolbar:addSpacer
+--@api-stub: LToolbar:addSpacer
 -- Adds a spacer to this toolbar.
 do
   local tb = lurek.ui.newToolbar()
   tb:addSpacer(1)
 end
 
---@api-stub: Toolbar:getButton
+--@api-stub: LToolbar:getButton
 -- Returns the button of this toolbar.
 do
   local tb = lurek.ui.newToolbar()
@@ -1843,21 +1843,21 @@ do
   print("getButton:", v)
 end
 
---@api-stub: Toolbar:setButtonEnabled
+--@api-stub: LToolbar:setButtonEnabled
 -- Sets whether this toolbar is enabled and accepts input.
 do
   local tb = lurek.ui.newToolbar()
   tb:addButton("file"); tb:setButtonEnabled("file", true)
 end
 
---@api-stub: Toolbar:setButtonToggled
+--@api-stub: LToolbar:setButtonToggled
 -- Sets the button toggled of this toolbar.
 do
   local tb = lurek.ui.newToolbar()
   tb:addButton("file"); tb:setButtonToggled("file", true)
 end
 
---@api-stub: Toolbar:isButtonToggled
+--@api-stub: LToolbar:isButtonToggled
 -- Returns true if this toolbar button toggled.
 do
   local tb = lurek.ui.newToolbar()
@@ -1867,7 +1867,7 @@ end
 
 -- Menu_Bar methods
 
---@api-stub: Menu_Bar:addMenu
+--@api-stub: LMenuBar:addMenu
 -- Adds a menu to this menu_bar.
 do
   local mb = lurek.ui.newMenuBar()
@@ -1875,14 +1875,14 @@ do
   mb:addMenu(1)
 end
 
---@api-stub: Menu_Bar:removeMenu
+--@api-stub: LMenuBar:removeMenu
 -- Removes a menu from this menu_bar.
 do
   local mb = lurek.ui.newMenuBar()
   mb:removeMenu(1)
 end
 
---@api-stub: Menu_Bar:getMenus
+--@api-stub: LMenuBar:getMenus
 -- Returns the menus of this menu_bar.
 do
   local mb = lurek.ui.newMenuBar()
@@ -1890,7 +1890,7 @@ do
   print("getMenus:", v)
 end
 
---@api-stub: Menu_Bar:getMenuCount
+--@api-stub: LMenuBar:getMenuCount
 -- Returns the number of menu items in this menu_bar.
 do
   local mb = lurek.ui.newMenuBar()
@@ -1900,7 +1900,7 @@ end
 
 -- Menu_Item methods
 
---@api-stub: Menu_Item:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
@@ -1908,14 +1908,14 @@ do
   print("getText:", v)
 end
 
---@api-stub: Menu_Item:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
   mi:setText("Hello")
 end
 
---@api-stub: Menu_Item:getShortcut
+--@api-stub: LMenuItem:getShortcut
 -- Returns the shortcut of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
@@ -1923,14 +1923,14 @@ do
   print("getShortcut:", v)
 end
 
---@api-stub: Menu_Item:setShortcut
+--@api-stub: LMenuItem:setShortcut
 -- Sets the shortcut of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
   mi:setShortcut("Ctrl+S")
 end
 
---@api-stub: Menu_Item:isChecked
+--@api-stub: LMenuItem:isChecked
 -- Returns true if this menu_item checked.
 do
   local mi = lurek.ui.newMenuItem("New Game")
@@ -1938,21 +1938,21 @@ do
   print("isChecked:", v)
 end
 
---@api-stub: Menu_Item:setChecked
+--@api-stub: LMenuItem:setChecked
 -- Sets the checked of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
   mi:setChecked(true)
 end
 
---@api-stub: Menu_Item:addSubItem
+--@api-stub: LMenuItem:addSubItem
 -- Adds a sub item to this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
   mi:addSubItem(1)
 end
 
---@api-stub: Menu_Item:getSubItems
+--@api-stub: LMenuItem:getSubItems
 -- Returns the sub items of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
@@ -1960,7 +1960,7 @@ do
   print("getSubItems:", v)
 end
 
---@api-stub: Menu_Item:setOnClick
+--@api-stub: LMenuItem:setOnClick
 -- Sets the on click of this menu_item.
 do
   local mi = lurek.ui.newMenuItem("New Game")
@@ -1969,7 +1969,7 @@ end
 
 -- Dialog methods
 
---@api-stub: Dialog:getTitle
+--@api-stub: LDialog:getTitle
 -- Returns the title of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
@@ -1977,14 +1977,14 @@ do
   print("getTitle:", v)
 end
 
---@api-stub: Dialog:setTitle
+--@api-stub: LDialog:setTitle
 -- Sets the title of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:setTitle("Hello")
 end
 
---@api-stub: Dialog:isModal
+--@api-stub: LDialog:isModal
 -- Returns true if this dialog modal.
 do
   local dlg = lurek.ui.newDialog("Quit?")
@@ -1992,14 +1992,14 @@ do
   print("isModal:", v)
 end
 
---@api-stub: Dialog:setModal
+--@api-stub: LDialog:setModal
 -- Sets the modal of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:setModal(true)
 end
 
---@api-stub: Dialog:isOpen
+--@api-stub: LDialog:isOpen
 -- Returns true if this dialog open.
 do
   local dlg = lurek.ui.newDialog("Quit?")
@@ -2007,35 +2007,35 @@ do
   print("isOpen:", v)
 end
 
---@api-stub: Dialog:open
+--@api-stub: LDialog:open
 -- Performs the open operation on this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:open()
 end
 
---@api-stub: Dialog:close
+--@api-stub: LDialog:close
 -- Performs the close operation on this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:close()
 end
 
---@api-stub: Dialog:setOnClose
+--@api-stub: LDialog:setOnClose
 -- Sets the on close of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:setOnClose(function() print("event") end)
 end
 
---@api-stub: Dialog:setContent
+--@api-stub: LDialog:setContent
 -- Sets the content of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
   dlg:setContent(1)
 end
 
---@api-stub: Dialog:getContent
+--@api-stub: LDialog:getContent
 -- Returns the content of this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
@@ -2043,7 +2043,7 @@ do
   print("getContent:", v)
 end
 
---@api-stub: Dialog:addButton
+--@api-stub: LDialog:addButton
 -- Adds a button to this dialog.
 do
   local dlg = lurek.ui.newDialog("Quit?")
@@ -2052,21 +2052,21 @@ end
 
 -- Status_Bar methods
 
---@api-stub: Status_Bar:addSection
+--@api-stub: LAccordion:addSection
 -- Adds a section to this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
   sb:addSection("Ready")
 end
 
---@api-stub: Status_Bar:setSectionText
+--@api-stub: LStatusBar:setSectionText
 -- Sets the section text of this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
   sb:addSection("Ready"); sb:setSectionText(1, "Hello")
 end
 
---@api-stub: Status_Bar:getSectionText
+--@api-stub: LStatusBar:getSectionText
 -- Returns the section text of this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
@@ -2074,7 +2074,7 @@ do
   print("getSectionText:", v)
 end
 
---@api-stub: Status_Bar:getSectionCount
+--@api-stub: LAccordion:getSectionCount
 -- Returns the number of section items in this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
@@ -2082,14 +2082,14 @@ do
   print("getSectionCount:", v)
 end
 
---@api-stub: Status_Bar:setSectionCount
+--@api-stub: LStatusBar:setSectionCount
 -- Sets the section count of this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
   sb:setSectionCount(4)
 end
 
---@api-stub: Status_Bar:setSectionWidget
+--@api-stub: LStatusBar:setSectionWidget
 -- Sets the section widget of this status_bar.
 do
   local sb = lurek.ui.newStatusBar()
@@ -2098,14 +2098,14 @@ end
 
 -- Accordion methods
 
---@api-stub: Accordion:addSection
+--@api-stub: LAccordion:addSection
 -- Adds a section to this accordion.
 do
   local acc = lurek.ui.newAccordion()
   acc:addSection("Stats")
 end
 
---@api-stub: Accordion:getSectionCount
+--@api-stub: LAccordion:getSectionCount
 -- Returns the number of section items in this accordion.
 do
   local acc = lurek.ui.newAccordion()
@@ -2113,14 +2113,14 @@ do
   print("getSectionCount:", v)
 end
 
---@api-stub: Accordion:toggleSection
+--@api-stub: LAccordion:toggleSection
 -- Toggles the section state of this accordion.
 do
   local acc = lurek.ui.newAccordion()
   acc:addSection("Stats"); acc:toggleSection(1)
 end
 
---@api-stub: Accordion:isSectionExpanded
+--@api-stub: LAccordion:isSectionExpanded
 -- Returns true if this accordion section expanded.
 do
   local acc = lurek.ui.newAccordion()
@@ -2128,7 +2128,7 @@ do
   print("isSectionExpanded:", v)
 end
 
---@api-stub: Accordion:isExclusive
+--@api-stub: LAccordion:isExclusive
 -- Returns true if this accordion exclusive.
 do
   local acc = lurek.ui.newAccordion()
@@ -2136,14 +2136,14 @@ do
   print("isExclusive:", v)
 end
 
---@api-stub: Accordion:setExclusive
+--@api-stub: LAccordion:setExclusive
 -- Sets the exclusive of this accordion.
 do
   local acc = lurek.ui.newAccordion()
   acc:setExclusive(true)
 end
 
---@api-stub: Accordion:getSectionTitle
+--@api-stub: LAccordion:getSectionTitle
 -- Returns the section title of this accordion.
 do
   local acc = lurek.ui.newAccordion()
@@ -2153,7 +2153,7 @@ end
 
 -- Tooltip_Panel methods
 
---@api-stub: Tooltip_Panel:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
@@ -2161,14 +2161,14 @@ do
   print("getText:", v)
 end
 
---@api-stub: Tooltip_Panel:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
   tip:setText("Hello")
 end
 
---@api-stub: Tooltip_Panel:getDelay
+--@api-stub: LTooltipPanel:getDelay
 -- Returns the delay of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
@@ -2176,14 +2176,14 @@ do
   print("getDelay:", v)
 end
 
---@api-stub: Tooltip_Panel:setDelay
+--@api-stub: LTooltipPanel:setDelay
 -- Sets the delay of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
   tip:setDelay(2.0)
 end
 
---@api-stub: Tooltip_Panel:getTarget
+--@api-stub: LTooltipPanel:getTarget
 -- Returns the target of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
@@ -2191,7 +2191,7 @@ do
   print("getTarget:", v)
 end
 
---@api-stub: Tooltip_Panel:setTarget
+--@api-stub: LTooltipPanel:setTarget
 -- Sets the target of this tooltip_panel.
 do
   local tip = lurek.ui.newTooltipPanel("Click to attack")
@@ -2200,7 +2200,7 @@ end
 
 -- Color_Picker methods
 
---@api-stub: Color_Picker:getColor
+--@api-stub: LColorPicker:getColor
 -- Returns the color of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
@@ -2208,14 +2208,14 @@ do
   print("getColor:", v)
 end
 
---@api-stub: Color_Picker:setColor
+--@api-stub: LColorPicker:setColor
 -- Sets the color of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
   cp:setColor(0.2, 0.6, 1.0, 1.0)
 end
 
---@api-stub: Color_Picker:getShowAlpha
+--@api-stub: LColorPicker:getShowAlpha
 -- Returns the show alpha of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
@@ -2223,14 +2223,14 @@ do
   print("getShowAlpha:", v)
 end
 
---@api-stub: Color_Picker:setShowAlpha
+--@api-stub: LColorPicker:setShowAlpha
 -- Sets the show alpha of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
   cp:setShowAlpha(true)
 end
 
---@api-stub: Color_Picker:getColorMode
+--@api-stub: LColorPicker:getColorMode
 -- Returns the color mode of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
@@ -2238,14 +2238,14 @@ do
   print("getColorMode:", v)
 end
 
---@api-stub: Color_Picker:setColorMode
+--@api-stub: LColorPicker:setColorMode
 -- Sets the color mode of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
   cp:setColorMode("rgb")
 end
 
---@api-stub: Color_Picker:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this color_picker.
 do
   local cp = lurek.ui.newColorPicker()
@@ -2254,14 +2254,14 @@ end
 
 -- Gui_Table methods
 
---@api-stub: Gui_Table:addColumn
+--@api-stub: LGuiTable:addColumn
 -- Adds a column to this gui_table.
 do
   local tbl = lurek.ui.newTable()
   tbl:addColumn("item_1")
 end
 
---@api-stub: Gui_Table:getColumnCount
+--@api-stub: LGuiTable:getColumnCount
 -- Returns the number of column items in this gui_table.
 do
   local tbl = lurek.ui.newTable()
@@ -2269,14 +2269,14 @@ do
   print("getColumnCount:", v)
 end
 
---@api-stub: Gui_Table:addRow
+--@api-stub: LGuiTable:addRow
 -- Adds a row to this gui_table.
 do
   local tbl = lurek.ui.newTable()
   tbl:addRow({"item_1"})
 end
 
---@api-stub: Gui_Table:getRowCount
+--@api-stub: LGuiTable:getRowCount
 -- Returns the number of row items in this gui_table.
 do
   local tbl = lurek.ui.newTable()
@@ -2284,7 +2284,7 @@ do
   print("getRowCount:", v)
 end
 
---@api-stub: Gui_Table:getCell
+--@api-stub: LGuiTable:getCell
 -- Returns the cell of this gui_table.
 do
   local tbl = lurek.ui.newTable()
@@ -2292,14 +2292,14 @@ do
   print("getCell:", v)
 end
 
---@api-stub: Gui_Table:setCell
+--@api-stub: LGuiTable:setCell
 -- Sets the cell of this gui_table.
 do
   local tbl = lurek.ui.newTable()
   tbl:addColumn("Name"); tbl:addRow({"Alice"}); tbl:setCell(1, 1, "Bob")
 end
 
---@api-stub: Gui_Table:getSelectedRow
+--@api-stub: LGuiTable:getSelectedRow
 -- Returns the selected row of this gui_table.
 do
   local tbl = lurek.ui.newTable()
@@ -2307,14 +2307,14 @@ do
   print("getSelectedRow:", v)
 end
 
---@api-stub: Gui_Table:setSelectedRow
+--@api-stub: LGuiTable:setSelectedRow
 -- Sets the selected row of this gui_table.
 do
   local tbl = lurek.ui.newTable()
   tbl:setSelectedRow(1)
 end
 
---@api-stub: Gui_Table:isSortable
+--@api-stub: LGuiTable:isSortable
 -- Returns true if this gui_table sortable.
 do
   local tbl = lurek.ui.newTable()
@@ -2322,14 +2322,14 @@ do
   print("isSortable:", v)
 end
 
---@api-stub: Gui_Table:setSortable
+--@api-stub: LGuiTable:setSortable
 -- Sets the sortable of this gui_table.
 do
   local tbl = lurek.ui.newTable()
   tbl:setSortable(true)
 end
 
---@api-stub: Gui_Table:setOnSelect
+--@api-stub: LGuiTable:setOnSelect
 -- Sets the on select of this gui_table.
 do
   local tbl = lurek.ui.newTable()
@@ -2338,7 +2338,7 @@ end
 
 -- Image_Widget methods
 
---@api-stub: Image_Widget:getScaleMode
+--@api-stub: LImageWidget:getScaleMode
 -- Returns the scale mode of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2346,14 +2346,14 @@ do
   print("getScaleMode:", v)
 end
 
---@api-stub: Image_Widget:setScaleMode
+--@api-stub: LImageWidget:setScaleMode
 -- Sets the scale mode of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   img:setScaleMode("fit")
 end
 
---@api-stub: Image_Widget:getTint
+--@api-stub: LImageWidget:getTint
 -- Returns the tint of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2361,252 +2361,252 @@ do
   print("getTint:", v)
 end
 
---@api-stub: Image_Widget:setTint
+--@api-stub: LImageWidget:setTint
 -- Sets the tint of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   img:setTint(0.2, 0.6, 1.0, 1.0)
 end
 
---@api-stub: Image_Widget:newButton
+--@api-stub: lurek.ui.newButton
 -- Creates and returns a new button widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newButton("Btn")
 end
 
---@api-stub: Image_Widget:newLabel
+--@api-stub: lurek.ui.newLabel
 -- Creates and returns a new label widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newLabel("hello")
 end
 
---@api-stub: Image_Widget:newTextInput
+--@api-stub: lurek.ui.newTextInput
 -- Creates and returns a new text input widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTextInput()
 end
 
---@api-stub: Image_Widget:newCheckbox
+--@api-stub: lurek.ui.newCheckbox
 -- Creates and returns a new checkbox widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newCheckbox("opt")
 end
 
---@api-stub: Image_Widget:newSlider
+--@api-stub: lurek.ui.newSlider
 -- Creates and returns a new slider widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSlider()
 end
 
---@api-stub: Image_Widget:newProgressBar
+--@api-stub: lurek.ui.newProgressBar
 -- Creates and returns a new progress bar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newProgressBar()
 end
 
---@api-stub: Image_Widget:newComboBox
+--@api-stub: lurek.ui.newComboBox
 -- Creates and returns a new combo box widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newComboBox()
 end
 
---@api-stub: Image_Widget:newList
+--@api-stub: lurek.ui.newList
 -- Creates and returns a new list widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newList()
 end
 
---@api-stub: Image_Widget:newPanel
+--@api-stub: lurek.ui.newPanel
 -- Creates and returns a new panel widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newPanel()
 end
 
---@api-stub: Image_Widget:newLayout
+--@api-stub: lurek.ui.newLayout
 -- Creates and returns a new layout widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newLayout("row")
 end
 
---@api-stub: Image_Widget:newScrollPanel
+--@api-stub: lurek.ui.newScrollPanel
 -- Creates and returns a new scroll panel widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newScrollPanel()
 end
 
---@api-stub: Image_Widget:newNinePatch
+--@api-stub: lurek.ui.newNinePatch
 -- Creates and returns a new nine patch widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newNinePatch()
 end
 
---@api-stub: Image_Widget:newTabBar
+--@api-stub: lurek.ui.newTabBar
 -- Creates and returns a new tab bar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTabBar()
 end
 
---@api-stub: Image_Widget:newSeparator
+--@api-stub: lurek.ui.newSeparator
 -- Creates and returns a new separator widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSeparator()
 end
 
---@api-stub: Image_Widget:newSpacer
+--@api-stub: lurek.ui.newSpacer
 -- Creates and returns a new spacer widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSpacer()
 end
 
---@api-stub: Image_Widget:newToast
+--@api-stub: lurek.ui.newToast
 -- Creates and returns a new toast widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newToast()
 end
 
---@api-stub: Image_Widget:newTreeView
+--@api-stub: lurek.ui.newTreeView
 -- Creates and returns a new tree view widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTreeView()
 end
 
---@api-stub: Image_Widget:newRadioButton
+--@api-stub: lurek.ui.newRadioButton
 -- Creates and returns a new radio button widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newRadioButton("opt")
 end
 
---@api-stub: Image_Widget:newScrollBar
+--@api-stub: lurek.ui.newScrollBar
 -- Creates and returns a new scroll bar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newScrollBar()
 end
 
---@api-stub: Image_Widget:newWindow
+--@api-stub: lurek.ui.newWindow
 -- Creates and returns a new window widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newWindow()
 end
 
---@api-stub: Image_Widget:newSplitPanel
+--@api-stub: lurek.ui.newSplitPanel
 -- Creates and returns a new split panel widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSplitPanel()
 end
 
---@api-stub: Image_Widget:newDockPanel
+--@api-stub: lurek.ui.newDockPanel
 -- Creates and returns a new dock panel widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newDockPanel()
 end
 
---@api-stub: Image_Widget:newToolbar
+--@api-stub: lurek.ui.newToolbar
 -- Creates and returns a new toolbar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newToolbar()
 end
 
---@api-stub: Image_Widget:newMenuBar
+--@api-stub: lurek.ui.newMenuBar
 -- Creates and returns a new menu bar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newMenuBar()
 end
 
---@api-stub: Image_Widget:newMenuItem
+--@api-stub: lurek.ui.newMenuItem
 -- Creates and returns a new menu item widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newMenuItem()
 end
 
---@api-stub: Image_Widget:newDialog
+--@api-stub: lurek.ui.newDialog
 -- Creates and returns a new dialog widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newDialog()
 end
 
---@api-stub: Image_Widget:newStatusBar
+--@api-stub: lurek.ui.newStatusBar
 -- Creates and returns a new status bar widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newStatusBar()
 end
 
---@api-stub: Image_Widget:newAccordion
+--@api-stub: lurek.ui.newAccordion
 -- Creates and returns a new accordion widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newAccordion()
 end
 
---@api-stub: Image_Widget:newTooltipPanel
+--@api-stub: lurek.ui.newTooltipPanel
 -- Creates and returns a new tooltip panel widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTooltipPanel()
 end
 
---@api-stub: Image_Widget:newColorPicker
+--@api-stub: lurek.ui.newColorPicker
 -- Creates and returns a new color picker widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newColorPicker()
 end
 
---@api-stub: Image_Widget:newTable
+--@api-stub: lurek.ui.newTable
 -- Creates and returns a new table widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTable()
 end
 
---@api-stub: Image_Widget:newImageWidget
+--@api-stub: lurek.ui.newImageWidget
 -- Creates and returns a new image widget widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newImageWidget()
 end
 
---@api-stub: Image_Widget:newTheme
+--@api-stub: lurek.ui.newTheme
 -- Creates and returns a new theme widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newTheme()
 end
 
---@api-stub: Image_Widget:setTheme
+--@api-stub: lurek.ui.setTheme
 -- Sets the theme of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.setTheme(lurek.ui.newTheme())
 end
 
---@api-stub: Image_Widget:getTheme
+--@api-stub: lurek.ui.getTheme
 -- Returns the theme of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2614,7 +2614,7 @@ do
   print("getTheme:", v)
 end
 
---@api-stub: Image_Widget:getRoot
+--@api-stub: lurek.ui.getRoot
 -- Returns the root of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2622,14 +2622,14 @@ do
   print("getRoot:", v)
 end
 
---@api-stub: Image_Widget:setFocus
+--@api-stub: lurek.ui.setFocus
 -- Sets the focus of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.setFocus(nil)
 end
 
---@api-stub: Image_Widget:getFocus
+--@api-stub: lurek.ui.getFocus
 -- Returns the focus of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2637,35 +2637,35 @@ do
   print("getFocus:", v)
 end
 
---@api-stub: Image_Widget:focusNext
+--@api-stub: lurek.ui.focusNext
 -- Performs the focus next operation on this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.focusNext()
 end
 
---@api-stub: Image_Widget:focusPrev
+--@api-stub: lurek.ui.focusPrev
 -- Performs the focus prev operation on this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.focusPrev()
 end
 
---@api-stub: Image_Widget:clearFocus
+--@api-stub: lurek.ui.clearFocus
 -- Clears all focus items from this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.clearFocus()
 end
 
---@api-stub: Image_Widget:addToast
+--@api-stub: lurek.ui.addToast
 -- Adds a toast to this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.addToast({text="Hello"})
 end
 
---@api-stub: Image_Widget:getToastCount
+--@api-stub: lurek.ui.getToastCount
 -- Returns the number of toast items in this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2673,62 +2673,62 @@ do
   print("getToastCount:", v)
 end
 
---@api-stub: Image_Widget:mousepressed
+--@api-stub: lurek.ui.mousepressed
 -- Forwards a mouse press event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.mousepressed(100, 200, 1)
 end
 
---@api-stub: Image_Widget:mousereleased
+--@api-stub: lurek.ui.mousereleased
 -- Forwards a mouse release event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.mousereleased(100, 200, 1)
 end
 
---@api-stub: Image_Widget:mousemoved
+--@api-stub: lurek.ui.mousemoved
 -- Forwards a mouse move event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.mousemoved(100, 200)
 end
---@api-stub: Image_Widget:keypressed
+--@api-stub: lurek.ui.keypressed
 -- Forwards a key press event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.keypressed("space")
 end
 
---@api-stub: Image_Widget:textinput
+--@api-stub: lurek.ui.textinput
 -- Forwards a text input event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.textinput("a")
 end
 
---@api-stub: Image_Widget:wheelmoved
+--@api-stub: lurek.ui.wheelmoved
 -- Forwards a mouse wheel event to this image_widget for input handling.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.wheelmoved(0, 1)
 end
 
---@api-stub: Image_Widget:update
+--@api-stub: lurek.ui.update
 -- Advances this image_widget by the given delta time.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.update(0.016)
 end
 
---@api-stub: Image_Widget:draw
+--@api-stub: lurek.ui.draw
 -- Draws or renders this image_widget to the current render target.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.draw()
 end
 
---@api-stub: Image_Widget:getWidgetCount
+--@api-stub: lurek.ui.getWidgetCount
 -- Returns the number of widget items in this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2736,112 +2736,112 @@ do
   print("getWidgetCount:", v)
 end
 
---@api-stub: Image_Widget:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this image_widget to the current render target.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.drawToImage(800, 600)
 end
 
---@api-stub: Image_Widget:newLineChart
+--@api-stub: lurek.ui.newLineChart
 -- Creates and returns a new line chart widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newLineChart({})
 end
 
---@api-stub: Image_Widget:newBarChart
+--@api-stub: lurek.ui.newBarChart
 -- Creates and returns a new bar chart widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newBarChart({})
 end
 
---@api-stub: Image_Widget:newScatterPlot
+--@api-stub: lurek.ui.newScatterPlot
 -- Creates and returns a new scatter plot widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newScatterPlot({})
 end
 
---@api-stub: Image_Widget:newPieChart
+--@api-stub: lurek.ui.newPieChart
 -- Creates and returns a new pie chart widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newPieChart({})
 end
 
---@api-stub: Image_Widget:newAreaChart
+--@api-stub: lurek.ui.newAreaChart
 -- Creates and returns a new area chart widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newAreaChart({})
 end
 
---@api-stub: Image_Widget:parseWidgetState
+--@api-stub: lurek.ui.parseWidgetState
 -- Performs the parse widget state operation on this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.parseWidgetState("{}")
 end
 
---@api-stub: Image_Widget:newSpinBox
+--@api-stub: lurek.ui.newSpinBox
 -- Creates and returns a new spin box widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSpinBox()
 end
 
---@api-stub: Image_Widget:newSwitch
+--@api-stub: lurek.ui.newSwitch
 -- Creates and returns a new switch widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newSwitch()
 end
 
---@api-stub: Image_Widget:newBadge
+--@api-stub: lurek.ui.newBadge
 -- Creates and returns a new badge widget or object.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.newBadge()
 end
 
---@api-stub: Image_Widget:setDefaultTheme
+--@api-stub: lurek.ui.setDefaultTheme
 -- Sets the default theme of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.setDefaultTheme()
 end
 
---@api-stub: Image_Widget:setViewport
+--@api-stub: lurek.ui.setViewport
 -- Sets the viewport of this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.setViewport(800, 600)
 end
 
---@api-stub: Image_Widget:flushCache
+--@api-stub: lurek.ui.flushCache
 -- Performs the flush cache operation on this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.flushCache()
 end
 
---@api-stub: Image_Widget:update_bindings
+--@api-stub: lurek.ui.update_bindings
 -- Advances _bindings this image_widget by the given delta time.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.update_bindings({})
 end
 
---@api-stub: Image_Widget:loadLayout
+--@api-stub: lurek.ui.loadLayout
 -- Loads layout into this image_widget.
 do
   local img = lurek.ui.newImageWidget()
   lurek.ui.loadLayout({})
 end
 
---@api-stub: Image_Widget:loadLayoutFile
+--@api-stub: lurek.ui.loadLayoutFile
 -- Loads layout file into this image_widget.
 do
   local img = lurek.ui.newImageWidget()
@@ -2850,7 +2850,7 @@ do
   lurek.log.info("loadLayoutFile available", "ui")
 end
 
---@api-stub: Image_Widget:renderToImage
+--@api-stub: lurek.ui.renderToImage
 -- Draws or renders this image_widget to the current render target.
 do
   local img = lurek.ui.newImageWidget()
@@ -2859,21 +2859,21 @@ end
 
 -- LineChart methods
 
---@api-stub: LineChart:setYMax
+--@api-stub: LAreaChart:setYMax
 -- Sets the y max of this line chart.
 do
   local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
   chart:setYMax(100)
 end
 
---@api-stub: LineChart:setXMax
+--@api-stub: LLineChart:setXMax
 -- Sets the x max of this line chart.
 do
   local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
   chart:setXMax(100)
 end
 
---@api-stub: LineChart:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this line chart to the current render target.
 do
   local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
@@ -2882,7 +2882,7 @@ end
 
 -- BarChart methods
 
---@api-stub: BarChart:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this bar chart to the current render target.
 do
   local w = lurek.ui.newBarChart({})
@@ -2891,21 +2891,21 @@ end
 
 -- ScatterPlot methods
 
---@api-stub: ScatterPlot:setXRange
+--@api-stub: LScatterPlot:setXRange
 -- Sets the x range of this scatter plot.
 do
   local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setXRange(1, 10)
 end
 
---@api-stub: ScatterPlot:setYRange
+--@api-stub: LScatterPlot:setYRange
 -- Sets the y range of this scatter plot.
 do
   local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
   plot:setYRange(1, 10)
 end
 
---@api-stub: ScatterPlot:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this scatter plot to the current render target.
 do
   local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
@@ -2914,7 +2914,7 @@ end
 
 -- PieChart methods
 
---@api-stub: PieChart:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this pie chart to the current render target.
 do
   local chart = lurek.ui.newPieChart({{label="HP",value=70}})
@@ -2923,14 +2923,14 @@ end
 
 -- AreaChart methods
 
---@api-stub: AreaChart:setYMax
+--@api-stub: LAreaChart:setYMax
 -- Sets the y max of this area chart.
 do
   local w = lurek.ui.newAreaChart({})
   w:setYMax(100)
 end
 
---@api-stub: AreaChart:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Draws or renders this area chart to the current render target.
 do
   local w = lurek.ui.newBarChart({})
@@ -2939,7 +2939,7 @@ end
 
 -- Custom widget extensibility
 
---@api-stub: Image_Widget:newCustomWidget
+--@api-stub: lurek.ui.newCustomWidget
 -- Creates and returns a new custom widget widget or object.
 do
   local widget = lurek.ui.newCustomWidget({
@@ -2963,7 +2963,7 @@ do
 end
 
 
---@api-stub: BarChart:addCategory
+--@api-stub: LBarChart:addCategory
 -- Adds a category to this bar chart.
 do
   lurek.log.info("BarChart:addCategory usage: chart:addCategory('Jan')", "ui")
@@ -2973,7 +2973,7 @@ do
   lurek.log.info("categories added", "ui")
 end
 
---@api-stub: AreaChart:addLayer
+--@api-stub: LAreaChart:addLayer
 -- Adds a layer to this area chart.
 do
   local ac = lurek.ui.newAreaChart({})
@@ -2982,7 +2982,7 @@ do
   lurek.log.info("area layers added", "ui")
 end
 
---@api-stub: PieChart:addSegment
+--@api-stub: LPieChart:addSegment
 -- Adds a segment to this pie chart.
 do
   local pc = lurek.ui.newPieChart({})
@@ -2992,7 +2992,7 @@ do
   lurek.log.info("pie segments added", "ui")
 end
 
---@api-stub: LineChart:addSeries
+--@api-stub: LScatterPlot:addSeries
 -- Adds a series to this line chart.
 do
   local lc = lurek.ui.newLineChart({})
@@ -3001,7 +3001,7 @@ do
   lurek.log.info("line series added", "ui")
 end
 
---@api-stub: BarChart:addSeries
+--@api-stub: LScatterPlot:addSeries
 -- Adds a series to this bar chart.
 do
   local bc = lurek.ui.newBarChart({})
@@ -3011,7 +3011,7 @@ do
   lurek.log.info("bar series added", "ui")
 end
 
---@api-stub: ScatterPlot:addSeries
+--@api-stub: LScatterPlot:addSeries
 -- Adds a series to this scatter plot.
 do
   local sp = lurek.ui.newScatterPlot({})
@@ -3020,7 +3020,7 @@ do
   lurek.log.info("scatter series added", "ui")
 end
 
---@api-stub: Theme:setStyle
+--@api-stub: LTheme:setStyle
 -- Sets the style of this theme.
 do
   local theme = lurek.ui.newTheme()
@@ -3032,7 +3032,7 @@ end
 -- LineChart methods
 
 
---@api-stub: LineChart:type
+--@api-stub: LAreaChart:type
 -- Returns the Lua-visible type name string for this line chart handle.
 do
   local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
@@ -3040,7 +3040,7 @@ do
   local t = chart:type()
   lurek.log.info("LineChart:type = " .. t, "ui")
 end
---@api-stub: LineChart:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Returns true if this line chart handle matches the given type name string.
 do
   local chart = lurek.ui.newLineChart({0.1,0.3,0.5,0.7})
@@ -3069,7 +3069,7 @@ do
   lurek.log.info("is LAreaChart: " .. tostring(w:typeOf("LAreaChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
 end
---@api-stub: LBarChart:type
+--@api-stub: LAreaChart:type
 -- Returns the type name of this object
 do
   local w = lurek.ui.newBarChart({})
@@ -3077,7 +3077,7 @@ do
   local t = w:type()
   lurek.log.info("LBarChart:type = " .. t, "ui")
 end
---@api-stub: LBarChart:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Checks whether this object matches the given type name
 do
   local w = lurek.ui.newBarChart({})
@@ -3085,21 +3085,21 @@ do
   lurek.log.info("is LBarChart: " .. tostring(w:typeOf("LBarChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
 end
---@api-stub: LLineChart:type
+--@api-stub: LAreaChart:type
 -- Returns the type name of this object
 do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Sales" })
   local t = chart:type()
   lurek.log.info("LLineChart:type=" .. t, "ui")
 end
---@api-stub: LLineChart:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Checks whether this object matches the given type name
 do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Revenue" })
   lurek.log.info("is LLineChart: " .. tostring(chart:typeOf("LLineChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
 end
---@api-stub: LPieChart:type
+--@api-stub: LAreaChart:type
 -- Returns the type name of this object
 do
   local chart = lurek.ui.newPieChart({{label="HP",value=70}})
@@ -3107,7 +3107,7 @@ do
   local t = chart:type()
   lurek.log.info("LPieChart:type = " .. t, "ui")
 end
---@api-stub: LPieChart:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Checks whether this object matches the given type name
 do
   local chart = lurek.ui.newPieChart({{label="HP",value=70}})
@@ -3115,7 +3115,7 @@ do
   lurek.log.info("is LPieChart: " .. tostring(chart:typeOf("LPieChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
 end
---@api-stub: LScatterPlot:type
+--@api-stub: LAreaChart:type
 -- Returns the type name of this object
 do
   local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
@@ -3123,7 +3123,7 @@ do
   local t = plot:type()
   lurek.log.info("LScatterPlot:type = " .. t, "ui")
 end
---@api-stub: LScatterPlot:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Checks whether this object matches the given type name
 do
   local plot = lurek.ui.newScatterPlot({{1,2},{3,4},{5,6}})
@@ -3131,7 +3131,7 @@ do
   lurek.log.info("is LScatterPlot: " .. tostring(plot:typeOf("LScatterPlot")), "ui")
   lurek.log.info("is wrong: " .. tostring(plot:typeOf("Unknown")), "ui")
 end
---@api-stub: LTheme:type
+--@api-stub: LAreaChart:type
 -- Returns the type name of this object
 do
   local theme = lurek.ui.newTheme()
@@ -3140,7 +3140,7 @@ do
   local t = theme:type()
   lurek.log.info("LTheme:type = " .. t, "ui")
 end
---@api-stub: LTheme:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Checks whether this object matches the given type name
 do
   local theme = lurek.ui.newTheme()
@@ -3150,14 +3150,14 @@ do
   lurek.log.info("is wrong: " .. tostring(theme:typeOf("Unknown")), "ui")
 end
 
---@api-stub: lurek.ui.type
+--@api-stub: LAreaChart:type
 -- Returns the Lua-visible type name string for this ui handle.
 do
   local chart = lurek.ui.newLineChart({ width = 200, height = 150, title = "FPS" })
   local t = chart:type()
   lurek.log.info("ui.type=" .. tostring(t), "ui")
 end
---@api-stub: LLineChart:setYMax
+--@api-stub: LAreaChart:setYMax
 -- Sets the maximum Y-axis value for this line chart
 do
   local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Score" })
@@ -3171,7 +3171,7 @@ do
   chart:setXMax(60)   -- fixed 60-second window
   lurek.log.info("x-axis max set to 60", "ui")
 end
---@api-stub: LLineChart:drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Renders this line chart to an image buffer
 do
   local chart = lurek.ui.newLineChart({ width = 256, height = 128, title = "Wave" })
@@ -3608,7 +3608,7 @@ do
 end
 
 
---@api-stub: lurek.ui.drawToImage
+--@api-stub: LAreaChart:drawToImage
 -- Renders the entire UI to an image buffer
 do
   local img = lurek.ui.drawToImage(128.0, 64.0)
@@ -3843,7 +3843,7 @@ end
 -- LButton methods
 
 
---@api-stub: LButton:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this button.
 do
   local btn = lurek.ui.newButton("Click")
@@ -3852,7 +3852,7 @@ do
 end
 
 
---@api-stub: LButton:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this button.
 do
   local btn = lurek.ui.newButton("Click")
@@ -3864,7 +3864,7 @@ end
 -- LCheckbox methods
 
 
---@api-stub: LCheckbox:setChecked
+--@api-stub: LMenuItem:setChecked
 -- Sets the checked of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Option")
@@ -3873,7 +3873,7 @@ do
 end
 
 
---@api-stub: LCheckbox:isChecked
+--@api-stub: LMenuItem:isChecked
 -- Returns true if this checkbox checked.
 do
   local cb = lurek.ui.newCheckbox("Option")
@@ -3882,7 +3882,7 @@ do
 end
 
 
---@api-stub: LCheckbox:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Option")
@@ -3891,7 +3891,7 @@ do
 end
 
 
---@api-stub: LCheckbox:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this checkbox.
 do
   local cb = lurek.ui.newCheckbox("Option")
@@ -3969,7 +3969,7 @@ end
 -- LComboBox methods
 
 
---@api-stub: LComboBox:addItem
+--@api-stub: LListBox:addItem
 -- Adds a item to this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -3978,7 +3978,7 @@ do
 end
 
 
---@api-stub: LComboBox:removeItem
+--@api-stub: LListBox:removeItem
 -- Removes a item from this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -3987,7 +3987,7 @@ do
 end
 
 
---@api-stub: LComboBox:clearItems
+--@api-stub: LListBox:clearItems
 -- Clears all items items from this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -3996,7 +3996,7 @@ do
 end
 
 
---@api-stub: LComboBox:getItemCount
+--@api-stub: LListBox:getItemCount
 -- Returns the number of item items in this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -4005,7 +4005,7 @@ do
 end
 
 
---@api-stub: LComboBox:getItem
+--@api-stub: LListBox:getItem
 -- Returns the item of this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -4014,7 +4014,7 @@ do
 end
 
 
---@api-stub: LComboBox:setSelectedIndex
+--@api-stub: LListBox:setSelectedIndex
 -- Sets the selected index of this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -4023,7 +4023,7 @@ do
 end
 
 
---@api-stub: LComboBox:getSelectedIndex
+--@api-stub: LListBox:getSelectedIndex
 -- Returns the selected index of this combo box.
 do
   local combo = lurek.ui.newComboBox()
@@ -4296,7 +4296,7 @@ end
 -- LGuiWindow methods
 
 
---@api-stub: LGuiWindow:getTitle
+--@api-stub: LDialog:getTitle
 -- Returns the title of this gui window.
 do
   local win = lurek.ui.newWindow("Title")
@@ -4305,7 +4305,7 @@ do
 end
 
 
---@api-stub: LGuiWindow:setTitle
+--@api-stub: LDialog:setTitle
 -- Sets the title of this gui window.
 do
   local win = lurek.ui.newWindow("Title")
@@ -4368,7 +4368,7 @@ do
 end
 
 
---@api-stub: LGuiWindow:setOnClose
+--@api-stub: LDialog:setOnClose
 -- Sets the on close of this gui window.
 do
   local win = lurek.ui.newWindow("Title")
@@ -4419,7 +4419,7 @@ end
 -- LLabel methods
 
 
---@api-stub: LLabel:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this abel.
 do
   local lbl = lurek.ui.newLabel("Text")
@@ -4428,7 +4428,7 @@ do
 end
 
 
---@api-stub: LLabel:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this abel.
 do
   local lbl = lurek.ui.newLabel("Text")
@@ -4542,7 +4542,7 @@ end
 -- LLineChart methods
 
 
---@api-stub: LLineChart:addSeries
+--@api-stub: LScatterPlot:addSeries
 -- Adds a named series of points to this line chart
 do
   local chart = lurek.ui.newLineChart({ width = 300, height = 200, title = "Data" })
@@ -4668,7 +4668,7 @@ end
 -- LMenuItem methods
 
 
---@api-stub: LMenuItem:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this menu item.
 do
   local mi = lurek.ui.newMenuItem("File")
@@ -4677,7 +4677,7 @@ do
 end
 
 
---@api-stub: LMenuItem:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this menu item.
 do
   local mi = lurek.ui.newMenuItem("File")
@@ -4800,7 +4800,7 @@ end
 -- LPanel methods
 
 
---@api-stub: LPanel:setTitle
+--@api-stub: LDialog:setTitle
 -- Sets the title of this panel.
 do
   local panel = lurek.ui.newPanel()
@@ -4809,7 +4809,7 @@ do
 end
 
 
---@api-stub: LPanel:getTitle
+--@api-stub: LDialog:getTitle
 -- Returns the title of this panel.
 do
   local panel = lurek.ui.newPanel()
@@ -4830,7 +4830,7 @@ end
 -- LProgressBar methods
 
 
---@api-stub: LProgressBar:setValue
+--@api-stub: LSpinBox:setValue
 -- Sets the value of this progress bar.
 do
   local bar = lurek.ui.newProgressBar(0, 100)
@@ -4839,7 +4839,7 @@ do
 end
 
 
---@api-stub: LProgressBar:getValue
+--@api-stub: LSpinBox:getValue
 -- Returns the value of this progress bar.
 do
   local bar = lurek.ui.newProgressBar(0, 100)
@@ -4848,7 +4848,7 @@ do
 end
 
 
---@api-stub: LProgressBar:getProgress
+--@api-stub: LToast:getProgress
 -- Returns the progress of this progress bar.
 do
   local bar = lurek.ui.newProgressBar(0, 100)
@@ -4857,7 +4857,7 @@ do
 end
 
 
---@api-stub: LProgressBar:setRange
+--@api-stub: LSpinBox:setRange
 -- Sets the range of this progress bar.
 do
   local bar = lurek.ui.newProgressBar(0, 100)
@@ -4887,7 +4887,7 @@ end
 -- LRadioButton methods
 
 
---@api-stub: LRadioButton:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this radio button.
 do
   local rb = lurek.ui.newRadioButton("Option", "group1")
@@ -4896,7 +4896,7 @@ do
 end
 
 
---@api-stub: LRadioButton:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this radio button.
 do
   local rb = lurek.ui.newRadioButton("Option", "group1")
@@ -4941,7 +4941,7 @@ do
 end
 
 
---@api-stub: LRadioButton:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this radio button.
 do
   local rb = lurek.ui.newRadioButton("Option", "group1")
@@ -5016,7 +5016,7 @@ do
 end
 
 
---@api-stub: LScrollBar:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this scroll bar.
 do
   local scrollbar = lurek.ui.newScrollBar(true)
@@ -5028,7 +5028,7 @@ end
 -- LScrollPanel methods
 
 
---@api-stub: LScrollPanel:setContentSize
+--@api-stub: LScrollBar:setContentSize
 -- Sets the content size of this scroll panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -5037,7 +5037,7 @@ do
 end
 
 
---@api-stub: LScrollPanel:getContentSize
+--@api-stub: LScrollBar:getContentSize
 -- Returns the content size of this scroll panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -5046,7 +5046,7 @@ do
 end
 
 
---@api-stub: LScrollPanel:setScrollPosition
+--@api-stub: LScrollBar:setScrollPosition
 -- Sets the scroll position of this scroll panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -5055,7 +5055,7 @@ do
 end
 
 
---@api-stub: LScrollPanel:getScrollPosition
+--@api-stub: LScrollBar:getScrollPosition
 -- Returns the scroll position of this scroll panel.
 do
   local sp = lurek.ui.newScrollPanel()
@@ -5103,7 +5103,7 @@ do
 end
 
 
---@api-stub: LSeparator:isVertical
+--@api-stub: LScrollBar:isVertical
 -- Returns true if this separator vertical.
 do
   local sep = lurek.ui.newSeparator(false)
@@ -5133,7 +5133,7 @@ end
 -- LSlider methods
 
 
---@api-stub: LSlider:setValue
+--@api-stub: LSpinBox:setValue
 -- Sets the value of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5142,7 +5142,7 @@ do
 end
 
 
---@api-stub: LSlider:getValue
+--@api-stub: LSpinBox:getValue
 -- Returns the value of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5151,7 +5151,7 @@ do
 end
 
 
---@api-stub: LSlider:setRange
+--@api-stub: LSpinBox:setRange
 -- Sets the range of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5160,7 +5160,7 @@ do
 end
 
 
---@api-stub: LSlider:setStep
+--@api-stub: LSpinBox:setStep
 -- Sets the step of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5169,7 +5169,7 @@ do
 end
 
 
---@api-stub: LSlider:getMin
+--@api-stub: LProgressBar:getMin
 -- Returns the min of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5178,7 +5178,7 @@ do
 end
 
 
---@api-stub: LSlider:getMax
+--@api-stub: LProgressBar:getMax
 -- Returns the max of this slider.
 do
   local slider = lurek.ui.newSlider(0, 100)
@@ -5247,7 +5247,7 @@ end
 -- LSplitPanel methods
 
 
---@api-stub: LSplitPanel:getOrientation
+--@api-stub: LToolbar:getOrientation
 -- Returns the orientation of this split panel.
 do
   local split = lurek.ui.newSplitPanel("vertical")
@@ -5256,7 +5256,7 @@ do
 end
 
 
---@api-stub: LSplitPanel:setOrientation
+--@api-stub: LToolbar:setOrientation
 -- Sets the orientation of this split panel.
 do
   local split = lurek.ui.newSplitPanel("vertical")
@@ -5340,7 +5340,7 @@ end
 -- LStatusBar methods
 
 
---@api-stub: LStatusBar:addSection
+--@api-stub: LAccordion:addSection
 -- Adds a section to this status bar.
 do
   local sbar = lurek.ui.newStatusBar()
@@ -5367,7 +5367,7 @@ do
 end
 
 
---@api-stub: LStatusBar:getSectionCount
+--@api-stub: LAccordion:getSectionCount
 -- Returns the number of section items in this status bar.
 do
   local sbar = lurek.ui.newStatusBar()
@@ -5389,7 +5389,8 @@ end
 -- Sets the section widget of this status bar.
 do
   local sbar = lurek.ui.newStatusBar()
-  sbar:setSectionWidget(1, 1.0)
+  local section_widget = {}
+  sbar:setSectionWidget(1, section_widget)
   lurek.log.info("LStatusBar:setSectionWidget applied", "ui")
 end
 
@@ -5484,7 +5485,7 @@ end
 -- LTextInput methods
 
 
---@api-stub: LTextInput:setText
+--@api-stub: LTooltipPanel:setText
 -- Sets the text of this text input.
 do
   local input = lurek.ui.newTextInput()
@@ -5493,7 +5494,7 @@ do
 end
 
 
---@api-stub: LTextInput:getText
+--@api-stub: LTooltipPanel:getText
 -- Returns the text of this text input.
 do
   local input = lurek.ui.newTextInput()
@@ -5625,7 +5626,7 @@ do
 end
 
 
---@api-stub: LToolbar:addButton
+--@api-stub: LDialog:addButton
 -- Adds a button to this toolbar.
 do
   local tb = lurek.ui.newToolbar("horizontal")
@@ -5922,7 +5923,7 @@ end
 -- LUiWidget methods
 
 
---@api-stub: LUiWidget:type
+--@api-stub: LAreaChart:type
 -- Returns the Lua-visible type name string for this ui widget handle.
 do
   local w = lurek.ui.newPanel()
@@ -5931,7 +5932,7 @@ do
 end
 
 
---@api-stub: LUiWidget:typeOf
+--@api-stub: LAreaChart:typeOf
 -- Returns true if this ui widget handle matches the given type name string.
 do
   local w = lurek.ui.newPanel()
@@ -6111,7 +6112,7 @@ do
 end
 
 
---@api-stub: LUiWidget:setOnClick
+--@api-stub: LMenuItem:setOnClick
 -- Sets the on click of this ui widget.
 do
   local w = lurek.ui.newPanel()
@@ -6120,7 +6121,7 @@ do
 end
 
 
---@api-stub: LUiWidget:setOnChange
+--@api-stub: LColorPicker:setOnChange
 -- Sets the on change of this ui widget.
 do
   local w = lurek.ui.newPanel()
@@ -6403,109 +6404,56 @@ print("content/examples/ui.lua")
 -- LAreaChart methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LAreaChart:addLayer -------------------------------------------
---@api-stub: LAreaChart:addLayer
--- Adds a data layer to this area chart.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lAreaChart_stub:addLayer("hero", vals_tbl, 1.0, 0.8, 0.2)
--- (replace lAreaChart_stub with your real LAreaChart instance above)
-
--- ---- Stub: LAreaChart:setYMax --------------------------------------------
---@api-stub: LAreaChart:setYMax
--- Sets the maximum Y-axis value for this area chart.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lAreaChart_stub:setYMax(1.0)
--- (replace lAreaChart_stub with your real LAreaChart instance above)
-
--- ---- Stub: LAreaChart:drawToImage ----------------------------------------
---@api-stub: LAreaChart:drawToImage
--- Renders this area chart to an image buffer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lAreaChart_stub:drawToImage()
--- (replace lAreaChart_stub with your real LAreaChart instance above)
-
--- -----------------------------------------------------------------------------
--- LBarChart methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LBarChart:addSeries -------------------------------------------
 --@api-stub: LBarChart:addSeries
 -- Adds a named series to this bar chart.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBarChart_stub:addSeries("hero", 1.0, 0.8, 0.2)
--- (replace lBarChart_stub with your real LBarChart instance above)
+do
+  -- Track per-wave enemy kill counts to display in a post-round summary screen.
+  local chart = lurek.ui.newBarChart({ width = 240, height = 160, title = "Wave Kills" })
+  chart:addSeries("wave_1", 1.0, 0.3, 0.3)
+  chart:addSeries("wave_2", 0.3, 1.0, 0.3)
+  chart:addSeries("wave_3", 0.3, 0.3, 1.0)
+  lurek.log.info("bar chart has 3 series for wave kills", "ui")
+end
 
--- ---- Stub: LBarChart:addCategory -----------------------------------------
---@api-stub: LBarChart:addCategory
--- Adds a category with values for each series.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBarChart_stub:addCategory(label, vals_tbl)
--- (replace lBarChart_stub with your real LBarChart instance above)
-
--- ---- Stub: LBarChart:drawToImage -----------------------------------------
 --@api-stub: LBarChart:drawToImage
 -- Renders this bar chart to an image buffer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lBarChart_stub:drawToImage()
--- (replace lBarChart_stub with your real LBarChart instance above)
+do
+  -- Render the DPS chart to an image for the combat log overlay.
+  local chart = lurek.ui.newBarChart({ width = 200, height = 120, title = "DPS" })
+  chart:addSeries("damage", 0.9, 0.2, 0.2)
+  local target = lurek.image.newImageData(200, 120)
+  chart:drawToImage(target)
+  lurek.log.info("bar chart rendered to image: " .. tostring(target), "ui")
+end
 
 -- -----------------------------------------------------------------------------
 -- LPieChart methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LPieChart:addSegment ------------------------------------------
---@api-stub: LPieChart:addSegment
--- Adds a segment to this pie chart. This method is available to Lua scripts.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPieChart_stub:addSegment(label, 42, 1.0, 0.8, 0.2)
--- (replace lPieChart_stub with your real LPieChart instance above)
-
--- ---- Stub: LPieChart:drawToImage -----------------------------------------
 --@api-stub: LPieChart:drawToImage
 -- Renders this pie chart to an image buffer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lPieChart_stub:drawToImage()
--- (replace lPieChart_stub with your real LPieChart instance above)
+do
+  -- Show resource distribution (gold/wood/food) in the economy panel.
+  local pie = lurek.ui.newPieChart({ width = 150, height = 150, title = "Resources" })
+  local target = lurek.image.newImageData(150, 150)
+  pie:drawToImage(target)
+  lurek.log.info("pie chart rendered to image: " .. tostring(target), "ui")
+end
 
 -- -----------------------------------------------------------------------------
 -- LScatterPlot methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LScatterPlot:addSeries ----------------------------------------
---@api-stub: LScatterPlot:addSeries
--- Adds a data series to this scatter plot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lScatterPlot_stub:addSeries("hero", pts_tbl, 1.0, 0.8, 0.2)
--- (replace lScatterPlot_stub with your real LScatterPlot instance above)
-
--- ---- Stub: LScatterPlot:setXRange ----------------------------------------
---@api-stub: LScatterPlot:setXRange
--- Sets the X-axis range for this scatter plot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lScatterPlot_stub:setXRange(mn, mx)
--- (replace lScatterPlot_stub with your real LScatterPlot instance above)
-
--- ---- Stub: LScatterPlot:setYRange ----------------------------------------
---@api-stub: LScatterPlot:setYRange
--- Sets the Y-axis range for this scatter plot.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lScatterPlot_stub:setYRange(mn, mx)
--- (replace lScatterPlot_stub with your real LScatterPlot instance above)
-
--- ---- Stub: LScatterPlot:drawToImage --------------------------------------
 --@api-stub: LScatterPlot:drawToImage
 -- Renders this scatter plot to an image buffer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lScatterPlot_stub:drawToImage()
--- (replace lScatterPlot_stub with your real LScatterPlot instance above)
+do
+  -- Visualize player hit accuracy (x=distance, y=damage) for aim analysis.
+  local plot = lurek.ui.newScatterPlot({ width = 200, height = 150, title = "Accuracy" })
+  local target = lurek.image.newImageData(200, 150)
+  plot:drawToImage(target)
+  lurek.log.info("scatter plot rendered to image: " .. tostring(target), "ui")
+end
 
 -- -----------------------------------------------------------------------------
 -- LTheme methods
 -- -----------------------------------------------------------------------------
-
--- ---- Stub: LTheme:setStyle -----------------------------------------------
---@api-stub: LTheme:setStyle
--- Sets a style entry for the given widget type and state.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lTheme_stub:setStyle(widget_type, state, style_table)
--- (replace lTheme_stub with your real LTheme instance above)

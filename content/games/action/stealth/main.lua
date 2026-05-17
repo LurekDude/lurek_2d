@@ -366,14 +366,14 @@ function lurek.init()
     _cam = lurek.camera.new()
 
     -- Input actions
-    lurek.input.bind("up",       {"w", "up"})
-    lurek.input.bind("down",     {"s", "down"})
-    lurek.input.bind("left",     {"a", "left"})
-    lurek.input.bind("right",    {"d", "right"})
-    lurek.input.bind("crouch",   {"lshift", "rshift"})
-    lurek.input.bind("interact", {"e"})
-    lurek.input.bind("start",    {"return"})
-    lurek.input.bind("quit",     {"escape"})
+    lurek.input.bind("up",       "w");    lurek.input.bind("up",       "up")
+    lurek.input.bind("down",     "s");    lurek.input.bind("down",     "down")
+    lurek.input.bind("left",     "a");    lurek.input.bind("left",     "left")
+    lurek.input.bind("right",    "d");    lurek.input.bind("right",    "right")
+    lurek.input.bind("crouch",   "lshift"); lurek.input.bind("crouch",   "rshift")
+    lurek.input.bind("interact", "e")
+    lurek.input.bind("start",    "return")
+    lurek.input.bind("quit",     "escape")
 
     -- Particle systems
     noise_ps = lurek.particle.newSystem({

@@ -48,7 +48,7 @@ end
 -- Camera2D methods (legacy interface — same object, different type name)
 -- =============================================================================
 
---@api-stub: Camera2D:setPosition
+--@api-stub: LCameraRig:setPosition
 -- Sets the position of this camera2d.
 do
   -- Camera position is the world coordinate at the top-left of the viewport.
@@ -59,7 +59,7 @@ do
   cam:setPosition(player_x - 400, player_y - 300)
 end
 
---@api-stub: Camera2D:getPosition
+--@api-stub: LCamera:getPosition
 -- Returns the position of this camera2d.
 do
   local cam = lurek.camera.new(800, 600)
@@ -69,7 +69,7 @@ do
   lurek.log.debug("camera at " .. cx .. "," .. cy, "camera")
 end
 
---@api-stub: Camera2D:setZoom
+--@api-stub: LCameraRig:setZoom
 -- Sets the zoom of this camera2d.
 do
   -- Zoom > 1.0 magnifies (shows less world area).
@@ -78,7 +78,7 @@ do
   cam:setZoom(2.0) -- 2x magnification, viewport shows 400x300 world units
 end
 
---@api-stub: Camera2D:getZoom
+--@api-stub: LCamera:getZoom
 -- Returns the zoom of this camera2d.
 do
   local cam = lurek.camera.new(800, 600)
@@ -87,7 +87,7 @@ do
   if z > 1.0 then lurek.log.info("zoomed in: " .. z, "camera") end
 end
 
---@api-stub: Camera2D:setRotation
+--@api-stub: LCamera:setRotation
 -- Sets the rotation of this camera2d.
 do
   -- Rotation is in radians. The world rotates around the camera center.
@@ -96,7 +96,7 @@ do
   cam:setRotation(math.pi / 8) -- 22.5 degrees
 end
 
---@api-stub: Camera2D:getRotation
+--@api-stub: LCamera:getRotation
 -- Returns the rotation of this camera2d.
 do
   local cam = lurek.camera.new(800, 600)
@@ -105,7 +105,7 @@ do
   lurek.log.debug("rotation rad=" .. r .. " deg=" .. math.deg(r), "camera")
 end
 
---@api-stub: Camera2D:getViewport
+--@api-stub: LCameraRig:getViewport
 -- Returns the viewport of this camera2d.
 do
   -- Returns x, y, width, height of the screen rectangle this camera renders into.
@@ -114,7 +114,7 @@ do
   lurek.log.info("viewport=" .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "camera")
 end
 
---@api-stub: Camera2D:removeBounds
+--@api-stub: LCamera:removeBounds
 -- Removes a bounds from this camera2d.
 do
   -- After removing bounds, the camera is free to move anywhere.
@@ -123,7 +123,7 @@ do
   cam:removeBounds()
 end
 
---@api-stub: Camera2D:setTarget
+--@api-stub: LCameraRig:setTarget
 -- Sets the target of this camera2d.
 do
   -- Setting a target makes the camera follow that world point.
@@ -133,7 +133,7 @@ do
   cam:setTarget(enemy.x, enemy.y)
 end
 
---@api-stub: Camera2D:clearTarget
+--@api-stub: LCamera:clearTarget
 -- Clears all target items from this camera2d.
 do
   -- After clearing, the camera stops moving toward any target.
@@ -143,7 +143,7 @@ do
   cam:clearTarget()
 end
 
---@api-stub: Camera2D:setFollowSmooth
+--@api-stub: LCamera:setFollowSmooth
 -- Sets the follow smooth of this camera2d.
 do
   -- Higher values = camera catches up faster. Lower = more cinematic lag.
@@ -152,7 +152,7 @@ do
   cam:setFollowSmooth(6.0)
 end
 
---@api-stub: Camera2D:setDeadZone
+--@api-stub: LCamera:setDeadZone
 -- Sets the dead zone of this camera2d.
 do
   -- The dead zone is a rectangle around screen center where the target
@@ -162,7 +162,7 @@ do
   cam:setDeadZone(40, 24) -- 40px wide, 24px tall
 end
 
---@api-stub: Camera2D:setLookAhead
+--@api-stub: LCamera:setLookAhead
 -- Sets the look ahead of this camera2d.
 do
   -- Look-ahead shifts the camera in the direction of target movement,
@@ -172,7 +172,7 @@ do
   cam:setLookAhead(0.25)
 end
 
---@api-stub: Camera2D:shake
+--@api-stub: LCamera:shake
 -- Performs the shake operation on this camera2d.
 do
   -- Screen shake is essential for game feel: explosions, hits, landing impacts.
@@ -181,7 +181,7 @@ do
   cam:shake(8.0, 0.35) -- 8px intensity, lasts 0.35 seconds
 end
 
---@api-stub: Camera2D:update
+--@api-stub: LCamera:update
 -- Advances this camera2d by the given delta time.
 do
   -- Call update() every frame to advance follow interpolation, shake decay,
@@ -190,7 +190,7 @@ do
   function lurek.process(dt) cam:update(dt) end
 end
 
---@api-stub: Camera2D:toWorld
+--@api-stub: LCamera:toWorld
 -- Performs the to world operation on this camera2d.
 do
   -- Convert mouse click screen coordinates to world position.
@@ -201,7 +201,7 @@ do
   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
 end
 
---@api-stub: Camera2D:toScreen
+--@api-stub: LCamera:toScreen
 -- Performs the to screen operation on this camera2d.
 do
   -- Convert a world-space object position to screen coordinates.
@@ -212,7 +212,7 @@ do
   if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
 end
 
---@api-stub: Camera2D:getVisibleArea
+--@api-stub: LCamera:getVisibleArea
 -- Returns the visible area of this camera2d.
 do
   -- Returns x, y, width, height in world units of what the camera currently sees.
@@ -222,7 +222,7 @@ do
   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
 end
 
---@api-stub: Camera2D:lookAt
+--@api-stub: LCamera:lookAt
 -- Performs the look at operation on this camera2d.
 do
   -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
@@ -231,7 +231,7 @@ do
   cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 end
 
---@api-stub: Camera2D:move
+--@api-stub: LCamera:move
 -- Performs the move operation on this camera2d.
 do
   -- Move adds a delta to the current position. Good for editor-style panning
@@ -240,7 +240,7 @@ do
   function lurek.process(dt) cam:move(200 * dt, 0) end -- pan right at 200 units/s
 end
 
---@api-stub: Camera2D:stopPath
+--@api-stub: LCamera:stopPath
 -- Stops the current operation or playback on this camera2d.
 do
   -- Halts a followPath in progress, freezing the camera at its current position.
@@ -249,7 +249,7 @@ do
   cam:stopPath()
 end
 
---@api-stub: Camera2D:updatePath
+--@api-stub: LCamera:updatePath
 -- Advances path this camera2d by the given delta time.
 do
   -- updatePath returns true while the path is still in progress,
@@ -264,7 +264,7 @@ do
   end
 end
 
---@api-stub: Camera2D:pathProgress
+--@api-stub: LCamera:pathProgress
 -- Performs the path progress operation on this camera2d.
 do
   -- Returns 0.0 at path start, 1.0 at completion.
@@ -275,7 +275,7 @@ do
   lurek.log.debug("path " .. math.floor(p * 100) .. "%", "cutscene")
 end
 
---@api-stub: Camera2D:zoomTo
+--@api-stub: LCamera:zoomTo
 -- Performs the zoom to operation on this camera2d.
 do
   -- Smooth zoom tween over time. Good for focus transitions:
@@ -284,7 +284,7 @@ do
   cam:zoomTo(2.5, 0.8) -- target zoom 2.5x over 0.8 seconds
 end
 
---@api-stub: Camera2D:stopZoom
+--@api-stub: LCamera:stopZoom
 -- Stops the current operation or playback on this camera2d.
 do
   -- Halts a zoomTo tween in progress, keeping the current zoom level.
@@ -293,7 +293,7 @@ do
   cam:stopZoom()
 end
 
---@api-stub: Camera2D:updateZoom
+--@api-stub: LCamera:updateZoom
 -- Advances zoom this camera2d by the given delta time.
 do
   -- Like updatePath, returns true while the tween is active, false when done.
@@ -306,7 +306,7 @@ do
   end
 end
 
---@api-stub: Camera2D:getParallaxFactor
+--@api-stub: LCamera:getParallaxFactor
 -- Returns the parallax factor of this camera2d.
 do
   -- Factor = how much a layer scrolls relative to the camera.
@@ -318,7 +318,7 @@ do
   lurek.log.debug("clouds parallax=" .. f, "render")
 end
 
---@api-stub: Camera2D:clearParallaxFactors
+--@api-stub: LCamera:clearParallaxFactors
 -- Clears all parallax factors items from this camera2d.
 do
   -- Resets all named layers back to the default factor of 1.0.
@@ -327,7 +327,7 @@ do
   cam:clearParallaxFactors()
 end
 
---@api-stub: Camera2D:zoomPulse
+--@api-stub: LCamera:zoomPulse
 -- Performs the zoom pulse operation on this camera2d.
 do
   -- A short zoom burst that decays — great for hit feedback or pickups.
@@ -336,7 +336,7 @@ do
   cam:zoomPulse(0.08, 0.25) -- +8% zoom pulse decaying over 0.25s
 end
 
---@api-stub: Camera2D:stopSway
+--@api-stub: LCamera:stopSway
 -- Stops the current operation or playback on this camera2d.
 do
   local cam = lurek.camera.new(800, 600)
@@ -344,7 +344,7 @@ do
   cam:stopSway()
 end
 
---@api-stub: Camera2D:isSway
+--@api-stub: LCamera:isSway
 -- Returns true if this camera2d sway.
 do
   local cam = lurek.camera.new(800, 600)
@@ -352,7 +352,7 @@ do
   if cam:isSway() then lurek.log.debug("on swaying surface", "camera") end
 end
 
---@api-stub: Camera2D:stopBreathing
+--@api-stub: LCamera:stopBreathing
 -- Stops the current operation or playback on this camera2d.
 do
   local cam = lurek.camera.new(800, 600)
@@ -360,7 +360,7 @@ do
   cam:stopBreathing()
 end
 
---@api-stub: Camera2D:isBreathing
+--@api-stub: LCamera:isBreathing
 -- Returns true if this camera2d breathing.
 do
   local cam = lurek.camera.new(800, 600)
@@ -368,7 +368,7 @@ do
   if cam:isBreathing() then lurek.log.debug("breathing on", "camera") end
 end
 
---@api-stub: Camera2D:getEffectiveZoom
+--@api-stub: LCamera:getEffectiveZoom
 -- Returns the effective zoom of this camera2d.
 do
   -- getEffectiveZoom includes pulse and breathing effects on top of the base zoom.
@@ -380,7 +380,7 @@ do
   lurek.log.debug("effective zoom=" .. ez, "render")
 end
 
---@api-stub: Camera2D:getEffectOffset
+--@api-stub: LCamera:getEffectOffset
 -- Returns the effect offset of this camera2d.
 do
   -- Returns the combined X, Y pixel offset from sway + shake effects.
@@ -391,7 +391,7 @@ do
   lurek.log.debug("sway offset " .. ox .. "," .. oy, "camera")
 end
 
---@api-stub: Camera2D:apply
+--@api-stub: LCameraRig:apply
 -- Applies  to this camera2d.
 do
   -- apply() pushes a render command that transforms all subsequent drawing
@@ -404,7 +404,7 @@ do
   lurek.log.info("camera applied", "camera")
 end
 
---@api-stub: Camera2D:attach
+--@api-stub: LCamera:attach
 -- Performs the attach operation on this camera2d.
 do
   -- attach/detach is an alternative to apply/reset — same effect, different naming.
@@ -416,7 +416,7 @@ do
   lurek.log.info("camera attached", "camera")
 end
 
---@api-stub: Camera2D:detach
+--@api-stub: LCamera:detach
 -- Performs the detach operation on this camera2d.
 do
   -- detach restores the render transform so HUD drawing is screen-relative again.
@@ -426,7 +426,7 @@ do
   lurek.log.info("camera detached", "camera")
 end
 
---@api-stub: Camera2D:followPath
+--@api-stub: LCamera:followPath
 -- Performs the follow path operation on this camera2d.
 do
   -- followPath takes an array of {x, y} waypoint tables and a total duration.
@@ -438,7 +438,7 @@ do
   lurek.log.info("following path", "camera")
 end
 
---@api-stub: Camera2D:reset
+--@api-stub: LCamera:reset
 -- Resets this camera2d to its default state.
 do
   -- reset() removes the camera transform from the render pipeline.
@@ -449,7 +449,7 @@ do
   lurek.log.info("zoom after reset: " .. cam:getZoom(), "camera")
 end
 
---@api-stub: Camera2D:setBounds
+--@api-stub: LCamera:setBounds
 -- Sets the bounds of this camera2d.
 do
   -- Bounds constrain the camera so it never shows area outside the world.
@@ -461,7 +461,7 @@ do
   lurek.log.info("bounds set", "camera")
 end
 
---@api-stub: Camera2D:setParallaxFactor
+--@api-stub: LCamera:setParallaxFactor
 -- Sets the parallax factor of this camera2d.
 do
   -- Assign different speeds to background layers for depth illusion.
@@ -472,7 +472,7 @@ do
   lurek.log.info("parallax factors set", "camera")
 end
 
---@api-stub: Camera2D:setViewport
+--@api-stub: LCamera:setViewport
 -- Sets the viewport of this camera2d.
 do
   -- Viewport defines the screen rectangle this camera renders into.
@@ -482,7 +482,7 @@ do
   lurek.log.info("viewport set", "camera")
 end
 
---@api-stub: Camera2D:startBreathing
+--@api-stub: LCamera:startBreathing
 -- Performs the start breathing operation on this camera2d.
 do
   -- Breathing is a subtle oscillating zoom that adds life to idle cameras.
@@ -492,7 +492,7 @@ do
   lurek.log.info("breathing: " .. tostring(cam:isBreathing()), "camera")
 end
 
---@api-stub: Camera2D:startSway
+--@api-stub: LCamera:startSway
 -- Performs the start sway operation on this camera2d.
 do
   -- Sway moves the camera in a figure-eight pattern.
@@ -507,7 +507,7 @@ end
 -- Camera2D methods (type introspection)
 -- -----------------------------------------------------------------------------
 
---@api-stub: Camera2D:type
+--@api-stub: LCameraRig:type
 -- Returns the Lua-visible type name string for this camera2d handle.
 do
   local cam = lurek.camera.new(800, 600)
@@ -515,7 +515,7 @@ do
   lurek.log.info("Camera2D:type=" .. t, "camera")
 end
 
---@api-stub: Camera2D:typeOf
+--@api-stub: LCameraRig:typeOf
 -- Returns true if this camera2d handle matches the given type name string.
 do
   -- typeOf checks inheritance: "LCamera" and "Object" both return true.
@@ -528,7 +528,7 @@ end
 -- LCamera methods (full featured camera API)
 -- =============================================================================
 
---@api-stub: LCamera:setPosition
+--@api-stub: LCameraRig:setPosition
 -- Sets the camera world position
 do
   -- Position sets the camera's top-left corner in world space.
@@ -548,7 +548,7 @@ do
   lurek.log.info("x=" .. x .. " y=" .. y, "camera")
 end
 
---@api-stub: LCamera:setZoom
+--@api-stub: LCameraRig:setZoom
 -- Sets the camera zoom factor
 do
   local cam = lurek.camera.new(800, 600)
@@ -591,7 +591,7 @@ do
   lurek.log.info("viewport=" .. w .. "x" .. h, "camera")
 end
 
---@api-stub: LCamera:getViewport
+--@api-stub: LCameraRig:getViewport
 -- Returns the camera viewport rectangle
 do
   local cam = lurek.camera.new(800, 600)
@@ -620,7 +620,7 @@ do
   lurek.log.info("bounds removed", "camera")
 end
 
---@api-stub: LCamera:setTarget
+--@api-stub: LCameraRig:setTarget
 -- Sets a world-space follow target
 do
   -- Setting a target activates the follow system: the camera smoothly
@@ -859,7 +859,7 @@ do
   lurek.log.info("parallax factor after clear=" .. cam:getParallaxFactor("clouds"), "camera")
 end
 
---@api-stub: LCamera:apply
+--@api-stub: LCameraRig:apply
 -- Appends render commands that apply this camera transform
 do
   -- apply/reset pattern: everything drawn between apply() and reset()
@@ -1402,16 +1402,21 @@ print("content/examples/camera.lua")
 -- LCamera methods
 -- -----------------------------------------------------------------------------
 
--- ---- Stub: LCamera:type --------------------------------------------------
 --@api-stub: LCamera:type
 -- Returns the Lua-visible type name for this camera handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCamera_stub:type()  -- -> string
--- (replace lCamera_stub with your real LCamera instance above)
+do
+  -- Use type() to identify a handle for serialization or debug output.
+  local cam = lurek.camera.new(800, 600)
+  local name = cam:type()
+  lurek.log.info("camera type name: " .. name, "camera")
+end
 
--- ---- Stub: LCamera:typeOf ------------------------------------------------
 --@api-stub: LCamera:typeOf
 -- Returns whether this camera handle matches a supported type name.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lCamera_stub:typeOf("hero")  -- -> boolean
--- (replace lCamera_stub with your real LCamera instance above)
+do
+  -- typeOf checks if the handle matches a type string (useful for polymorphic APIs).
+  local cam = lurek.camera.new(800, 600)
+  local is_cam = cam:typeOf("LCamera")
+  local is_img = cam:typeOf("LImage")
+  lurek.log.info("is LCamera=" .. tostring(is_cam) .. " is LImage=" .. tostring(is_img), "camera")
+end

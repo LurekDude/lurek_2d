@@ -2436,6 +2436,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
     let s = state.clone();
+    // -- resetCanvas --
+    /// Marks a canvas as needing a full clear before its next render pass. Use before re-rendering to avoid content accumulation.
+    /// @param | canvas | LCanvas | Canvas to reset.
+    /// @return | nil | No return value.
+    graphics.set(
+        "resetCanvas",
+        lua.create_function(move |_, ud: LuaAnyUserData| {
+            let c = ud.borrow::<LuaCanvas>()?;
+            let key = c.key;
+            drop(c);
+            let mut st = s.borrow_mut();
+            if !st.canvases.contains_key(key) {
+                return Err(LuaError::RuntimeError(
+                    "lurek.render.resetCanvas: canvas handle is not valid".into(),
+                ));
+            }
+            st.render_commands.push(RenderCommand::ResetCanvas(key));
+            Ok(())
+        })?,
+    )?;
+    let s = state.clone();
     // -- setCanvas --
     /// Redirects all subsequent drawing to the given canvas. Pass nil to draw to the screen again.
     /// @param | canvas | LCanvas? | Canvas to draw to, or nil for the main screen.

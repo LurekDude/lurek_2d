@@ -158,6 +158,34 @@ def extract_field_entries_from_full_doc(full_doc):
     return entries
 
 
+def extract_overload_entries_from_full_doc(full_doc):
+    """Extract custom @overload entries for alternative single-return call shapes.
+
+    Supported source format:
+    @overload | param_name | param_type | return_type | description
+    """
+    if not full_doc:
+        return []
+    entries = []
+    for line in full_doc.splitlines():
+        stripped = line.strip()
+        m = re.match(
+            r"^@overload\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*(.+)$",
+            stripped,
+        )
+        if not m:
+            continue
+        entries.append(
+            {
+                "param_name": m.group(1).strip(),
+                "param_type": normalize_type(m.group(2).strip()),
+                "return_type": normalize_type(m.group(3).strip()),
+                "description": m.group(4).strip(),
+            }
+        )
+    return entries
+
+
 def _derive_class_name(fn_name):
     """Derive a PascalCase class name from a stub function name."""
     if ":" in fn_name:
@@ -617,6 +645,9 @@ def write_function_doc(out, fn, name):
         for line in desc.splitlines():
             out.append(f"--- {line}")
 
+    overload_entries = extract_overload_entries_from_full_doc(fn.get("full_doc", ""))
+    overload_param_names = {entry["param_name"] for entry in overload_entries}
+
     pkeys, ptyp, pdesc, popt = parse_params(fn)
 
     # For colon-notation methods, self is implicit in LuaLS — skip it from
@@ -627,11 +658,15 @@ def write_function_doc(out, fn, name):
     param_names = []
 
     for k in pkeys:
+        raw_key = k
         pd = pdesc.get(k, "")
         t = ptyp.get(k, DYNAMIC_LUA_TYPE)
         k = k.replace("?", "")
 
         is_optional = popt.get(k, False)
+
+        if is_optional and raw_key.replace("?", "") in overload_param_names:
+            continue
 
         if k == "...":
             if pd:
@@ -689,6 +724,36 @@ def write_function_doc(out, fn, name):
                 out.append(f"---@return {ret_type} {raw_ret_desc}")
         else:
             out.append(f"---@return {ret_type}")
+
+    for overload in overload_entries:
+        overload_param_name = overload["param_name"]
+        overload_param_type = overload["param_type"]
+        overload_return_type = overload["return_type"]
+        overload_desc = overload["description"]
+
+        overload_signatures = []
+        if overload_param_name == "...":
+            overload_signatures.append(f"...: {overload_param_type}")
+        else:
+            safe_param_name = (
+                overload_param_name + "_"
+                if overload_param_name in LUA_KEYWORDS
+                else overload_param_name
+            )
+            overload_signatures.append(f"{safe_param_name}: {overload_param_type}")
+            if ':' in name:
+                owner_name = name.split(':', 1)[0].split('.')[-1]
+                overload_signatures.append(
+                    f"self: {owner_name}, {safe_param_name}: {overload_param_type}"
+                )
+
+        for overload_signature in overload_signatures:
+            if overload_desc:
+                out.append(
+                    f"---@overload fun({overload_signature}): {overload_return_type} # {overload_desc}"
+                )
+            else:
+                out.append(f"---@overload fun({overload_signature}): {overload_return_type}")
 
     signature = ', '.join(param_names)
     if ':' in name:

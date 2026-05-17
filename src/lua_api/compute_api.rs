@@ -218,7 +218,7 @@ impl LuaUserData for LuaArray {
         });
         // -- add --
         /// Returns element-wise addition with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New array containing the addition result.
         dispatch_arith!(
             methods,
@@ -229,7 +229,7 @@ impl LuaUserData for LuaArray {
         );
         // -- sub --
         /// Returns element-wise subtraction with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New array containing the subtraction result.
         dispatch_arith!(
             methods,
@@ -240,7 +240,7 @@ impl LuaUserData for LuaArray {
         );
         // -- mul --
         /// Returns element-wise multiplication with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New array containing the multiplication result.
         dispatch_arith!(
             methods,
@@ -251,7 +251,7 @@ impl LuaUserData for LuaArray {
         );
         // -- div --
         /// Returns element-wise division with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New array containing the division result.
         dispatch_arith!(
             methods,
@@ -300,12 +300,12 @@ impl LuaUserData for LuaArray {
         });
         // -- eq --
         /// Returns element-wise equality comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(methods, "eq", "Element-wise eq.", ops::eq, ops::eq_scalar);
         // -- neq --
         /// Returns element-wise inequality comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(
             methods,
@@ -316,17 +316,17 @@ impl LuaUserData for LuaArray {
         );
         // -- gt --
         /// Returns element-wise greater-than comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(methods, "gt", "Element-wise gt.", ops::gt, ops::gt_scalar);
         // -- lt --
         /// Returns element-wise less-than comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(methods, "lt", "Element-wise lt.", ops::lt, ops::lt_scalar);
         // -- gte --
         /// Returns element-wise greater-or-equal comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(
             methods,
@@ -337,7 +337,7 @@ impl LuaUserData for LuaArray {
         );
         // -- lte --
         /// Returns element-wise less-or-equal comparison with an array or scalar.
-        /// @param | value | LArray | LArray or scalar number for element-wise operation.
+        /// @param | value | any | Array or scalar number for element-wise operation.
         /// @return | LArray | New mask array containing comparison results.
         dispatch_arith!(
             methods,
@@ -394,7 +394,8 @@ impl LuaUserData for LuaArray {
         // -- sum --
         /// Returns total sum or a summed array along a one-based axis.
         /// @param | axis | integer? | Optional one-based axis to reduce.
-        /// @return | number|LArray | Scalar sum when no axis given, or reduced array along the axis.
+        /// @return | number | Scalar sum when no axis is given.
+        /// @overload | axis | integer | LArray | Reduced array along the requested one-based axis.
         methods.add_method("sum", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::sum(&this.inner))),
             Some(a) => {
@@ -408,7 +409,8 @@ impl LuaUserData for LuaArray {
         // -- mean --
         /// Returns total mean or a mean array along a one-based axis.
         /// @param | axis | integer? | Optional one-based axis to reduce.
-        /// @return | number|LArray | Scalar mean when no axis given, or reduced array along the axis.
+        /// @return | number | Scalar mean when no axis is given.
+        /// @overload | axis | integer | LArray | Reduced array of axis means.
         methods.add_method("mean", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::mean(&this.inner))),
             Some(a) => {
@@ -422,7 +424,8 @@ impl LuaUserData for LuaArray {
         // -- min --
         /// Returns total minimum or a minimum array along a one-based axis.
         /// @param | axis | integer? | Optional one-based axis to reduce.
-        /// @return | number|LArray | Scalar minimum when no axis given, or reduced array along the axis.
+        /// @return | number | Scalar minimum when no axis is given.
+        /// @overload | axis | integer | LArray | Reduced array of minimum values along the axis.
         methods.add_method("min", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::min_val(&this.inner))),
             Some(a) => {
@@ -436,7 +439,8 @@ impl LuaUserData for LuaArray {
         // -- max --
         /// Returns total maximum or a maximum array along a one-based axis.
         /// @param | axis | integer? | Optional one-based axis to reduce.
-        /// @return | number|LArray | Scalar maximum when no axis given, or reduced array along the axis.
+        /// @return | number | Scalar maximum when no axis is given.
+        /// @overload | axis | integer | LArray | Reduced array of maximum values along the axis.
         methods.add_method("max", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::max_val(&this.inner))),
             Some(a) => {

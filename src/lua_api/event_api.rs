@@ -38,7 +38,7 @@ impl LuaUserData for LuaSignal {
         // -- emit --
         /// Emits a signal event and invokes matching callbacks with the remaining arguments.
         /// @param | name | string | Signal event name to emit.
-        /// @param | ... | table | Additional arguments passed to matching callbacks.
+        /// @param | ... | any | Additional arguments passed to matching callbacks.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let name: String = match iter.next() {
@@ -365,7 +365,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- pushDeferred --
     /// Adds a normal-priority event to the deferred buffer instead of the live queue.
     /// @param | name | string | Event name to enqueue later.
-    /// @param | ... | table | Additional event arguments stored with the event.
+    /// @param | ... | any | Additional event arguments stored with the event.
     tbl.set(
         "pushDeferred",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -396,7 +396,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Adds an event with explicit priority to the deferred buffer.
     /// @param | name | string | Event name to enqueue later.
     /// @param | priority | string | Priority string `high` or `normal`.
-    /// @param | ... | table | Additional event arguments stored with the event.
+    /// @param | ... | any | Additional event arguments stored with the event.
     tbl.set(
         "pushDeferredPriority",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -508,7 +508,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- push --
     /// Pushes a normal-priority event into the shared event queue and optional history.
     /// @param | name | string | Event name.
-    /// @param | ... | table | Additional event arguments.
+    /// @param | ... | any | Additional event arguments.
     tbl.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -549,7 +549,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Pushes an event with explicit priority into the shared event queue and optional history.
     /// @param | name | string | Event name.
     /// @param | priority | string | Priority string `high` or `normal`.
-    /// @param | ... | table | Additional event arguments.
+    /// @param | ... | any | Additional event arguments.
     tbl.set(
         "pushPriority",
         lua.create_function(move |_, args: LuaMultiValue| {

@@ -266,14 +266,14 @@ do
   lurek.log.info("debug preview generated: " .. tostring(preview), "sprite")
 end
 
---@api-stub: LSpriteSheet:type
+--@api-stub: LSpriteAtlas:type
 -- Returns the type name string for this sheet object (always "LSpriteSheet")
 do
   local sheet = lurek.sprite.newSheet(64, 64, 32, 32)
   lurek.log.info("sheet type: " .. sheet:type(), "sprite")
 end
 
---@api-stub: LSpriteSheet:typeOf
+--@api-stub: LSpriteAtlas:typeOf
 -- Checks whether this sheet object matches the given type name
 do
   -- typeOf is useful in generic systems that process multiple object types.

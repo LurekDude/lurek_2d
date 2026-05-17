@@ -1,656 +1,479 @@
--- Universal render helpers (handles all legacy and current call signatures)
-local _gfx = lurek.render
-local function _sc(c)
-    if type(c) == "table" then
-        local col = c.color or c
-        if type(col) == "table" then
-            _gfx.setColor(col[1] or 1, col[2] or 1, col[3] or 1, col[4] or 1)
+﻿-- content/games/showcase/terminal_demo/main.lua
+-- Terminal API showcase: 5 navigable scenes covering all lurek.terminal widgets.
+-- Auto-fills the window. Navigate: Left/Right arrows or 1-5.
+
+local SCENE_COUNT = 5
+local scene       = 1
+local term        ---@type LTerminal
+local tick        = 0
+
+local cmd_input   ---@type LWidget?
+local inv_list    ---@type LWidget?
+local name_input  ---@type LWidget?
+local status_lbl  ---@type LWidget?
+
+-- ─── helpers ─────────────────────────────────────────────────────────────────
+
+local function add_border(t, c, r, w, h, style, title)
+    local b = lurek.terminal.newBorder(c, r, w, h)
+    b:setStyle(style or "single")
+    if title then b:setTitle(title) end
+    t:addWidget(b)
+    return b
+end
+
+local function add_label(t, c, r, text, lr, lg, lb)
+    local l = lurek.terminal.newLabel(c, r, text)
+    if lr then l:setColor(lr, lg or 1, lb or 1) end
+    t:addWidget(l)
+    return l
+end
+
+local function nav_hint(t, cols, rows)
+    add_label(t, 3, rows - 1,
+        string.format("  [<-][->] prev/next   [1-5] jump   scene %d/%d  ", scene, SCENE_COUNT),
+        0.3, 0.3, 0.3)
+end
+
+local function window_fit(font_size)
+    local probe = lurek.terminal.newTerminal(10, 10)
+    probe:setFont(font_size)
+    local cw, ch = probe:getCellSize()
+    local w, h   = lurek.window.getDimensions()
+    local cols   = math.max(40, math.floor(w / cw))
+    local rows   = math.max(10, math.floor(h / ch))
+    return cols, rows
+end
+
+-- ─── scene 1: raw cell drawing ───────────────────────────────────────────────
+
+local function build_scene1(t, cols, rows)
+    add_border(t, 1, 1, cols, rows, "double")
+    add_label(t, 3, 1, " Scene 1/5: set()  print()  Unicode  getDimensions ", 1, 0.9, 0.2)
+
+    -- animated rainbow banner redrawn each frame in lurek.draw
+    add_label(t, 3, 5, "print() - writes text into cells:", 0.5, 0.5, 0.5)
+    t:print(3, 6, "The quick brown fox jumps over the lazy dog")
+    t:print(3, 7, "1234567890  !@#$%^&*()-=[]{}|;:,.<>?")
+
+    add_label(t, 3, 9, "set() - per-cell foreground and background color:", 0.5, 0.5, 0.5)
+    local ch_set  = { "#", "@", "%", "&", "*", "=", "+", "-", "^", "!" }
+    local col_set = {
+        {1,.3,.3},{1,.7,.2},{.9,1,.2},{.2,1,.4},{.2,.9,1},
+        {.4,.4,1},{.9,.3,1},{1,.5,.5},{.5,1,.5},{.5,.5,1},
+    }
+    for i, ch in ipairs(ch_set) do
+        local x = (i - 1) * 5 + 3
+        local c = col_set[i]
+        for dy = 0, 3 do
+            t:set(x, 10 + dy, ch, c[1], c[2], c[3], 1, c[1]*.12, c[2]*.12, c[3]*.12, 1)
+        end
+    end
+
+    add_label(t, 3, 15, "set() - Unicode codepoints:", 0.5, 0.5, 0.5)
+    local glyphs = {9829,9830,9824,9827,9733,9658,9650,9660,9632,9633,9679,8984}
+    for i, cp in ipairs(glyphs) do
+        t:set(3 + (i - 1) * 3, 16, cp, 1, 0.9, 0.3, 1)
+    end
+
+    local dc, dr   = t:getDimensions()
+    local cw, ch2  = t:getCellSize()
+    add_label(t, 3, 18, string.format("getDimensions: %d x %d cells", dc, dr), .4, 1, .4)
+    add_label(t, 3, 19, string.format("getCellSize:   %d x %d px/cell", cw, ch2), .4, 1, .4)
+    add_label(t, 3, 20, "type(): " .. t:type() .. "  typeOf(LTerminal): " .. tostring(t:typeOf("LTerminal")), .7, .7, 1)
+
+    nav_hint(t, cols, rows)
+end
+
+-- ─── scene 2: buttons, textbox, list ─────────────────────────────────────────
+
+local function build_scene2(t, cols, rows)
+    add_border(t, 1, 1, cols, rows, "double")
+    add_label(t, 3, 1, " Scene 2/5: Button  TextBox  List  setFocus  callbacks ", 1, 0.9, 0.2)
+
+    add_border(t, 2, 3, 36, 12, "single", " Buttons ")
+
+    local b_normal = lurek.terminal.newButton(4, 5, 20, 1, "[ Normal button ]")
+    b_normal:setOnClick(function()
+        if status_lbl then status_lbl:setText("Clicked: Normal button") end
+    end)
+    t:addWidget(b_normal)
+
+    local b_wide = lurek.terminal.newButton(4, 7, 28, 3, "[ Wide 3-row button ]")
+    b_wide:setOnClick(function()
+        if status_lbl then status_lbl:setText("Clicked: Wide (3-row) button") end
+    end)
+    t:addWidget(b_wide)
+
+    local b_dis = lurek.terminal.newButton(4, 11, 28, 1, "[ Disabled - setEnabled(false) ]")
+    b_dis:setEnabled(false)
+    t:addWidget(b_dis)
+
+    add_border(t, 2, 16, 36, 5, "single", " TextBox - setMaxLength(20) ")
+    add_label(t, 4, 18, "Name:", .5, .5, .5)
+    name_input = lurek.terminal.newTextBox(10, 18, 24)
+    name_input:setMaxLength(20)
+    name_input:setOnChange(function(text)
+        if status_lbl then status_lbl:setText("onChange: '" .. text .. "'") end
+    end)
+    t:addWidget(name_input)
+    t:setFocus(name_input)
+
+    local lx = math.min(40, cols - 20)
+    local lw = cols - lx - 2
+    local lh = rows - 10
+    add_border(t, lx, 3, lw, lh + 2, "single", " List - setOnSelect ")
+    inv_list = lurek.terminal.newList(lx + 1, 4, lw - 2, lh)
+    local items = {
+        "Healing Potion x3", "Iron Sword +1",   "Wooden Shield",
+        "Lockpick x5",       "Torch x2",         "Magic Scroll",
+        "Leather Armor",     "Gold Key",          "Rope (10m)",
+        "Bomb x2",           "Map Fragment",      "Ancient Coin",
+        "Elixir of Speed",   "Dragon Scale",      "Rune Stone",
+    }
+    for _, item in ipairs(items) do inv_list:addItem(item) end
+    inv_list:setSelected(1)
+    inv_list:setOnSelect(function(idx)
+        if status_lbl and idx then
+            status_lbl:setText("onSelect[" .. idx .. "]: " .. inv_list:getItem(idx))
+        end
+    end)
+    t:addWidget(inv_list)
+
+    add_border(t, 2, rows - 6, cols - 2, 4, "single", " Status / Events ")
+    status_lbl = lurek.terminal.newLabel(4, rows - 5, "Focus: TextBox   [Tab]=switch   click buttons/list")
+    status_lbl:setColor(.2, 1, .45)
+    t:addWidget(status_lbl)
+
+    add_label(t, 4, rows - 4,
+        string.format("getWidgetCount: %d   getItemCount: %d   getMaxLength: %d",
+            t:getWidgetCount() + 1, inv_list:getItemCount(), name_input:getMaxLength()),
+        .35, .35, .7)
+
+    nav_hint(t, cols, rows)
+end
+
+-- ─── scene 3: border styles, panel, widget state ─────────────────────────────
+
+local function build_scene3(t, cols, rows)
+    add_border(t, 1, 1, cols, rows, "double")
+    add_label(t, 3, 1, " Scene 3/5: Border styles  Panel  setVisible  setEnabled  setTag ", 1, 0.9, 0.2)
+
+    local styles = { "single", "double", "rounded", "heavy", "ascii" }
+    local bw     = math.floor((cols - 4) / #styles)
+    local x      = 3
+    for _, sty in ipairs(styles) do
+        local b = lurek.terminal.newBorder(x, 3, bw, 7)
+        b:setStyle(sty)
+        b:setTitle(" " .. sty .. " ")
+        t:addWidget(b)
+        t:print(x + 2, 5, "setStyle()")
+        t:print(x + 2, 6, '"' .. sty .. '"')
+        t:print(x + 2, 7, "getStyle:")
+        t:print(x + 2, 8, '"' .. b:getStyle() .. '"')
+        x = x + bw
+    end
+
+    add_label(t, 3, 11, "Panel - child positions are relative to panel origin:", .5, .5, .5)
+    local pw  = math.min(52, cols - 4)
+    local panel = lurek.terminal.newPanel(3, 12, pw, 11)
+    local pb  = lurek.terminal.newBorder(1, 1, pw, 11)
+    pb:setStyle("single")
+    panel:addChild(pb)
+    local cx  = math.floor((pw - 18) / 2)
+    local ph  = lurek.terminal.newLabel(cx, 2, "=== PAUSE MENU ===")
+    ph:setColor(1, .9, .2)
+    panel:addChild(ph)
+    local bx  = math.floor((pw - 14) / 2)
+    local pr  = lurek.terminal.newButton(bx, 4, 14, 1, "[ Resume ]")
+    pr:setOnClick(function() end)
+    panel:addChild(pr)
+    local po  = lurek.terminal.newButton(bx, 6, 14, 1, "[ Options ]")
+    po:setOnClick(function() end)
+    panel:addChild(po)
+    local pq  = lurek.terminal.newButton(bx, 8, 14, 1, "[ Quit ]")
+    pq:setColor(1, .3, .3)
+    pq:setOnClick(function() end)
+    panel:addChild(pq)
+    local pc  = lurek.terminal.newLabel(2, 10, "getChildCount: " .. (panel:getChildCount() + 1))
+    pc:setColor(.4, 1, .4)
+    panel:addChild(pc)
+    t:addWidget(panel)
+
+    local rx = pw + 6
+    if rx + 26 <= cols then
+        add_border(t, rx, 12, cols - rx, 11, "single", " Widget State ")
+        local v1 = lurek.terminal.newLabel(rx + 2, 14, "setVisible(true)  <- shown")
+        v1:setVisible(true)
+        t:addWidget(v1)
+        local v2 = lurek.terminal.newLabel(rx + 2, 15, "setVisible(false) <- hidden")
+        v2:setVisible(false)
+        t:addWidget(v2)
+        local en = lurek.terminal.newButton(rx + 2, 17, cols - rx - 4, 1, "setEnabled(true) <- works")
+        en:setEnabled(true)
+        en:setOnClick(function() end)
+        t:addWidget(en)
+        local di = lurek.terminal.newButton(rx + 2, 19, cols - rx - 4, 1, "setEnabled(false) <- blocked")
+        di:setEnabled(false)
+        t:addWidget(di)
+        local tg = lurek.terminal.newLabel(rx + 2, 21, "")
+        tg:setTag("menu.quit")
+        add_label(t, rx + 2, 21, 'setTag("menu.quit"): ' .. tg:getTag(), .7, .7, 1)
+    end
+
+    nav_hint(t, cols, rows)
+end
+
+-- ─── scene 4: dev console ────────────────────────────────────────────────────
+
+local function build_scene4(t, cols, rows)
+    add_border(t, 1, 1, cols, rows, "double")
+    add_label(t, 3, 1, " Scene 4/5: Scrollback  pushScrollback  ANSI  history  [Enter]=submit ", 1, 0.9, 0.2)
+
+    lurek.terminal.applyTheme(t, "dracula")
+    lurek.terminal.setScrollbackCap(t, 500)
+
+    local out_h = rows - 9
+    add_border(t, 2, 3, cols - 2, out_h, "single", " Output - Up/Down history ")
+
+    for _, line in ipairs({
+        "\27[32m[engine]\27[0m Lurek2D terminal demo started",
+        "\27[33mWARN:\27[0m no save file - starting fresh",
+        "\27[32m[engine]\27[0m assets loaded",
+        "\27[36mINFO:\27[0m scene 4 active",
+        "> help",
+        "\27[32m[console]\27[0m Commands: help  clear  echo <text>  scrollbackLen  historyLen",
+    }) do
+        lurek.terminal.pushScrollback(t, line)
+    end
+
+    add_border(t, 2, rows - 5, cols - 2, 3, "single", " Command input - press Enter to submit ")
+    cmd_input = lurek.terminal.newTextBox(4, rows - 4, cols - 9)
+    cmd_input:setMaxLength(120)
+    t:addWidget(cmd_input)
+    t:setFocus(cmd_input)
+
+    add_label(t, 4, rows - 2,
+        string.format("scrollbackLen: %d   cmdHistoryLen: %d   cap: 500",
+            lurek.terminal.scrollbackLen(t), lurek.terminal.cmdHistoryLen(t)),
+        .3, .3, .3)
+
+    nav_hint(t, cols, rows)
+end
+
+local function render_scrollback(cols, rows)
+    if not term then return end
+    local out_h  = rows - 9
+    local recent = lurek.terminal.getScrollback(term, 0, out_h)
+    local base   = 3 + out_h - 1
+    local blank  = string.rep(" ", cols - 6)
+    for i = 1, #recent do
+        local row = base - (#recent - i)
+        if row >= 4 then
+            term:print(3, row, blank)
+            lurek.terminal.printAnsi(term, 3, row, recent[i])
         end
     end
 end
-local function rect(a, b, c, d, e, f, g, h)
-    if type(a) == "string" then
-        _gfx.rectangle(a, b, c, d, e)
-    elseif type(e) == "table" then
-        _sc(e); _gfx.rectangle(e.mode or "fill", a, b, c, d)
-    elseif type(e) == "number" then
-        _gfx.setColor(e or 1, f or 1, g or 1, h or 1); _gfx.rectangle("fill", a, b, c, d)
-    else
-        _gfx.rectangle("fill", a, b, c, d)
+
+-- ─── scene 5: ANSI, themes, highlight, completion ────────────────────────────
+
+local function build_scene5(t, cols, rows)
+    add_border(t, 1, 1, cols, rows, "double")
+    add_label(t, 3, 1, " Scene 5/5: applyTheme  printAnsi  stripAnsi  printHighlighted  completions ", 1, 0.9, 0.2)
+
+    add_label(t, 3, 3, "applyTheme - built-in themes:", .5, .5, .5)
+    local themes = { "dracula", "monokai", "nord", "solarized_dark", "solarized_light" }
+    local tx = 3
+    for i, th in ipairs(themes) do
+        local lbl = lurek.terminal.newLabel(tx, 4, "[" .. i .. "] " .. th)
+        t:addWidget(lbl)
+        tx = tx + #th + 6
     end
-end
-local function circ(a, b, c, d, e, f, g, h)
-    if type(a) == "string" then
-        if type(e) == "table" then _sc(e)
-        elseif type(e) == "number" then _gfx.setColor(e or 1, f or 1, g or 1, h or 1) end
-        _gfx.circle(a, b, c, d)
-    elseif type(d) == "table" then
-        _sc(d); _gfx.circle("fill", a, b, c)
-    elseif type(d) == "number" then
-        _gfx.setColor(d or 1, e or 1, f or 1, g or 1); _gfx.circle("fill", a, b, c)
-    else
-        _gfx.circle("fill", a, b, c)
+
+    add_label(t, 3, 6, "printAnsi - ANSI escape codes:", .5, .5, .5)
+    local samples = {
+        "\27[31mERROR\27[0m: something went wrong at line 42",
+        "\27[32mOK\27[0m:    map loaded (\27[36m42 rooms\27[0m, \27[33m7 exits\27[0m)",
+        "\27[1;33mWARN\27[0m:  physics budget exceeded \27[1;31m16 ms\27[0m this frame",
+        "\27[35mDEBUG\27[0m: lua GC freed \27[36m1.2 MB\27[0m in \27[33m0.3 ms\27[0m",
+    }
+    for i, line in ipairs(samples) do
+        lurek.terminal.printAnsi(t, 3, 6 + i, line)
     end
-end
-local function text_(a, b, c, d, e, f, g, h)
-    if type(d) == "table" then
-        _sc(d)
-    elseif type(d) == "number" and type(e) == "number" then
-        _gfx.setColor(e or 1, f or 1, g or 1, h or 1)
+
+    add_label(t, 3, 12, "stripAnsi:", .5, .5, .5)
+    local stripped = lurek.terminal.stripAnsi("\27[1;32mOK\27[0m test \27[31mfailed\27[0m (3 errors)")
+    t:print(3, 13, "stripped: " .. stripped)
+
+    add_label(t, 3, 15, "printHighlighted - regex color rules:", .5, .5, .5)
+    lurek.terminal.printHighlighted(t, 3, 16,
+        'ERROR at line 42: WARN in "main.lua"  OK (0 errors)  count=100',
+        {
+            { pattern = "ERROR",  fg = { 255, 80,  80  } },
+            { pattern = "WARN",   fg = { 255, 200, 50  } },
+            { pattern = "OK",     fg = { 80,  255, 80  } },
+            { pattern = "%d+",    fg = { 120, 200, 255 } },
+            { pattern = "%b\"\"", fg = { 180, 255, 180 } },
+        })
+
+    add_label(t, 3, 18, "Completion engine:", .5, .5, .5)
+    lurek.terminal.clearCompletions()
+    for _, cmd in ipairs({ "spawn_enemy","spawn_item","spawn_npc","give_gold","give_xp","kill_all","noclip","god_mode" }) do
+        lurek.terminal.addCompletion(cmd)
     end
-    _gfx.print(tostring(a), b, c)
-end
-local function ln(x1, y1, x2, y2, c)
-    if type(c) == "table" then _sc(c) end
-    _gfx.line(x1, y1, x2, y2)
-end
+    local hits = lurek.terminal.getCompletions("spawn")
+    local tab1 = lurek.terminal.nextCompletion("give")
+    local tab2 = lurek.terminal.nextCompletion("give")
+    lurek.terminal.resetCompletion()
+    t:print(3, 19, ("getCompletions('spawn'): " .. table.concat(hits, ", ")):sub(1, cols - 5))
+    t:print(3, 20, "nextCompletion('give') x2: " .. tostring(tab1) .. " -> " .. tostring(tab2))
 
--- ============================================================================
--- Terminal Demo — Lurek2D
--- ============================================================================
--- Category : showcase
--- Source   : content/games/showcase/terminal_demo/main.lua
--- Run with : cargo run -- content/games/showcase/terminal_demo
--- ============================================================================
--- Full-screen terminal UI character creation wizard with box-drawing borders,
--- colored text, stat allocation, and multi-page navigation on an 80x25 grid.
--- Controls: Up/Down navigate, Enter confirm, Backspace back, Tab next stat,
---           +/- adjust stats, 1-6 color, Escape quit
--- ============================================================================
+    lurek.terminal.pushCmdHistory(t, "spawn_enemy 10 20")
+    lurek.terminal.pushCmdHistory(t, "give_gold 500")
+    lurek.terminal.pushCmdHistory(t, "noclip on")
+    add_label(t, 3, 22,
+        string.format("cmdHistoryLen: %d   scrollbackLen: %d   prevCmd: %s",
+            lurek.terminal.cmdHistoryLen(t),
+            lurek.terminal.scrollbackLen(t),
+            tostring(lurek.terminal.prevCmd(t))),
+        .4, 1, .4)
 
--- ---------------------------------------------------------------------------
--- Constants
--- ---------------------------------------------------------------------------
+    local mc, mr = lurek.terminal.getMaxCols(), lurek.terminal.getMaxRows()
+    add_label(t, 3, 23, string.format("getMaxCols: %d   getMaxRows: %d", mc, mr), .4, 1, .4)
 
-local SCREEN_W, SCREEN_H = 800, 600
-local GRID_COLS = 80
-local GRID_ROWS = 25
-local CELL_W    = math.floor(SCREEN_W / GRID_COLS)   -- 10
-local CELL_H    = math.floor(SCREEN_H / GRID_ROWS)   -- 24
-local MAX_NAME  = 16
-
--- ---------------------------------------------------------------------------
--- States
--- ---------------------------------------------------------------------------
-local STATE_TITLE    = "PLAYING"
-local STATE_PAGE_1   = "PAGE_1"   -- Name entry
-local STATE_PAGE_2   = "PAGE_2"   -- Class selection
-local STATE_PAGE_3   = "PAGE_3"   -- Stat allocation
-local STATE_PAGE_4   = "PAGE_4"   -- Appearance
-local STATE_PAGE_5   = "PAGE_5"   -- Summary
-local STATE_COMPLETE = "COMPLETE"
-
-local current_state  = STATE_TITLE
-local title_timer    = 1
-
--- ---------------------------------------------------------------------------
--- Colors
--- ---------------------------------------------------------------------------
-local COL_GREEN   = { 0.0, 1.0, 0.3 }
-local COL_CYAN    = { 0.2, 0.9, 1.0 }
-local COL_YELLOW  = { 1.0, 0.85, 0.2 }
-local COL_RED     = { 1.0, 0.2, 0.1 }
-local COL_WHITE   = { 1.0, 1.0, 1.0 }
-local COL_DIM     = { 0.3, 0.3, 0.3 }
-local COL_MAGENTA = { 0.9, 0.3, 1.0 }
-
--- ---------------------------------------------------------------------------
--- Character data (persists across pages)
--- ---------------------------------------------------------------------------
-local char_name   = ""
-local char_class  = 1
-local class_list  = { "Warrior", "Mage", "Rogue", "Cleric" }
-local class_desc  = {
-    "High STR and CON. Excels in melee combat with heavy armor.",
-    "High INT and WIS. Commands powerful arcane and elemental spells.",
-    "High DEX. Master of stealth, traps, and critical strikes.",
-    "Balanced WIS and CON. Heals allies and smites undead foes.",
-}
-
-local STAT_NAMES  = { "STR", "DEX", "INT", "WIS", "CON" }
-local stat_values = { 4, 4, 4, 4, 4 }   -- 20 total to distribute
-local STAT_POOL   = 20
-local stat_cursor = 1
-
-local color_names   = { "Green", "Cyan", "Yellow", "Red", "Magenta", "White" }
-local color_values  = { COL_GREEN, COL_CYAN, COL_YELLOW, COL_RED, COL_MAGENTA, COL_WHITE }
-local char_color    = 1
-local symbol_list   = { "@", "#", "$", "&", "*" }
-local char_symbol   = 1
-
--- ---------------------------------------------------------------------------
--- UI state
--- ---------------------------------------------------------------------------
-local cursor_blink   = 0
-local cursor_visible = true
-local flash_timer    = 0    -- error flash
-local _slide         = { value = 0 }  -- tween slide
-local scroll_offset  = 0   -- lore scroll
-
--- Particles & systems
----@type LParticleSystem
-local ps_flash    = nil
----@type LParticleSystem
-local ps_complete = nil
----@type LCamera
-local camera      = nil
-
--- ---------------------------------------------------------------------------
--- Helpers: grid drawing
--- ---------------------------------------------------------------------------
-local function grid_x(col) return (col - 1) * CELL_W end
-local function grid_y(row) return (row - 1) * CELL_H end
-
-local function draw_char(ch, col, row, color, alpha)
-    local c = color or COL_GREEN
-    lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    text_(ch, grid_x(col), grid_y(row))
+    nav_hint(t, cols, rows)
 end
 
-local function draw_string(str, col, row, color, alpha)
-    local c = color or COL_GREEN
-    lurek.render.setColor(c[1], c[2], c[3], alpha or 1)
-    text_(str, grid_x(col), grid_y(row))
+-- ─── scene builder ───────────────────────────────────────────────────────────
+
+local builders = { build_scene1, build_scene2, build_scene3, build_scene4, build_scene5 }
+
+local function build_current_scene()
+    cmd_input  = nil
+    inv_list   = nil
+    name_input = nil
+    status_lbl = nil
+
+    local cols, rows = window_fit(16)
+    term = lurek.terminal.newTerminal(cols, rows)
+    term:setFont(16)
+    builders[scene](term, cols, rows)
+    term:autoResize()
 end
 
-local function draw_box(c1, r1, c2, r2, color)
-    local col = color or COL_GREEN
-    -- corners
-    draw_char("+", c1, r1, col)
-    draw_char("+", c2, r1, col)
-    draw_char("+", c1, r2, col)
-    draw_char("+", c2, r2, col)
-    -- horizontal
-    for c = c1 + 1, c2 - 1 do
-        draw_char("-", c, r1, col)
-        draw_char("-", c, r2, col)
-    end
-    -- vertical
-    for r = r1 + 1, r2 - 1 do
-        draw_char("|", c1, r, col)
-        draw_char("|", c2, r, col)
-    end
-end
-
-local function draw_hline(c1, c2, row, color)
-    for c = c1, c2 do
-        draw_char("-", c, row, color)
-    end
-end
-
-local function draw_button(label, col, row, selected)
-    local clr = selected and COL_YELLOW or COL_DIM
-    draw_string("[" .. label .. "]", col, row, clr)
-end
-
-local function draw_progress_bar(page, total, col, row)
-    local filled = math.floor((page / total) * 20)
-    local bar = "Step " .. page .. "/" .. total .. " "
-    for i = 1, 20 do
-        bar = bar .. (i <= filled and "=" or ".")
-    end
-    draw_string(bar, col, row, COL_DIM)
-end
-
-local function stat_total()
-    local s = 0
-    for _, v in ipairs(stat_values) do s = s + v end
-    return s
-end
-
-local function stat_remaining()
-    return STAT_POOL - stat_total()
-end
-
-local function current_page_num()
-    if current_state == STATE_PAGE_1 then return 1
-    elseif current_state == STATE_PAGE_2 then return 2
-    elseif current_state == STATE_PAGE_3 then return 3
-    elseif current_state == STATE_PAGE_4 then return 4
-    elseif current_state == STATE_PAGE_5 then return 5
-    end
-    return 0
-end
-
-local function trigger_error_flash()
-    flash_timer = 0.3
-    if ps_flash then ps_flash:emit(15) end
-end
-
-local function trigger_page_complete()
-    if ps_complete then ps_complete:emit(25) end
-    lurek.tween.to(_slide, { value = 0 }, 0.3)
-end
-
--- ---------------------------------------------------------------------------
--- Page navigation
--- ---------------------------------------------------------------------------
-local PAGES = { STATE_PAGE_1, STATE_PAGE_2, STATE_PAGE_3, STATE_PAGE_4, STATE_PAGE_5 }
-
-local function go_next_page()
-    for i, p in ipairs(PAGES) do
-        if current_state == p and i < #PAGES then
-            _slide.value = 30
-            current_state = PAGES[i + 1]
-            trigger_page_complete()
-            return true
-        end
-    end
-    return false
-end
-
-local function go_prev_page()
-    for i, p in ipairs(PAGES) do
-        if current_state == p and i > 1 then
-            _slide.value = -30
-            current_state = PAGES[i - 1]
-            lurek.tween.to(_slide, { value = 0 }, 0.3)
-            return true
-        end
-    end
-    return false
-end
-
--- ---------------------------------------------------------------------------
--- Init
--- ---------------------------------------------------------------------------
+-- ─── game loop ───────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.window.setTitle("Terminal Demo — Lurek2D")
-    lurek.render.setBackgroundColor(0, 0, 0)
-
-    lurek.input.bind("nav_up",    { "up" })
-    lurek.input.bind("nav_down",  { "down" })
-    lurek.input.bind("confirm",   { "return", "kpenter" })
-    lurek.input.bind("back",      { "backspace" })
-    lurek.input.bind("next_stat", { "tab" })
-    lurek.input.bind("quit",      { "escape" })
-
-    camera = lurek.camera.new(SCREEN_W, SCREEN_H)
-
-    -- Page-complete flash (white sparks)
-    ps_complete = lurek.particle.newSystem({
-        maxParticles = 60, emissionRate = 0,
-        lifetimeMin = 0.3, lifetimeMax = 0.7,
-        speedMin = 50, speedMax = 160, direction = 0, spread = 6.28,
-        sizes = { 3, 1.5, 0 },
-        colors = { 1, 1, 1, 1, 0.8, 0.9, 1, 0.5, 0.4, 0.6, 1, 0 },
-    })
-
-    -- Error flash (red sparks)
-    ps_flash = lurek.particle.newSystem({
-        maxParticles = 40, emissionRate = 0,
-        lifetimeMin = 0.15, lifetimeMax = 0.4,
-        speedMin = 30, speedMax = 100, direction = 0, spread = 6.28,
-        sizes = { 2.5, 1, 0 },
-        colors = { 1, 0.2, 0.1, 1, 0.8, 0.1, 0, 0 },
-    })
+    lurek.render.setBackgroundColor(0.03, 0.03, 0.04)
+    build_current_scene()
 end
 
--- ---------------------------------------------------------------------------
--- Update
--- ---------------------------------------------------------------------------
-function lurek.process(dt)
-    if lurek.input.wasActionPressed("quit") then lurek.event.quit() end
-
-    -- Systems
-    ps_complete:update(dt)
-    ps_flash:update(dt)
-    lurek.tween.update(dt)
-
-    -- Cursor blink
-    cursor_blink = cursor_blink + dt
-    if cursor_blink >= 0.45 then
-        cursor_blink = cursor_blink - 0.45
-        cursor_visible = not cursor_visible
-    end
-
-    -- Error flash decay
-    if flash_timer > 0 then flash_timer = flash_timer - dt end
-
-    -- Title timer
-    if current_state == STATE_TITLE then
-        title_timer = title_timer + dt
-    end
-
-    -- ── PAGE 1: Name entry ────────────────────────────────────
-    if current_state == STATE_PAGE_1 then
-        if lurek.input.wasActionPressed("confirm") then
-            if #char_name > 0 then
-                go_next_page()
-            else
-                trigger_error_flash()
-            end
-        end
-    end
-
-    -- ── PAGE 2: Class selection ───────────────────────────────
-    if current_state == STATE_PAGE_2 then
-        if lurek.input.wasActionPressed("nav_up") then
-            char_class = char_class > 1 and char_class - 1 or #class_list
-        end
-        if lurek.input.wasActionPressed("nav_down") then
-            char_class = char_class < #class_list and char_class + 1 or 1
-        end
-        if lurek.input.wasActionPressed("confirm") then go_next_page() end
-        if lurek.input.wasActionPressed("back") then go_prev_page() end
-    end
-
-    -- ── PAGE 3: Stat allocation ───────────────────────────────
-    if current_state == STATE_PAGE_3 then
-        if lurek.input.wasActionPressed("nav_up") or lurek.input.wasActionPressed("next_stat") then
-            stat_cursor = stat_cursor < #STAT_NAMES and stat_cursor + 1 or 1
-        end
-        if lurek.input.wasActionPressed("nav_down") then
-            stat_cursor = stat_cursor > 1 and stat_cursor - 1 or #STAT_NAMES
-        end
-        if lurek.input.wasActionPressed("confirm") then go_next_page() end
-        if lurek.input.wasActionPressed("back") then go_prev_page() end
-    end
-
-    -- ── PAGE 4: Appearance ────────────────────────────────────
-    if current_state == STATE_PAGE_4 then
-        if lurek.input.wasActionPressed("nav_up") then
-            char_symbol = char_symbol > 1 and char_symbol - 1 or #symbol_list
-        end
-        if lurek.input.wasActionPressed("nav_down") then
-            char_symbol = char_symbol < #symbol_list and char_symbol + 1 or 1
-        end
-        if lurek.input.wasActionPressed("confirm") then go_next_page() end
-        if lurek.input.wasActionPressed("back") then go_prev_page() end
-    end
-
-    -- ── PAGE 5: Summary ───────────────────────────────────────
-    if current_state == STATE_PAGE_5 then
-        if lurek.input.wasActionPressed("confirm") then
-            current_state = STATE_COMPLETE
-            if ps_complete then ps_complete:emit(60) end
-        end
-        if lurek.input.wasActionPressed("back") then go_prev_page() end
-    end
+function lurek.resize(w, h)
+    build_current_scene()
 end
 
--- ---------------------------------------------------------------------------
--- Text input — name entry on PAGE_1
--- ---------------------------------------------------------------------------
-function lurek.textinput(text)
-    if current_state == STATE_PAGE_1 then
-        if #char_name < MAX_NAME then
-            char_name = char_name .. text
-        end
-    end
-end
-
-function lurek._keypressed(key)
-    -- Title → start
-    if current_state == STATE_TITLE then
-        if key ~= "escape" then current_state = STATE_PAGE_1 end
-        return
-    end
-
-    -- Backspace deletes character on name page
-    if current_state == STATE_PAGE_1 and key == "backspace" then
-        if #char_name > 0 then
-            char_name = char_name:sub(1, -2)
-        end
-        return
-    end
-
-    -- Stat +/- on PAGE_3
-    if current_state == STATE_PAGE_3 then
-        if key == "=" or key == "kp+" then
-            if stat_remaining() > 0 and stat_values[stat_cursor] < 18 then
-                stat_values[stat_cursor] = stat_values[stat_cursor] + 1
-            else
-                trigger_error_flash()
-            end
-        end
-        if key == "-" or key == "kp-" then
-            if stat_values[stat_cursor] > 1 then
-                stat_values[stat_cursor] = stat_values[stat_cursor] - 1
-            else
-                trigger_error_flash()
-            end
-        end
-    end
-
-    -- Color selection 1-6 on PAGE_4
-    if current_state == STATE_PAGE_4 then
-        local n = tonumber(key)
-        if n and n >= 1 and n <= #color_names then
-            char_color = n
-        end
-    end
-
-    -- Complete state: any key quits
-    if current_state == STATE_COMPLETE and key ~= "escape" then
-        lurek.event.quit()
-    end
-end
-
--- ---------------------------------------------------------------------------
--- Render — world-space effects (scanlines, particles)
--- ---------------------------------------------------------------------------
 function lurek.draw()
-    camera:attach()
+    if not term then return end
+    local cols, rows = term:getDimensions()
 
-    -- CRT scanlines
-    lurek.render.setColor(0, 0.12, 0.04, 0.2)
-    for y = 0, SCREEN_H, 3 do
-        ln(0, y, SCREEN_W, y)
+    if scene == 1 then
+        local banner = "  TERMINAL  DEMO  "
+        local bc     = math.max(1, math.floor((cols - #banner) / 2) + 1)
+        for i = 1, #banner do
+            local phase = (tick * 0.025 + (i - 1) / #banner) % 1
+            local r2 = math.abs(math.sin(phase * math.pi))
+            local g2 = math.abs(math.sin(phase * math.pi + 2.1))
+            local b2 = math.abs(math.sin(phase * math.pi + 4.2))
+            term:set(bc + i - 1, 3, banner:sub(i, i), r2, g2, b2, 1)
+        end
     end
 
-    -- Error flash overlay
-    if flash_timer > 0 then
-        local a = flash_timer / 0.3 * 0.15
-        lurek.render.setColor(1, 0.1, 0, a)
-        rect(0, 0, SCREEN_W, SCREEN_H)
+    if scene == 4 then
+        render_scrollback(cols, rows)
     end
 
-    -- Particles
-    lurek.render.setColor(1, 1, 1, 1)
-    ps_complete:render()
-    ps_flash:render()
-
-    camera:detach()
+    term:render(0, 0)
 end
 
--- ---------------------------------------------------------------------------
--- Render UI — terminal grid, all pages, HUD
--- ---------------------------------------------------------------------------
-function lurek.draw_ui()
-    local fps  = lurek.timer.getFPS()
-    local pnum = current_page_num()
-    local ox   = math.floor(_slide.value)
+function lurek.process(dt)
+    tick = tick + 1
+end
 
-    -- ── TITLE SCREEN ──────────────────────────────────────────
-    if current_state == STATE_TITLE then
-        draw_box(5, 3, 76, 23, COL_GREEN)
-        draw_string("T E R M I N A L   D E M O", 22 + ox, 8, COL_GREEN)
-        draw_string("CHARACTER CREATION", 27 + ox, 10, COL_CYAN)
-        draw_hline(20, 60, 12, COL_DIM)
-        draw_string("A full-screen terminal UI widget showcase", 16 + ox, 14, COL_DIM)
-        draw_string("demonstrating character creation wizards", 17 + ox, 15, COL_DIM)
-        draw_string("with box-drawing, colored text, and stats.", 16 + ox, 16, COL_DIM)
+function lurek.keypressed(key)
+    if not term then return end
 
-        local blink_a = (math.sin(title_timer * 3) + 1) * 0.5
-        draw_string("[ Press any key to begin ]", 24, 20, COL_YELLOW, 0.4 + blink_a * 0.6)
-
-        draw_string("Lurek2D Showcase", 30, 22, COL_DIM, 0.5)
-        draw_string(string.format("FPS: %d", fps), 70, 25, COL_DIM, 0.4)
+    if key == "right" then
+        scene = (scene % SCENE_COUNT) + 1
+        build_current_scene()
+        return
+    elseif key == "left" then
+        scene = ((scene - 2 + SCENE_COUNT) % SCENE_COUNT) + 1
+        build_current_scene()
+        return
+    end
+    local num = tonumber(key)
+    if num and num >= 1 and num <= SCENE_COUNT then
+        scene = num
+        build_current_scene()
         return
     end
 
-    -- ── COMPLETE SCREEN ───────────────────────────────────────
-    if current_state == STATE_COMPLETE then
-        draw_box(10, 4, 70, 22, COL_GREEN)
-        draw_string("*** CHARACTER CREATED ***", 24, 6, COL_YELLOW)
-        draw_hline(12, 68, 8, COL_DIM)
-
-        draw_string("Name  : " .. char_name, 16, 10, COL_WHITE)
-        draw_string("Class : " .. class_list[char_class], 16, 11, COL_CYAN)
-        draw_string("Symbol: " .. symbol_list[char_symbol], 16, 12, color_values[char_color])
-        draw_string("Color : " .. color_names[char_color], 16, 13, color_values[char_color])
-
-        draw_hline(16, 50, 15, COL_DIM)
-        for i, name in ipairs(STAT_NAMES) do
-            local bar = string.rep("#", stat_values[i])
-            draw_string(string.format("  %s: %2d  %s", name, stat_values[i], bar), 16, 15 + i, COL_CYAN)
-        end
-
-        draw_string("Your hero awaits!", 28, 22, COL_GREEN)
-        local pa = (math.sin(title_timer * 4) + 1) * 0.5
-        draw_string("[ Press any key to exit ]", 24, 24, COL_DIM, 0.4 + pa * 0.6)
-        return
-    end
-
-    -- ── SHARED FRAME: border + header + progress ──────────────
-    draw_box(1, 1, 80, 25, COL_GREEN)
-    draw_progress_bar(pnum, 5, 3, 2)
-    draw_hline(2, 79, 3, COL_DIM)
-
-    -- ── PAGE 1: Name Entry ────────────────────────────────────
-    if current_state == STATE_PAGE_1 then
-        draw_string("  NAME ENTRY", 30 + ox, 4, COL_CYAN)
-        draw_string("Enter your character's name (max 16 chars):", 8 + ox, 7, COL_GREEN)
-
-        -- Name input box
-        draw_box(8, 9, 50, 11, COL_DIM)
-        local display_name = char_name
-        if cursor_visible then display_name = display_name .. "_" end
-        draw_string(display_name, 10 + ox, 10, COL_WHITE)
-
-        draw_string(string.format("(%d/%d characters)", #char_name, MAX_NAME), 8 + ox, 13, COL_DIM)
-
-        -- Lore text
-        draw_hline(8, 72, 15, COL_DIM)
-        draw_string("In the land of Eldoria, a new hero rises.", 8 + ox, 16, COL_DIM)
-        draw_string("Your name will echo through the halls of", 8 + ox, 17, COL_DIM)
-        draw_string("the great citadel for centuries to come.", 8 + ox, 18, COL_DIM)
-
-        draw_button("Confirm: Enter", 55, 23, #char_name > 0)
-        if flash_timer > 0 then
-            draw_string("! Name cannot be empty !", 20, 23, COL_RED)
-        end
-    end
-
-    -- ── PAGE 2: Class Selection ───────────────────────────────
-    if current_state == STATE_PAGE_2 then
-        draw_string("  CLASS SELECTION", 27 + ox, 4, COL_CYAN)
-        draw_string("Choose your class with Up/Down, then Enter:", 8 + ox, 7, COL_GREEN)
-
-        for i, cls in ipairs(class_list) do
-            local prefix = (i == char_class) and "> " or "  "
-            local clr = (i == char_class) and COL_YELLOW or COL_DIM
-            draw_string(prefix .. cls, 12 + ox, 9 + i, clr)
-        end
-
-        -- Description box
-        draw_box(8, 16, 72, 20, COL_DIM)
-        draw_string(class_desc[char_class], 10 + ox, 17, COL_GREEN)
-        draw_string("Recommended for: " .. (char_class == 1 and "beginners" or
-                     char_class == 2 and "strategic players" or
-                     char_class == 3 and "stealth fans" or "support players"), 10 + ox, 19, COL_DIM)
-
-        draw_button("Confirm", 55, 23, true)
-        draw_button("Back", 45, 23, true)
-    end
-
-    -- ── PAGE 3: Stat Allocation ───────────────────────────────
-    if current_state == STATE_PAGE_3 then
-        draw_string("  STAT ALLOCATION", 27 + ox, 4, COL_CYAN)
-        draw_string(string.format("Distribute points (Remaining: %d)", stat_remaining()), 8 + ox, 7, COL_GREEN)
-        draw_string("Tab/Up: next stat | +/-: adjust | Enter: confirm", 8 + ox, 8, COL_DIM)
-
-        for i, name in ipairs(STAT_NAMES) do
-            local row = 10 + i
-            local selected = (i == stat_cursor)
-            local prefix = selected and "> " or "  "
-            local name_clr = selected and COL_YELLOW or COL_CYAN
-            draw_string(prefix .. name, 10 + ox, row, name_clr)
-
-            -- Value
-            draw_string(string.format("%2d", stat_values[i]), 20 + ox, row, COL_WHITE)
-
-            -- Visual bar
-            local bar_full = string.rep("#", stat_values[i])
-            local bar_empty = string.rep(".", 18 - stat_values[i])
-            draw_string("[" .. bar_full .. bar_empty .. "]", 24 + ox, row, selected and COL_GREEN or COL_DIM)
-
-            -- +/- indicators for selected
-            if selected then
-                draw_string("-", 45 + ox, row, stat_values[i] > 1 and COL_RED or COL_DIM)
-                draw_string("+", 47 + ox, row, stat_remaining() > 0 and stat_values[i] < 18 and COL_GREEN or COL_DIM)
+    if scene == 4 and key == "return" and cmd_input then
+        local text = cmd_input:getText()
+        if text ~= "" then
+            lurek.terminal.pushScrollback(term, "> " .. text)
+            lurek.terminal.pushCmdHistory(term, text)
+            if text == "clear" then
+                lurek.terminal.setScrollbackCap(term, 0)
+                lurek.terminal.setScrollbackCap(term, 500)
+            elseif text:sub(1, 5) == "echo " then
+                lurek.terminal.pushScrollback(term, text:sub(6))
+            elseif text == "help" then
+                lurek.terminal.pushScrollback(term, "\27[32m[console]\27[0m Commands: help  clear  echo <text>  scrollbackLen  historyLen")
+            elseif text == "scrollbackLen" then
+                lurek.terminal.pushScrollback(term, tostring(lurek.terminal.scrollbackLen(term)))
+            elseif text == "historyLen" then
+                lurek.terminal.pushScrollback(term, tostring(lurek.terminal.cmdHistoryLen(term)))
+            else
+                lurek.terminal.pushScrollback(term, "\27[31mUnknown:\27[0m " .. text .. "  (type 'help')")
             end
+            cmd_input:setText("")
         end
-
-        -- Pool display
-        draw_hline(10, 50, 17, COL_DIM)
-        local pool_bar = string.rep("=", stat_remaining()) .. string.rep(".", STAT_POOL - stat_remaining())
-        draw_string("Pool: [" .. pool_bar .. "] " .. stat_remaining(), 10 + ox, 18, COL_GREEN)
-
-        draw_button("Confirm", 55, 23, true)
-        draw_button("Back", 45, 23, true)
+        return
     end
 
-    -- ── PAGE 4: Appearance ────────────────────────────────────
-    if current_state == STATE_PAGE_4 then
-        draw_string("  APPEARANCE", 30 + ox, 4, COL_CYAN)
-
-        -- Symbol selection
-        draw_string("Choose your symbol with Up/Down:", 8 + ox, 7, COL_GREEN)
-        for i, sym in ipairs(symbol_list) do
-            local prefix = (i == char_symbol) and "> " or "  "
-            local clr = (i == char_symbol) and COL_YELLOW or COL_DIM
-            draw_string(prefix .. sym, 12 + ox, 8 + i, clr)
+    if scene == 4 and cmd_input then
+        if key == "up" then
+            local prev = lurek.terminal.prevCmd(term)
+            if prev then cmd_input:setText(prev) end
+            return
+        elseif key == "down" then
+            local nxt = lurek.terminal.nextCmd(term)
+            cmd_input:setText(nxt or "")
+            return
         end
-
-        -- Color selection
-        draw_string("Choose your color (press 1-6):", 8 + ox, 15, COL_GREEN)
-        for i, name in ipairs(color_names) do
-            local prefix = (i == char_color) and "> " or "  "
-            local clr = (i == char_color) and color_values[i] or COL_DIM
-            draw_string(prefix .. i .. ". " .. name, 12 + ox, 15 + i, clr)
-        end
-
-        -- Preview
-        draw_box(50, 7, 70, 15, COL_DIM)
-        draw_string("Preview:", 52 + ox, 8, COL_DIM)
-        local pc = color_values[char_color]
-        draw_string(symbol_list[char_symbol], 59 + ox, 11, pc)
-        draw_string(color_names[char_color], 55 + ox, 13, pc)
-
-        draw_button("Confirm", 55, 23, true)
-        draw_button("Back", 45, 23, true)
     end
 
-    -- ── PAGE 5: Summary ───────────────────────────────────────
-    if current_state == STATE_PAGE_5 then
-        draw_string("  CHARACTER SUMMARY", 26 + ox, 4, COL_CYAN)
-        draw_hline(8, 72, 5, COL_DIM)
-
-        draw_string("Name   : " .. char_name, 10 + ox, 7, COL_WHITE)
-        draw_string("Class  : " .. class_list[char_class], 10 + ox, 8, COL_CYAN)
-        draw_string("Symbol : " .. symbol_list[char_symbol], 10 + ox, 9, color_values[char_color])
-        draw_string("Color  : " .. color_names[char_color], 10 + ox, 10, color_values[char_color])
-
-        draw_hline(10, 50, 12, COL_DIM)
-        draw_string("Stats:", 10 + ox, 13, COL_GREEN)
-        for i, name in ipairs(STAT_NAMES) do
-            local bar = string.rep("#", stat_values[i])
-            draw_string(string.format("  %s: %2d  %s", name, stat_values[i], bar), 10 + ox, 13 + i, COL_CYAN)
+    if scene == 2 and key == "tab" then
+        local focused = term:getFocused()
+        if focused == name_input then
+            term:setFocus(inv_list)
+            if status_lbl then status_lbl:setText("Focus: List - arrow keys select  [Tab]=back to textbox") end
+        else
+            term:setFocus(name_input)
+            if status_lbl then status_lbl:setText("Focus: TextBox - type to filter  [Tab]=switch to list") end
         end
-
-        -- Total
-        draw_string(string.format("  Total: %d / %d", stat_total(), STAT_POOL), 10 + ox, 20, COL_DIM)
-
-        draw_hline(8, 72, 21, COL_DIM)
-        draw_string("Press Enter to create, or Backspace to go back.", 10 + ox, 22, COL_GREEN)
-        draw_button("Create!", 55, 23, true)
-        draw_button("Back", 45, 23, true)
+        return
     end
 
-    -- ── HUD ───────────────────────────────────────────────────
-    lurek.render.setColor(COL_DIM[1], COL_DIM[2], COL_DIM[3], 0.4)
-    text_(string.format("FPS: %d", fps), SCREEN_W - 70, SCREEN_H - 18)
+    term:keypressed(key)
+end
+
+function lurek.textinput(text)
+    if term then term:textinput(text) end
+end
+
+function lurek.mousepressed(x, y, button)
+    if term then term:mousepressed(x, y, button) end
 end

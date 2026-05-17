@@ -59,7 +59,7 @@ do
   end
 end
 
---@api-stub: lurek.filesystem.read
+--@api-stub: LFileHandle:read
 -- Reads a UTF-8 text file from GameFS
 do
   -- read() loads the entire file as a UTF-8 string. Use it for config files,
@@ -72,7 +72,7 @@ do
   end
 end
 
---@api-stub: lurek.filesystem.write
+--@api-stub: LFileHandle:write
 -- Writes a UTF-8 text file through GameFS
 do
   -- write() creates or overwrites a file with text content. GameFS resolves the
@@ -529,7 +529,7 @@ end
 
 -- — FileData methods —
 
---@api-stub: LFileData:getSize
+--@api-stub: LFileHandle:getSize
 -- Returns the byte length of this file data
 do
   -- LFileData:getSize() tells you how many bytes the loaded file occupies.
@@ -565,7 +565,7 @@ do
   end)
 end
 
---@api-stub: LFileData:type
+--@api-stub: LZipMount:type
 -- Returns the Lua-visible type name for this file data handle
 do
   -- type() always returns "LFileData". Use it for runtime type checks when
@@ -579,7 +579,7 @@ do
   end
 end
 
---@api-stub: LFileData:typeOf
+--@api-stub: LZipMount:typeOf
 -- Returns whether this file data handle matches a supported type name
 do
   -- typeOf() checks if this handle matches a given type name. Accepts "LFileData"
@@ -718,7 +718,7 @@ do
   end)
 end
 
---@api-stub: LFileHandle:type
+--@api-stub: LZipMount:type
 -- Returns the Lua-visible type name for this file handle
 do
   -- type() always returns "LFileHandle" for file handle objects.
@@ -730,7 +730,7 @@ do
   lurek.log.info("LFileHandle:type = " .. t, "filesystem")
 end
 
---@api-stub: LFileHandle:typeOf
+--@api-stub: LZipMount:typeOf
 -- Returns whether this file handle matches a supported type name
 do
   -- typeOf() checks "LFileHandle" and "Object". Same pattern as LFileData:typeOf.

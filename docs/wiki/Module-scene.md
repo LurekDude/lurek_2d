@@ -58,7 +58,7 @@
   - [lurek.scene.renderUi()](#lurekscenerenderui)
   - [lurek.scene.serializeScene() -> table](#lureksceneserializescene-table)
   - [lurek.scene.setCurrentLayer(layer: integer) -> boolean](#lurekscenesetcurrentlayerlayer-integer-boolean)
-  - [lurek.scene.setData(key: string, value: table)](#lurekscenesetdatakey-string-value-table)
+  - [lurek.scene.setData(key: string, value: any)](#lurekscenesetdatakey-string-value-any)
   - [lurek.scene.transitions.slide([direction]: string, [duration]: number) -> table](#lurekscenetransitionsslidedirection-string-duration-number-table)
   - [lurek.scene.switchTo(scene: table, [transition]: string, [duration]: number, [easing]: string, [params]: table)](#lureksceneswitchtoscene-table-transition-string-duration-number-easing-string-params-table)
   - [lurek.scene.unregisterScene(name: string)](#lureksceneunregisterscenename-string)
@@ -1269,14 +1269,14 @@ do
 end
 ```
 
-### `lurek.scene.setData(key: string, value: table)`
+### `lurek.scene.setData(key: string, value: any)`
 
 Store an arbitrary Lua value in the scene module's shared data map, keyed by a string name. Scenes can use this to pass information between each other without direct references — for example, passing a selected level index from a menu scene to a gameplay scene.
 
 **Parameters**
 
 - `key` (`string`, required) - The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
-- `value` (`table`, required) - Value to store (a table with your game data).
+- `value` (`any`, required) - Value to store.
 
 #### Example
 

@@ -29,7 +29,7 @@
   - [LUniverse:defineTag(name: string) -> integer](#luniversedefinetagname-string-integer)
   - [LUniverse:deserialize(snapshot: table)](#luniversedeserializesnapshot-table)
   - [LUniverse:each(name: string, callback: function)](#luniverseeachname-string-callback-function)
-  - [LUniverse:emit(event: string, ...: table)](#luniverseemitevent-string-table)
+  - [LUniverse:emit(event: string, ...: any)](#luniverseemitevent-string-any)
   - [LUniverse:extendBlueprint(name: string, parent: string, overrides: table)](#luniverseextendblueprintname-string-parent-string-overrides-table)
   - [LUniverse:flushObservers()](#luniverseflushobservers)
   - [LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil](#luniversegetid-integer-name-string-tablenumberstringbooleannil)
@@ -73,7 +73,7 @@
   - [LUniverse:removeTag(id: integer, tag: string)](#luniverseremovetagid-integer-tag-string)
   - [LUniverse:render()](#luniverserender)
   - [LUniverse:serialize() -> table](#luniverseserialize-table)
-  - [LUniverse:set(id: integer, name: string, value: table)](#luniversesetid-integer-name-string-value-table)
+  - [LUniverse:set(id: integer, name: string, value: any)](#luniversesetid-integer-name-string-value-any)
   - [LUniverse:setLayer(id: integer, layer: integer)](#luniversesetlayerid-integer-layer-integer)
   - [LUniverse:setParent(child_id: integer, [parent_id]: integer)](#luniversesetparentchildid-integer-parentid-integer)
   - [LUniverse:snapshot() -> table](#luniversesnapshot-table)
@@ -567,14 +567,14 @@ do
 end
 ```
 
-### `LUniverse:emit(event: string, ...: table)`
+### `LUniverse:emit(event: string, ...: any)`
 
 Calls matching event-named functions on registered systems.
 
 **Parameters**
 
 - `event` (`string`, required) - Function name looked up on each system table.
-- `...` (`table`, required) - Extra values forwarded after the system and universe arguments.
+- `...` (`any`, required) - Extra values forwarded after the system and universe arguments.
 
 #### Example
 
@@ -1849,7 +1849,7 @@ do
 end
 ```
 
-### `LUniverse:set(id: integer, name: string, value: table)`
+### `LUniverse:set(id: integer, name: string, value: any)`
 
 Stores or replaces a component value on an entity.
 
@@ -1857,7 +1857,7 @@ Stores or replaces a component value on an entity.
 
 - `id` (`integer`, required) - Entity id that receives the component.
 - `name` (`string`, required) - Component name.
-- `value` (`table`, required) - Lua value stored as the component payload.
+- `value` (`any`, required) - Lua value stored as the component payload.
 
 #### Example
 

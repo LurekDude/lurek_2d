@@ -379,7 +379,7 @@ function ensure_evidence_dir(category)
     -- Use os.execute for cross-platform directory creation
     local sep = package.config:sub(1, 1)
     if sep == "\\" then
-        os.execute('mkdir "' .. dir:gsub("/", "\\") .. '" 2>NUL')
+        os.execute('mkdir "' .. string.gsub(dir, "/", "\\") .. '" 2>NUL')
     else
         os.execute('mkdir -p "' .. dir .. '" 2>/dev/null')
     end

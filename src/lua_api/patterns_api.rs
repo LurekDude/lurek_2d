@@ -49,7 +49,7 @@ impl LuaUserData for LuaEventBus {
         // -- emit --
         /// Emit an event, invoking all subscribed listeners in priority order with optional payload arguments.
         /// @param | event | string | The event name to emit.
-        /// @param | ... | table | Additional arguments passed to each listener callback.
+        /// @param | ... | any | Additional arguments passed to each listener callback.
         methods.add_method("emit", |lua, this, args: LuaMultiValue| {
             let mut args_iter = args.into_iter();
             let event: String = match args_iter.next() {
@@ -134,7 +134,7 @@ impl LuaUserData for LuaObjectPool {
         add_type_methods(methods);
         // -- add --
         /// Add an object to the pool's idle set, making it available for future acquisition.
-        /// @param | value | table | The object table to store in the pool.
+        /// @param | value | any | The object value to store in the pool.
         methods.add_method("add", |lua, this, value: LuaValue| {
             let total = this.pool.borrow().total_count();
             let new_ids = this.pool.borrow_mut().prewarm(total + 1);
@@ -162,7 +162,7 @@ impl LuaUserData for LuaObjectPool {
         });
         // -- release --
         /// Return an active object back to the pool's idle set so it can be reused.
-        /// @param | value | table | The object table to release back into the pool.
+        /// @param | value | any | The object value to release back into the pool.
         methods.add_method("release", |lua, this, value: LuaValue| {
             if let Some(id) = this.active_queue.borrow_mut().pop_front() {
                 this.pool.borrow_mut().release(id);
@@ -388,7 +388,7 @@ impl LuaUserData for LuaServiceLocator {
         // -- provide --
         /// Register a service instance under a given name. Replaces any previously registered service with the same name.
         /// @param | name | string | Unique identifier for the service.
-        /// @param | value | table | The service table to register.
+        /// @param | value | any | The service value to register.
         methods.add_method("provide", |lua, this, (name, value): (String, LuaValue)| {
             this.locator.borrow_mut().register(&name);
             let key = lua.create_registry_value(value)?;
@@ -487,7 +487,7 @@ impl LuaUserData for LuaFactory {
         // -- create --
         /// Create a new object by type name, passing additional arguments to the constructor.
         /// @param | typeName | string | The registered type to instantiate.
-        /// @param | ... | table | Extra arguments forwarded to the constructor.
+        /// @param | ... | any | Extra arguments forwarded to the constructor.
         /// @return | table | The created object table.
         /// @return | nil | When not available.
         methods.add_method("create", |lua, this, args: LuaMultiValue| {
@@ -1099,7 +1099,7 @@ impl LuaUserData for LuaPriorityQueue {
         // -- push --
         /// Add an item with a numeric priority. Higher priority items are dequeued first.
         /// @param | priority | integer | The priority value (higher = dequeued sooner).
-        /// @param | value | table | The payload table to store.
+        /// @param | value | any | The payload value to store.
         /// @param | label | string? | Optional human-readable label for debugging.
         /// @return | number | The internal ID of the enqueued item.
         methods.add_method(
@@ -1523,7 +1523,7 @@ impl LuaUserData for LuaMediator {
         // -- send --
         /// Send a message to all handlers on a specific channel with optional payload arguments.
         /// @param | channel | string | The target channel name.
-        /// @param | ... | table | Additional arguments passed to each handler.
+        /// @param | ... | any | Additional arguments passed to each handler.
         methods.add_method("send", |lua, this, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let channel: String = match iter.next() {
@@ -1544,7 +1544,7 @@ impl LuaUserData for LuaMediator {
         });
         // -- broadcast --
         /// Send a message to all handlers on all channels. Every registered handler receives the payload.
-        /// @param | ... | table | Arguments passed to every handler.
+        /// @param | ... | any | Arguments passed to every handler.
         methods.add_method("broadcast", |lua, this, args: LuaMultiValue| {
             let extra: Vec<LuaValue> = args.into_iter().collect();
             let names = this.mediator.borrow().channel_names();
@@ -1635,7 +1635,7 @@ impl LuaUserData for LuaStrategy {
         });
         // -- execute --
         /// Execute the currently active strategy, passing through all arguments and returning its results.
-        /// @param | ... | table | Arguments forwarded to the active strategy function.
+        /// @param | ... | any | Arguments forwarded to the active strategy function.
         /// @return | table | Return value from the strategy function.
         /// @return | nil | When not available.
         methods.add_method("execute", |lua, this, args: LuaMultiValue| {
@@ -1718,7 +1718,7 @@ impl LuaUserData for LuaStack {
         add_type_methods(methods);
         // -- push --
         /// Push a value onto the top of the stack. Returns false if the stack is at capacity.
-        /// @param | value | string | The value to push.
+        /// @param | value | any | The value to push.
         /// @return | boolean | True if pushed, false if full.
         methods.add_method("push", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1731,7 +1731,7 @@ impl LuaUserData for LuaStack {
         });
         // -- pushBottom --
         /// Push a value onto the bottom of the stack. Returns false if at capacity.
-        /// @param | value | string | The value to insert at the bottom.
+        /// @param | value | any | The value to insert at the bottom.
         /// @return | boolean | True if pushed, false if full.
         methods.add_method("pushBottom", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1827,7 +1827,7 @@ impl LuaUserData for LuaStack {
         // -- insertAt --
         /// Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | string | The value to insert.
+        /// @param | value | any | The value to insert.
         /// @return | boolean | True if inserted, false if full.
         methods.add_method(
             "insertAt",
@@ -1922,7 +1922,7 @@ impl LuaUserData for LuaQueue {
         add_type_methods(methods);
         // -- enqueue --
         /// Add a value to the back of the queue. Returns false if at capacity.
-        /// @param | value | string | The value to enqueue.
+        /// @param | value | any | The value to enqueue.
         /// @return | boolean | True if enqueued, false if full.
         methods.add_method("enqueue", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -1935,7 +1935,7 @@ impl LuaUserData for LuaQueue {
         });
         // -- enqueueFront --
         /// Add a value to the front of the queue (priority insertion). Returns false if at capacity.
-        /// @param | value | string | The value to insert at the front.
+        /// @param | value | any | The value to insert at the front.
         /// @return | boolean | True if enqueued, false if full.
         methods.add_method("enqueueFront", |lua, this, value: LuaValue| {
             let len = this.items.borrow().len();
@@ -2015,7 +2015,7 @@ impl LuaUserData for LuaQueue {
         // -- insertAt --
         /// Insert a value at a 1-based index in the queue. Returns false if at capacity.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | string | The value to insert.
+        /// @param | value | any | The value to insert.
         /// @return | boolean | True if inserted, false if full.
         methods.add_method(
             "insertAt",
@@ -2097,7 +2097,7 @@ impl LuaUserData for LuaList {
         add_type_methods(methods);
         // -- add --
         /// Append a value to the end of the list.
-        /// @param | value | string | The value to append.
+        /// @param | value | any | The value to append.
         methods.add_method("add", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().push(key);
@@ -2105,7 +2105,7 @@ impl LuaUserData for LuaList {
         });
         // -- push --
         /// Append a value to the end of the list (alias for add).
-        /// @param | value | string | The value to append.
+        /// @param | value | any | The value to append.
         methods.add_method("push", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().push(key);
@@ -2113,7 +2113,7 @@ impl LuaUserData for LuaList {
         });
         // -- unshift --
         /// Insert a value at the beginning of the list.
-        /// @param | value | string | The value to prepend.
+        /// @param | value | any | The value to prepend.
         methods.add_method("unshift", |lua, this, value: LuaValue| {
             let key = lua.create_registry_value(value)?;
             this.items.borrow_mut().insert(0, key);
@@ -2139,7 +2139,7 @@ impl LuaUserData for LuaList {
         // -- set --
         /// Replace the value at a 1-based index. Errors if index is 0 or out of range.
         /// @param | index | integer | 1-based position.
-        /// @param | value | string | The new value.
+        /// @param | value | any | The new value.
         methods.add_method("set", |lua, this, (index, value): (usize, LuaValue)| {
             if index == 0 {
                 return Err(LuaError::runtime("list index must be >= 1"));
@@ -2156,7 +2156,7 @@ impl LuaUserData for LuaList {
         // -- insert --
         /// Insert a value at a 1-based index, shifting subsequent items right.
         /// @param | index | integer | 1-based insertion position.
-        /// @param | value | string | The value to insert.
+        /// @param | value | any | The value to insert.
         methods.add_method("insert", |lua, this, (index, value): (usize, LuaValue)| {
             let len = this.items.borrow().len();
             let idx = if index == 0 { 0 } else { (index - 1).min(len) };
@@ -2371,7 +2371,7 @@ impl LuaUserData for LuaMap {
         // -- set --
         /// Set a key-value pair in the map. Replaces any existing value for the same key.
         /// @param | key | string | The key.
-        /// @param | value | string | The value to store.
+        /// @param | value | any | The value to store.
         methods.add_method("set", |lua, this, (key, value): (String, LuaValue)| {
             let rk = lua.create_registry_value(value)?;
             if let Some(old) = this.items.borrow_mut().insert(key, rk) {
@@ -2499,7 +2499,7 @@ impl LuaUserData for LuaWeightedRandom {
         // -- add --
         /// Add an item with a relative weight. Higher weight = higher selection probability.
         /// @param | weight | number | The selection weight (must be > 0).
-        /// @param | value | string | The payload value returned on pick.
+        /// @param | value | any | The payload value returned on pick.
         /// @param | label | string? | Optional human-readable label.
         /// @return | number | The internal ID of the added entry.
         methods.add_method(

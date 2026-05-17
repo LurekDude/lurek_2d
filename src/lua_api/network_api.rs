@@ -999,6 +999,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Joins a room by id when available. This function is exposed to Lua scripts.
     /// @param | id | string | Room id.
     /// @return | table | Room info table, or nil when missing.
+    /// @field | id | string | Room id.
     /// @field | name | string | Room name.
     /// @field | host | string | Host address.
     /// @field | player_count | integer | Current player count.
@@ -1016,6 +1017,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Leaves a room by id when available. This function is exposed to Lua scripts.
     /// @param | id | string | Room id.
     /// @return | table | Room info table, or nil when missing.
+    /// @field | id | string | Room id.
     /// @field | room_id | string | Room identifier.
     /// @field | peer_id | string | Peer identifier.
     tbl.set(
