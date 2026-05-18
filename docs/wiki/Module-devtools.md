@@ -21,7 +21,7 @@
   - [lurek.devtools.eval(code: string) -> LuaValue](#lurekdevtoolsevalcode-string-luavalue)
   - [lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer](#lurekdevtoolsexposewatchname-string-getter-function-category-string-integer)
   - [lurek.devtools.fatal(message: string)](#lurekdevtoolsfatalmessage-string)
-  - [lurek.devtools.getCallStack([max_depth]: integer) -> string[]](#lurekdevtoolsgetcallstackmaxdepth-integer-string)
+  - [lurek.devtools.getCallStack([max_depth]: integer) -> any[]](#lurekdevtoolsgetcallstackmaxdepth-integer-any)
   - [lurek.devtools.getFrameHistory() -> number[]](#lurekdevtoolsgetframehistory-number)
   - [lurek.devtools.getFrameHistorySize() -> integer](#lurekdevtoolsgetframehistorysize-integer)
   - [lurek.devtools.getFrameStats() -> table](#lurekdevtoolsgetframestats-table)
@@ -169,7 +169,7 @@ lurek.devtools.error(message: string) -- Adds an error-level diagnostic message 
 lurek.devtools.eval(code: string) -> LuaValue -- Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
 lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer -- Registers a watch expression callback for snapshots and watch panels.
 lurek.devtools.fatal(message: string) -- Adds a fatal-level diagnostic message to the devtools log.
-lurek.devtools.getCallStack([max_depth]: integer) -> string[] -- Returns Lua call stack frames using the Lua debug library.
+lurek.devtools.getCallStack([max_depth]: integer) -> any[] -- Returns Lua call stack frames using the Lua debug library.
 lurek.devtools.getFrameHistory() -> number[] -- Returns retained CPU frame duration samples in insertion order.
 lurek.devtools.getFrameHistorySize() -> integer -- Returns the current CPU frame history capacity.
 lurek.devtools.getFrameStats() -> table -- Returns aggregate CPU frame timing statistics from recorded samples.
@@ -287,18 +287,9 @@ Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
 do
-  -- Returns (true, result) on success, (false, error_string) on failure.
-  -- Use for in-game console commands, debug expressions, or live tweaking.
-  local ok, value = lurek.devtools.eval("return 2 + 2")
-  if ok then
-    lurek.devtools.info("eval result: " .. tostring(value))
-  end
-
-  -- Error case: syntax or runtime error returns false + message.
-  local ok2, err = lurek.devtools.eval("return undefined_var.field")
-  if not ok2 then
-    lurek.devtools.warn("eval error: " .. tostring(err))
-  end
+  -- eval() runs a Lua snippet string in the live runtime and returns results.
+  local result = lurek.devtools.eval("return 2 + 2")
+  lurek.log.debug("eval result: " .. tostring(result), "devtools") -- 4
 end
 ```
 
@@ -359,7 +350,7 @@ do
 end
 ```
 
-### `lurek.devtools.getCallStack([max_depth]: integer) -> string[]`
+### `lurek.devtools.getCallStack([max_depth]: integer) -> any[]`
 
 Returns Lua call stack frames using the Lua debug library.
 
@@ -367,7 +358,7 @@ Returns Lua call stack frames using the Lua debug library.
 
 - `max_depth` (`integer`, optional) - Optional maximum number of frames to return; defaults to 20 and is capped at 100.
 
-**Returns**: `string[]` - Array of frames with source, line, name, and what fields.
+**Returns**: `any[]` - Array of frame tables; each has source (string), line (integer), name (string), and what (string) fields.
 
 #### Example
 
@@ -381,7 +372,6 @@ do
   local function inner_function()
     local frames = lurek.devtools.getCallStack(5)
     for i, f in ipairs(frames) do
-      ---@cast f {source: string, line: integer, name: string, what: string}
       lurek.devtools.debug(string.format(
         "#%d %s:%d in %s (%s)", i, f.source, f.line, f.name, f.what
       ))
@@ -1531,9 +1521,8 @@ Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
 do
-  -- Returns the string "LFileWatcher". Use for debugging or type dispatch.
-  local fw = lurek.devtools.newFileWatcher("save/")
-  lurek.devtools.debug("type = " .. fw:type())  -- "LFileWatcher"
+  local obj = lurek.devtools.newFileWatcher('.')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LFileWatcher"
 end
 ```
 
@@ -1553,11 +1542,8 @@ Exact example from [devtools.lua](../blob/main/content/examples/devtools.lua):
 
 ```lua
 do
-  -- Checks against "LFileWatcher" and the base "Object" type.
-  local fw = lurek.devtools.newFileWatcher("save/")
-  lurek.devtools.debug("is LFileWatcher: " .. tostring(fw:typeOf("LFileWatcher")))  -- true
-  lurek.devtools.debug("is Object: " .. tostring(fw:typeOf("Object")))  -- true
-  lurek.devtools.debug("is LSource: " .. tostring(fw:typeOf("LSource")))  -- false
+  local obj = lurek.devtools.newFileWatcher('.')
+  lurek.log.debug("typeOf LFileWatcher: " .. tostring(obj:typeOf("LFileWatcher")), "example") -- true
 end
 ```
 

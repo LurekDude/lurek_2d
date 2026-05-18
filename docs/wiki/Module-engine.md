@@ -273,13 +273,14 @@ Returns the engine crate version string embedded at build time.
 
 #### Example
 
-Exact example from [system.lua](../blob/main/content/examples/system.lua):
+Exact example from [engine.lua](../blob/main/content/examples/engine.lua):
 
 ```lua
 do
+  -- Useful for save-file headers so you can detect version mismatches on load.
   local version = lurek.engine.getVersion()
-  -- Use engine.getVersion for the Cargo.toml version (vs runtime.getVersion for semver)
-  lurek.log.info("engine crate version: " .. version, "boot")
+  local save_header = { engine = version, schema = 3, ts = os.time() }
+  lurek.log.info("save header: engine=" .. save_header.engine .. " schema=" .. save_header.schema, "save")
 end
 ```
 

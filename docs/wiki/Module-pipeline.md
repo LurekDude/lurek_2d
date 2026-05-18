@@ -121,7 +121,7 @@ Module example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
   end
 end
 
---@api-stub: Pipeline:cancel
+--@api-stub: LPipeline:cancel
 -- Cancels the current operation of this pipeline.
 do
   -- cancel() stops all pending/waiting steps. Already-running or completed steps are unaffected.
@@ -134,7 +134,7 @@ do
   pl:cancel()
 end
 
---@api-stub: Pipeline:reset
+--@api-stub: LPipeline:reset
 -- Resets this pipeline to its default state.
 do
   -- reset() clears all step statuses back to "pending" and removes context.
@@ -147,7 +147,7 @@ do
   pl:run({ level = 2 })
 end
 
---@api-stub: Pipeline:isRunning
+--@api-stub: LPipeline:isRunning
 -- Returns true if this pipeline is currently running.
 do
   -- isRunning() returns true between runAsync() and completion.
@@ -595,9 +595,9 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  local pl = lurek.pipeline.newPipeline("save_routine")
-  -- getName() returns the pipeline identifier string
-  lurek.log.info("executing pipeline: " .. pl:getName(), "save")
+  -- Identical to Step:getName — included here for the LPipelineStep class reference.
+  local step = lurek.pipeline.newStep("load_assets", function() end)
+  lurek.log.info("step name=" .. step:getName(), "pipeline")
 end
 ```
 
@@ -1155,9 +1155,8 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  local pl = lurek.pipeline.newPipeline("boot")
-  -- type() returns "LPipeline" for pipeline userdata
-  assert(pl:type() == "LPipeline")
+  local step = lurek.pipeline.newStep("test_step", function() end)
+  assert(step:type() == "LPipelineStep")
 end
 ```
 
@@ -1177,11 +1176,11 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  -- typeOf() accepts "LPipeline", "Pipeline", or "Object"
-  local pl = lurek.pipeline.newPipeline("boot")
-  assert(pl:typeOf("Pipeline") == true)
-  assert(pl:typeOf("Object") == true)
-  assert(pl:typeOf("LPipelineStep") == false)
+  -- Accepts "LPipelineStep", "PipelineStep", or "Object"
+  local step = lurek.pipeline.newStep("check_step", function() end)
+  assert(step:typeOf("PipelineStep") == true)
+  assert(step:typeOf("Object") == true)
+  assert(step:typeOf("Unknown") == false)
 end
 ```
 
@@ -1442,9 +1441,9 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  -- Identical to Step:getName — included here for the LPipelineStep class reference.
-  local step = lurek.pipeline.newStep("load_assets", function() end)
-  lurek.log.info("step name=" .. step:getName(), "pipeline")
+  local step = lurek.pipeline.newStep("my_step")
+  local name = step:getName()
+  lurek.log.debug("step name: " .. tostring(name), "pipeline")
 end
 ```
 
@@ -1809,8 +1808,8 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  local step = lurek.pipeline.newStep("test_step", function() end)
-  assert(step:type() == "LPipelineStep")
+  local obj = lurek.pipeline.newStep("typed_step")
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LPipelineStep"
 end
 ```
 
@@ -1830,11 +1829,8 @@ Exact example from [pipeline.lua](../blob/main/content/examples/pipeline.lua):
 
 ```lua
 do
-  -- Accepts "LPipelineStep", "PipelineStep", or "Object"
-  local step = lurek.pipeline.newStep("check_step", function() end)
-  assert(step:typeOf("PipelineStep") == true)
-  assert(step:typeOf("Object") == true)
-  assert(step:typeOf("Unknown") == false)
+  local obj = lurek.pipeline.newStep("typed_step2")
+  lurek.log.debug("typeOf LPipelineStep: " .. tostring(obj:typeOf("LPipelineStep")), "example") -- true
 end
 ```
 

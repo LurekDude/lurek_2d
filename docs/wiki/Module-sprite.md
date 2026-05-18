@@ -436,10 +436,8 @@ Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
 do
-  -- Useful for runtime type checks in systems that handle multiple object types.
-  local json_data = '{"frames":{},"meta":{"app":"TexturePacker","version":"1.0","image":"empty.png","format":"RGBA8888","size":{"w":1,"h":1},"scale":"1"}}'
-  local atlas = lurek.sprite.parseAtlas(json_data)
-  lurek.log.info("atlas type: " .. atlas:type(), "sprite")
+  local sheet = lurek.sprite.newSheet(64, 64, 32, 32)
+  lurek.log.info("sheet type: " .. sheet:type(), "sprite")
 end
 ```
 
@@ -459,12 +457,11 @@ Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
 do
-  -- typeOf supports both the concrete type and parent types like "Object".
-  local json_data = '{"frames":{},"meta":{"app":"TexturePacker","version":"1.0","image":"empty.png","format":"RGBA8888","size":{"w":1,"h":1},"scale":"1"}}'
-  local atlas = lurek.sprite.parseAtlas(json_data)
-  local is_atlas = atlas:typeOf("LSpriteAtlas")
-  local is_wrong = atlas:typeOf("LSpriteSheet")
-  lurek.log.info("typeOf LSpriteAtlas: " .. tostring(is_atlas) .. ", typeOf LSpriteSheet: " .. tostring(is_wrong), "sprite")
+  -- typeOf is useful in generic systems that process multiple object types.
+  local sheet = lurek.sprite.newSheet(64, 64, 32, 32)
+  local is_sheet = sheet:typeOf("LSpriteSheet")
+  local is_atlas = sheet:typeOf("LSpriteAtlas")
+  lurek.log.info("typeOf LSpriteSheet: " .. tostring(is_sheet) .. ", typeOf LSpriteAtlas: " .. tostring(is_atlas), "sprite")
 end
 ```
 
@@ -741,8 +738,8 @@ Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
 do
-  local sheet = lurek.sprite.newSheet(64, 64, 32, 32)
-  lurek.log.info("sheet type: " .. sheet:type(), "sprite")
+  local obj = lurek.sprite.newSheet(256, 256, 64, 64)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LSpriteSheet"
 end
 ```
 
@@ -762,11 +759,8 @@ Exact example from [sprite.lua](../blob/main/content/examples/sprite.lua):
 
 ```lua
 do
-  -- typeOf is useful in generic systems that process multiple object types.
-  local sheet = lurek.sprite.newSheet(64, 64, 32, 32)
-  local is_sheet = sheet:typeOf("LSpriteSheet")
-  local is_atlas = sheet:typeOf("LSpriteAtlas")
-  lurek.log.info("typeOf LSpriteSheet: " .. tostring(is_sheet) .. ", typeOf LSpriteAtlas: " .. tostring(is_atlas), "sprite")
+  local obj = lurek.sprite.newSheet(256, 256, 64, 64)
+  lurek.log.debug("typeOf LSpriteSheet: " .. tostring(obj:typeOf("LSpriteSheet")), "example") -- true
 end
 ```
 

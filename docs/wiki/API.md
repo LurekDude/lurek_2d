@@ -17,13 +17,13 @@ The API index is generated from machine-readable Lua API data and links back to 
 ## Source Artifacts
 
 - Lua API data: [logs/data/lua_api_data.json](../blob/main/logs/data/lua_api_data.json)
-- Markdown reference: [docs/api/lurek.md](../blob/main/docs/api/lurek.md) (7166 lines)
-- LuaCATS stub: [docs/api/lurek.lua](../blob/main/docs/api/lurek.lua) (26164 lines)
+- Markdown reference: [docs/api/lurek.md](../blob/main/docs/api/lurek.md) (7167 lines)
+- LuaCATS stub: [docs/api/lurek.lua](../blob/main/docs/api/lurek.lua) (26175 lines)
 
 ## Coverage
 
 - 52 modules
-- 4803 functions and methods
+- 4804 functions and methods
 - 100.0% documented
 
 ## API Module Index
@@ -67,7 +67,7 @@ The API index is generated from machine-readable Lua API data and links back to 
 | lurek.procgen ([[Module-procgen]]) | 24 | 1 | Procedural content generation: noise, L-systems, WFC, BSP, dungeon gen. CPU-only, headless. |
 | lurek.province ([[Module-province]]) | 8 | 1 | Engine-native province runtime: topology, style state, revisioned deltas, geometry cache, Lua bridge. |
 | lurek.raycaster ([[Module-raycaster]]) | 8 | 5 | Wolfenstein-style 2D grid raycaster: textured walls, billboard sprites, doors, lighting. |
-| lurek.render ([[Module-render]]) | 107 | 12 | wgpu 22 renderer with deferred RenderCommand queue; nothing executes during Lua callbacks. |
+| lurek.render ([[Module-render]]) | 108 | 12 | wgpu 22 renderer with deferred RenderCommand queue; nothing executes during Lua callbacks. |
 | lurek.repl ([[Module-repl]]) | 1 | 1 | Release-safe Lua REPL core used by the GUI CLI mode and devtools wrappers; headless also reuses its value-formatting helper. |
 | lurek.save ([[Module-save]]) | 1 | 1 | Save / load lifecycle: schema versioning, migrations, auto-save. Bytes belong to serial. |
 | lurek.scene ([[Module-scene]]) | 50 | 1 | Named, stackable scenes with transitions for menu / gameplay / pause / cutscene state changes. |

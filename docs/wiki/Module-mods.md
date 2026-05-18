@@ -456,11 +456,11 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- type() returns "LContentRegistry" for content registry handles.
-  local reg = lurek.mods.newRegistry()
-  local t = reg:type()
-  assert(t == "LContentRegistry")
-  lurek.log.info("LContentRegistry:type = " .. t, "mods")
+  -- type() returns "LModManager" for mod manager handles.
+  local mgr = lurek.mods.newModManager()
+  local t = mgr:type()
+  assert(t == "LModManager")
+  lurek.log.info("LModManager:type = " .. t, "mods")
 end
 ```
 
@@ -480,12 +480,12 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- typeOf(name) returns true for "LContentRegistry" and "Object".
-  local reg = lurek.mods.newRegistry()
-  assert(reg:typeOf("LContentRegistry") == true)
-  assert(reg:typeOf("Object") == true)
-  assert(reg:typeOf("Unknown") == false)
-  lurek.log.info("is LContentRegistry: " .. tostring(reg:typeOf("LContentRegistry")), "mods")
+  -- typeOf(name) returns true for "LModManager" and "Object".
+  local mgr = lurek.mods.newModManager()
+  assert(mgr:typeOf("LModManager") == true)
+  assert(mgr:typeOf("Object") == true)
+  assert(mgr:typeOf("Unknown") == false)
+  lurek.log.info("is LModManager: " .. tostring(mgr:typeOf("LModManager")), "mods")
 end
 ```
 
@@ -1072,11 +1072,8 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- type() returns "LMod" for mod handles.
-  local m = lurek.mods.newMod({id = "test.type"})
-  local t = m:type()
-  assert(t == "LMod")
-  lurek.log.info("LMod:type = " .. t, "mods")
+  local obj = lurek.mods.newMod({id='core', name='Core', version='1.0.0'})
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LMod"
 end
 ```
 
@@ -1096,12 +1093,8 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- typeOf(name) returns true for "LMod" and "Object".
-  local m = lurek.mods.newMod({id = "test.typeof"})
-  assert(m:typeOf("LMod") == true)
-  assert(m:typeOf("Object") == true)
-  assert(m:typeOf("Unknown") == false)
-  lurek.log.info("is LMod: " .. tostring(m:typeOf("LMod")), "mods")
+  local obj = lurek.mods.newMod({id='core', name='Core', version='1.0.0'})
+  lurek.log.debug("typeOf LMod: " .. tostring(obj:typeOf("LMod")), "example") -- true
 end
 ```
 
@@ -1511,11 +1504,8 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- type() returns "LModManager" for mod manager handles.
-  local mgr = lurek.mods.newModManager()
-  local t = mgr:type()
-  assert(t == "LModManager")
-  lurek.log.info("LModManager:type = " .. t, "mods")
+  local obj = lurek.mods.newModManager()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LModManager"
 end
 ```
 
@@ -1535,12 +1525,8 @@ Exact example from [mods.lua](../blob/main/content/examples/mods.lua):
 
 ```lua
 do
-  -- typeOf(name) returns true for "LModManager" and "Object".
-  local mgr = lurek.mods.newModManager()
-  assert(mgr:typeOf("LModManager") == true)
-  assert(mgr:typeOf("Object") == true)
-  assert(mgr:typeOf("Unknown") == false)
-  lurek.log.info("is LModManager: " .. tostring(mgr:typeOf("LModManager")), "mods")
+  local obj = lurek.mods.newModManager()
+  lurek.log.debug("typeOf LModManager: " .. tostring(obj:typeOf("LModManager")), "example") -- true
 end
 ```
 

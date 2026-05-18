@@ -105,22 +105,22 @@
   - [LFunnel:push(tag: string, [value]: number)](#lfunnelpushtag-string-value-number)
   - [LFunnel:update(dt: number) -> boolean](#lfunnelupdatedt-number-boolean)
   - [LList](#llist)
-  - [LList:add(value: string)](#llistaddvalue-string)
+  - [LList:add(value: any)](#llistaddvalue-any)
   - [LList:clear()](#llistclear)
   - [LList:contains(value: string) -> boolean](#llistcontainsvalue-string-boolean)
   - [LList:get(index: integer) -> string](#llistgetindex-integer-string)
   - [LList:indexOf(value: string) -> integer](#llistindexofvalue-string-integer)
-  - [LList:insert(index: integer, value: string)](#llistinsertindex-integer-value-string)
+  - [LList:insert(index: integer, value: any)](#llistinsertindex-integer-value-any)
   - [LList:isEmpty() -> boolean](#llistisempty-boolean)
   - [LList:len() -> number](#llistlen-number)
   - [LList:pop() -> string](#llistpop-string)
-  - [LList:push(value: string)](#llistpushvalue-string)
+  - [LList:push(value: any)](#llistpushvalue-any)
   - [LList:remove(index: integer) -> string](#llistremoveindex-integer-string)
   - [LList:reverse()](#llistreverse)
-  - [LList:set(index: integer, value: string)](#llistsetindex-integer-value-string)
+  - [LList:set(index: integer, value: any)](#llistsetindex-integer-value-any)
   - [LList:shift() -> string](#llistshift-string)
   - [LList:toArray() -> number[]](#llisttoarray-number)
-  - [LList:unshift(value: string)](#llistunshiftvalue-string)
+  - [LList:unshift(value: any)](#llistunshiftvalue-any)
   - [LMap](#lmap)
   - [LMap:clear()](#lmapclear)
   - [LMap:entries() -> table](#lmapentries-table)
@@ -131,7 +131,7 @@
   - [LMap:len() -> number](#lmaplen-number)
   - [LMap:merge(other: LMap)](#lmapmergeother-lmap)
   - [LMap:remove(key: string) -> boolean](#lmapremovekey-string-boolean)
-  - [LMap:set(key: string, value: string)](#lmapsetkey-string-value-string)
+  - [LMap:set(key: string, value: any)](#lmapsetkey-string-value-any)
   - [LMap:values() -> number[]](#lmapvalues-number)
   - [LMediator](#lmediator)
   - [LMediator:broadcast(...: any)](#lmediatorbroadcast-any)
@@ -158,7 +158,7 @@
   - [LObserver:unsubscribe(id: integer)](#lobserverunsubscribeid-integer)
   - [LPatternGraph](#lpatterngraph)
   - [LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number](#lpatterngraphaddedgefrom-integer-to-integer-weight-number-label-string-number)
-  - [LPatternGraph:addNode([label]: string, [value]: any) -> number](#lpatterngraphaddnodelabel-string-value-any-number)
+  - [LPatternGraph:addNode([label]: string, [value]: table) -> number](#lpatterngraphaddnodelabel-string-value-table-number)
   - [LPatternGraph:bfs(start: integer) -> integer[]](#lpatterngraphbfsstart-integer-integer)
   - [LPatternGraph:clearAll()](#lpatterngraphclearall)
   - [LPatternGraph:dfs(start: integer) -> integer[]](#lpatterngraphdfsstart-integer-integer)
@@ -182,10 +182,10 @@
   - [LQueue:clear()](#lqueueclear)
   - [LQueue:dequeue() -> string](#lqueuedequeue-string)
   - [LQueue:dequeueBack() -> string](#lqueuedequeueback-string)
-  - [LQueue:enqueue(value: string) -> boolean](#lqueueenqueuevalue-string-boolean)
-  - [LQueue:enqueueFront(value: string) -> boolean](#lqueueenqueuefrontvalue-string-boolean)
+  - [LQueue:enqueue(value: any) -> boolean](#lqueueenqueuevalue-any-boolean)
+  - [LQueue:enqueueFront(value: any) -> boolean](#lqueueenqueuefrontvalue-any-boolean)
   - [LQueue:front() -> string](#lqueuefront-string)
-  - [LQueue:insertAt(index: integer, value: string) -> boolean](#lqueueinsertatindex-integer-value-string-boolean)
+  - [LQueue:insertAt(index: integer, value: any) -> boolean](#lqueueinsertatindex-integer-value-any-boolean)
   - [LQueue:isEmpty() -> boolean](#lqueueisempty-boolean)
   - [LQueue:isFull() -> boolean](#lqueueisfull-boolean)
   - [LQueue:len() -> number](#lqueuelen-number)
@@ -239,7 +239,7 @@
   - [LSimpleState:update(dt: number)](#lsimplestateupdatedt-number)
   - [LStack](#lstack)
   - [LStack:clear()](#lstackclear)
-  - [LStack:insertAt(index: integer, value: string) -> boolean](#lstackinsertatindex-integer-value-string-boolean)
+  - [LStack:insertAt(index: integer, value: any) -> boolean](#lstackinsertatindex-integer-value-any-boolean)
   - [LStack:isEmpty() -> boolean](#lstackisempty-boolean)
   - [LStack:isFull() -> boolean](#lstackisfull-boolean)
   - [LStack:len() -> number](#lstacklen-number)
@@ -250,8 +250,8 @@
   - [LStack:pop() -> string](#lstackpop-string)
   - [LStack:popBottom() -> string](#lstackpopbottom-string)
   - [LStack:popMany(count: integer) -> integer[]](#lstackpopmanycount-integer-integer)
-  - [LStack:push(value: string) -> boolean](#lstackpushvalue-string-boolean)
-  - [LStack:pushBottom(value: string) -> boolean](#lstackpushbottomvalue-string-boolean)
+  - [LStack:push(value: any) -> boolean](#lstackpushvalue-any-boolean)
+  - [LStack:pushBottom(value: any) -> boolean](#lstackpushbottomvalue-any-boolean)
   - [LStack:removeAt(index: integer) -> string](#lstackremoveatindex-integer-string)
   - [LStack:toArray() -> number[]](#lstacktoarray-number)
   - [LStrategy](#lstrategy)
@@ -271,7 +271,7 @@
   - [LThrottle:setEnabled(enabled: boolean)](#lthrottlesetenabledenabled-boolean)
   - [LThrottle:update(dt: number) -> boolean](#lthrottleupdatedt-number-boolean)
   - [LWeightedRandom](#lweightedrandom)
-  - [LWeightedRandom:add(weight: number, value: string, [label]: string) -> number](#lweightedrandomaddweight-number-value-string-label-string-number)
+  - [LWeightedRandom:add(weight: number, value: any, [label]: string) -> number](#lweightedrandomaddweight-number-value-any-label-string-number)
   - [LWeightedRandom:clearAll()](#lweightedrandomclearall)
   - [LWeightedRandom:getRevision() -> number](#lweightedrandomgetrevision-number)
   - [LWeightedRandom:isEmpty() -> boolean](#lweightedrandomisempty-boolean)
@@ -413,23 +413,19 @@ Create a new behavior tree for AI decision-making with sequences, selectors, par
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- ---- Stub: lurek.patterns.newBehaviorTree --------------------------------
---@api-stub: lurek.patterns.newBehaviorTree
--- Create a new behavior tree for AI decision-making with sequences, selectors, parallels, and leaf actions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.patterns.newBehaviorTree()  -- -> LBehaviorTree
-
--- ---- Stub: lurek.patterns.newGraph ---------------------------------------
---@api-stub: lurek.patterns.newGraph
--- Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lurek.patterns.newGraph()  -- -> LPatternGraph  (undirected: boolean)
-
--- -----------------------------------------------------------------------------
--- LBehaviorTree methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LBehaviorTree:addSequence -------------------------------------
+do
+  -- Guard AI: patrol until player spotted, then chase.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addSelector("guard_ai")
+  local chase = bt:addLeaf("chase", "chase_leaf")
+  local patrol = bt:addLeaf("patrol", "patrol_leaf")
+  bt:addChild(root, chase)
+  bt:addChild(root, patrol)
+  bt:setLeaf("chase", function() return "failure" end)
+  bt:setLeaf("patrol", function() return "success" end)
+  bt:setRoot(root)
+  print("guard decision: " .. bt:tick())
+end
 ```
 
 ### `lurek.patterns.newBlackboard([name]: string) -> LBlackboard`
@@ -665,26 +661,19 @@ Create a new graph data structure with directed or undirected edges, BFS, DFS, a
 
 #### Example
 
-Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- Performs a breadth-first search from a start node and returns nodes in visit order.
 do
-  -- BFS visits nodes level by level (closest first). Use for:
-  -- influence spread, finding nearest resource, or flood-fill logic.
-  -- NOTE: bfs() is on lurek.patterns.newGraph() (algorithmic graph), not lurek.graph.newGraph()
-  local g = lurek.patterns.newGraph()
-  local center = g:addNode("center")
-  local ring1 = g:addNode("ring1")
-  local ring2 = g:addNode("ring2")
-  g:addEdge(center, ring1, 1.0, "path")
-  g:addEdge(ring1, ring2, 1.0, "path")
-
-  local visit_order = g:bfs(center)
-  lurek.log.info("BFS visited " .. #visit_order .. " nodes", "algorithm")
+  -- Quest dependency graph: directed edges show unlock order.
+  local g = lurek.patterns.newGraph(false)
+  local start = g:addNode("tutorial")
+  local mid = g:addNode("dungeon_1")
+  local boss = g:addNode("final_boss")
+  g:addEdge(start, mid, 1.0)
+  g:addEdge(mid, boss, 1.0)
+  print("quest graph: " .. g:nodeCount() .. " quests, " .. g:edgeCount() .. " dependencies")
 end
-
---@api-stub: LGraph:clearAll
 ```
 
 ### `lurek.patterns.newList() -> LList`
@@ -928,7 +917,7 @@ do
   -- Query relationships for gameplay decisions.
   local level = rel:getLevel(player_id, merchant_id, "diplomacy")
   local value = rel:getValue(player_id, merchant_id)
-  print("merchant is " .. level .. " (score=" .. value .. ")")
+  print("merchant is " .. tostring(level) .. " (score=" .. tostring(value) .. ")")
 end
 ```
 
@@ -1184,23 +1173,15 @@ Create a new weighted random selection pool. Add items with weights and pick ran
 Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- ---- Stub: lurek.patterns.newWeightedRandom ------------------------------
---@api-stub: lurek.patterns.newWeightedRandom
--- Create a new weighted random selection pool. Add items with weights and pick random selections.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.patterns.newWeightedRandom()  -- -> LWeightedRandom
-
--- ---- Stub: lurek.patterns.newBehaviorTree --------------------------------
---@api-stub: lurek.patterns.newBehaviorTree
--- Create a new behavior tree for AI decision-making with sequences, selectors, parallels, and leaf actions.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.patterns.newBehaviorTree()  -- -> LBehaviorTree
-
--- ---- Stub: lurek.patterns.newGraph ---------------------------------------
---@api-stub: lurek.patterns.newGraph
--- Create a new graph data structure with directed or undirected edges, BFS, DFS, and connectivity queries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lurek.patterns.newGraph()  -- -> LPatternGraph  (undirected: boolean)
+do
+  -- Loot tables use weighted random to control drop rarity.
+  local loot = lurek.patterns.newWeightedRandom()
+  loot:add(70.0, "common_herb", "common")
+  loot:add(25.0, "rare_gem", "rare")
+  loot:add(5.0, "legendary_sword", "legendary")
+  local drop = loot:pick(math.random())
+  print("monster dropped: " .. tostring(drop))
+end
 ```
 
 
@@ -1268,20 +1249,18 @@ Attach a child node to a parent composite or decorator node.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- BehaviorTree nodes are created with lurek.ai.newSequence/newSelector/newAction/etc.
-  -- then linked via node:addChild(). This is LBTNode:addChild, not a bt method.
-  local seq = lurek.ai.newSequence()
-  local check_hp = lurek.ai.newCondition(function() return true end)
-  local attack = lurek.ai.newAction(function() return "success" end)
-  seq:addChild(check_hp)   -- add condition as first child
-  seq:addChild(attack)     -- add action as second child
-  local bt = lurek.ai.newBehaviorTree()
-  bt:setRoot(seq)
-  lurek.log.debug("BT built: seq with " .. seq:getChildCount() .. " children", "ai")
+  -- Build a tree by wiring children to composites.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addSequence("main")
+  local a = bt:addLeaf("step_a", "action_a")
+  local b = bt:addLeaf("step_b", "action_b")
+  local ok1 = bt:addChild(root, a)
+  local ok2 = bt:addChild(root, b)
+  print("wired=" .. tostring(ok1) .. "," .. tostring(ok2) .. " nodes=" .. bt:nodeCount())
 end
 ```
 
@@ -1297,18 +1276,18 @@ Create a decorator node that inverts its child's result (success ↔ failure).
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- newInverter() wraps a child node and flips success ↔ failure.
-  -- Use setChild() on the inverter (decorator pattern), not addChild.
-  local action = lurek.ai.newAction(function() return "failure" end)
-  local inv = lurek.ai.newInverter()
-  inv:setChild(action)     -- inverter turns failure → success
-  local bt = lurek.ai.newBehaviorTree()
+  -- Inverter: "is NOT hungry" check. Inverts the hunger leaf result.
+  local bt = lurek.patterns.newBehaviorTree()
+  local inv = bt:addInverter("not_hungry")
+  local hungry = bt:addLeaf("hungry", "check_hunger")
+  bt:addChild(inv, hungry)
+  bt:setLeaf("hungry", function() return "failure" end)  -- not hungry
   bt:setRoot(inv)
-  lurek.log.debug("BT with inverter, childCount=" .. inv:getChildCount(), "ai")
+  print("not_hungry: " .. bt:tick())  -- inverted failure -> success
 end
 ```
 
@@ -1325,19 +1304,18 @@ Create a leaf (action) node that will invoke a named callback function on tick.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Leaf nodes are created with lurek.ai.newAction(fn) or lurek.ai.newCondition(fn).
-  -- newAction executes a callback each tick and returns "success"/"failure"/"running".
-  local leaf = lurek.ai.newAction(function()
-    -- Leaf logic: e.g., move toward target, play animation, etc.
+  -- Leaf nodes are the actual game actions at the bottom of the tree.
+  local bt = lurek.patterns.newBehaviorTree()
+  local leaf = bt:addLeaf("gather_wood", "gather_action")
+  bt:setLeaf("gather_wood", function()
     return "success"
   end)
-  local bt = lurek.ai.newBehaviorTree()
   bt:setRoot(leaf)
-  lurek.log.debug("BT with action leaf ready", "ai")
+  print("gather result: " .. bt:tick())
 end
 ```
 
@@ -1354,20 +1332,21 @@ Create a parallel composite node that runs all children simultaneously.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- newParallel() runs ALL children simultaneously each tick.
-  -- Both succeed, both fail, or one runs independently of the other.
-  local par = lurek.ai.newParallel()
-  local patrol = lurek.ai.newAction(function() return "running" end)
-  local scan   = lurek.ai.newAction(function() return "running" end)
-  par:addChild(patrol)
-  par:addChild(scan)
-  local bt = lurek.ai.newBehaviorTree()
+  -- Parallel: run and shoot at the same time (needs 1 success minimum).
+  local bt = lurek.patterns.newBehaviorTree()
+  local par = bt:addParallel(1, "run_and_gun")
+  local run = bt:addLeaf("run", "run_action")
+  local shoot = bt:addLeaf("shoot", "shoot_action")
+  bt:addChild(par, run)
+  bt:addChild(par, shoot)
+  bt:setLeaf("run", function() return "success" end)
+  bt:setLeaf("shoot", function() return "running" end)
   bt:setRoot(par)
-  lurek.log.debug("BT with parallel, children=" .. par:getChildCount(), "ai")
+  print("parallel: " .. bt:tick())
 end
 ```
 
@@ -1384,18 +1363,20 @@ Create a decorator node that repeats its child a fixed number of times.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- newRepeater(count) repeats its child N times before reporting success.
-  -- Use setChild() for decorator nodes (single child).
-  local action = lurek.ai.newAction(function() return "success" end)
-  local rep = lurek.ai.newRepeater(3)
-  rep:setChild(action)
-  local bt = lurek.ai.newBehaviorTree()
+  -- Repeat: swing sword 3 times in a combo attack.
+  local bt = lurek.patterns.newBehaviorTree()
+  local rep = bt:addRepeat(3, "triple_slash")
+  local slash = bt:addLeaf("slash", "slash_action")
+  bt:addChild(rep, slash)
+  local count = 0
+  bt:setLeaf("slash", function() count = count + 1; return "success" end)
   bt:setRoot(rep)
-  lurek.log.debug("BT with repeater(3), count=" .. rep:getCount(), "ai")
+  bt:tick()
+  print("slashes executed=" .. count)
 end
 ```
 
@@ -1411,20 +1392,21 @@ Create a selector (fallback) composite node. Succeeds if any child succeeds.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- newSelector() tries children left-to-right; succeeds on the first success.
-  -- Use for "try this, if it fails try that" AI fallback logic.
-  local sel = lurek.ai.newSelector()
-  local preferred = lurek.ai.newAction(function() return "failure" end)  -- fails → try next
-  local fallback  = lurek.ai.newAction(function() return "success" end)  -- succeeds
-  sel:addChild(preferred)
-  sel:addChild(fallback)
-  local bt = lurek.ai.newBehaviorTree()
+  -- Selector: try ranged attack, fallback to melee.
+  local bt = lurek.patterns.newBehaviorTree()
+  local sel = bt:addSelector("attack_choice")
+  local ranged = bt:addLeaf("ranged", "try_ranged")
+  local melee = bt:addLeaf("melee", "try_melee")
+  bt:addChild(sel, ranged)
+  bt:addChild(sel, melee)
+  bt:setLeaf("ranged", function() return "failure" end)  -- out of ammo
+  bt:setLeaf("melee", function() return "success" end)
   bt:setRoot(sel)
-  lurek.log.debug("BT with selector, children=" .. sel:getChildCount(), "ai")
+  print("attack: " .. bt:tick())  -- falls back to melee
 end
 ```
 
@@ -1440,20 +1422,21 @@ Create a sequence composite node. All children must succeed for this node to suc
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- newSequence() runs children in order; stops and fails on first failure.
-  -- Use for "do A, then B, then C" chains that abort early on failure.
-  local seq = lurek.ai.newSequence()
-  local step1 = lurek.ai.newAction(function() return "success" end)
-  local step2 = lurek.ai.newAction(function() return "success" end)
-  seq:addChild(step1)
-  seq:addChild(step2)
-  local bt = lurek.ai.newBehaviorTree()
+  -- Sequence: eat then sleep. Both must succeed for "rest" to succeed.
+  local bt = lurek.patterns.newBehaviorTree()
+  local seq = bt:addSequence("rest_routine")
+  local eat = bt:addLeaf("eat", "eat_action")
+  local sleep = bt:addLeaf("sleep", "sleep_action")
+  bt:addChild(seq, eat)
+  bt:addChild(seq, sleep)
+  bt:setLeaf("eat", function() return "success" end)
+  bt:setLeaf("sleep", function() return "success" end)
   bt:setRoot(seq)
-  lurek.log.debug("BT with sequence, children=" .. seq:getChildCount(), "ai")
+  print("rest_routine: " .. bt:tick())
 end
 ```
 
@@ -1463,19 +1446,16 @@ Remove all nodes and leaf functions, resetting the tree to empty.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- LuaBehaviorTree has no clearAll(); to reset, create a new BT
-  -- or call node:reset() on individual nodes to clear execution state.
-  local bt = lurek.ai.newBehaviorTree()
-  local seq = lurek.ai.newSequence()
-  bt:setRoot(seq)
-  -- "clear" by creating a fresh tree and discarding the old reference
-  bt = lurek.ai.newBehaviorTree()
-  seq:reset()  -- clear node execution state
-  lurek.log.debug("BT node state cleared via reset()", "ai")
+  -- Clear and rebuild when loading a different AI profile.
+  local bt = lurek.patterns.newBehaviorTree()
+  bt:addSequence("temp")
+  bt:addLeaf("x", "x_leaf")
+  bt:clearAll()
+  print("after clear: nodes=" .. bt:nodeCount())
 end
 ```
 
@@ -1487,16 +1467,16 @@ Return the total number of nodes in the tree.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- LuaBehaviorTree has no nodeCount(). Use getChildCount() on composite nodes
-  -- to count direct children. Full subtree counting is done manually in Lua.
-  local seq = lurek.ai.newSequence()
-  seq:addChild(lurek.ai.newAction(function() return "success" end))
-  seq:addChild(lurek.ai.newAction(function() return "success" end))
-  lurek.log.debug("seq childCount=" .. seq:getChildCount(), "ai")
+  -- Monitor tree complexity for debugging.
+  local bt = lurek.patterns.newBehaviorTree()
+  bt:addSequence("a")
+  bt:addSelector("b")
+  bt:addLeaf("c", "leaf_c")
+  print("tree nodes=" .. bt:nodeCount())
 end
 ```
 
@@ -1506,20 +1486,18 @@ Reset the tree's running state. Use between encounters or when restarting AI log
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Call node:reset() on each node that needs execution state cleared.
-  -- Composite nodes (sequence, selector, parallel) all support reset().
-  local seq = lurek.ai.newSequence()
-  local action = lurek.ai.newAction(function() return "running" end)
-  seq:addChild(action)
-  seq:reset()    -- clear tick state; next tick starts from the beginning
-  action:reset()
-  local bt = lurek.ai.newBehaviorTree()
-  bt:setRoot(seq)
-  lurek.log.debug("node execution state reset", "ai")
+  -- Reset between combat encounters so AI starts fresh.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addLeaf("fight", "fight_leaf")
+  bt:setLeaf("fight", function() return "running" end)
+  bt:setRoot(root)
+  bt:tick()
+  bt:resetState()
+  print("state reset, ready for next encounter")
 end
 ```
 
@@ -1534,20 +1512,18 @@ Register or replace the callback function for a named leaf. The function must re
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- LuaBehaviorTree has no setLeaf(). To "replace" a leaf, create a new action
-  -- node and swap it using the parent node's setChild().
-  local old_action = lurek.ai.newAction(function() return "success" end)
-  local new_action = lurek.ai.newAction(function() return "running" end)
-  local inv = lurek.ai.newInverter()
-  inv:setChild(old_action)
-  inv:setChild(new_action)  -- replace old with new
-  local bt = lurek.ai.newBehaviorTree()
-  bt:setRoot(inv)
-  lurek.log.debug("leaf swapped via setChild()", "ai")
+  -- Hot-swap leaf behavior for different AI states.
+  local bt = lurek.patterns.newBehaviorTree()
+  local leaf = bt:addLeaf("move", "move_action")
+  bt:setRoot(leaf)
+  bt:setLeaf("move", function() return "running" end)
+  print("first tick: " .. bt:tick())
+  bt:setLeaf("move", function() return "success" end)  -- arrived
+  print("second tick: " .. bt:tick())
 end
 ```
 
@@ -1563,17 +1539,16 @@ Designate a node as the tree's root. Tick evaluation starts here.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- The root node is the entry point ticked every frame. Typically a Selector or Sequence.
-  -- Build the tree bottom-up: create leaf nodes first, compose into branches, then setRoot.
-  -- Scenario: root Selector tries "attack" branch first, falls back to "patrol" branch.
-  local bt = lurek.ai.newBehaviorTree()
-  local root = lurek.ai.newSelector()
-  root:addChild(lurek.ai.newAction(function() return "success" end))
-  bt:setRoot(root)
+  -- Must set root before tick() or tree has nothing to evaluate.
+  local bt = lurek.patterns.newBehaviorTree()
+  local node = bt:addLeaf("idle", "idle_leaf")
+  bt:setLeaf("idle", function() return "success" end)
+  local ok = bt:setRoot(node)
+  print("root set=" .. tostring(ok))
 end
 ```
 
@@ -1585,19 +1560,17 @@ Execute one tick of the behavior tree from the root. Returns the root node's sta
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- LuaBehaviorTree has no tick(). The tree is driven by the AI world's update loop.
-  -- Set the root node and let the engine tick it each frame via world:update().
-  -- getLastStatus() and getDebugState() read results after the engine ticks.
-  local seq = lurek.ai.newSequence()
-  seq:addChild(lurek.ai.newAction(function() return "success" end))
-  local bt = lurek.ai.newBehaviorTree()
-  bt:setRoot(seq)
-  -- After engine ticks this bt: bt:getLastStatus() and bt:getDebugState()
-  lurek.log.debug("BT ready; engine drives ticks via world:update()", "ai")
+  -- Call tick() once per AI update frame.
+  local bt = lurek.patterns.newBehaviorTree()
+  local root = bt:addLeaf("think", "think_action")
+  bt:setLeaf("think", function() return "running" end)
+  bt:setRoot(root)
+  local status = bt:tick()
+  print("AI status: " .. status)  -- "running" means still processing
 end
 ```
 
@@ -1639,15 +1612,15 @@ Remove a single key from the blackboard.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Wipes all entries — use when an agent respawns or changes role entirely.
-  -- Scenario: enemy dies and respawns → clear blackboard so stale target data is gone.
-  local bb = lurek.ai.newBlackboard()
-  bb:setBool("dirty", true)
-  bb:clear()
+  -- Clear a key when the information becomes stale.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("last_sound_pos", 50)
+  bb:clear("last_sound_pos")
+  print("after clear: " .. tostring(bb:get("last_sound_pos")))  -- nil
 end
 ```
 
@@ -1661,12 +1634,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Reset blackboard between AI encounters.
   local bb = lurek.patterns.newBlackboard()
-  bb:set("hp", 100)
-
-  -- Reset between encounters or when loading a new AI context.
+  bb:set("a", 1); bb:set("b", 2)
   bb:clearAll()
-  print("keys after clear=" .. #bb:keys())
+  print("keys remaining=" .. #bb:keys())
 end
 ```
 
@@ -1686,12 +1658,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- AI decision code reads blackboard values set by other systems.
   local bb = lurek.patterns.newBlackboard()
-  bb:set("ammo", 12)
-
-  -- Always handle nil for keys that might not exist yet.
-  local ammo = bb:get("ammo") or 0
-  if ammo <= 0 then print("reload needed!") else print("ammo=" .. ammo) end
+  bb:set("threat_level", 3)
+  local threat = bb:get("threat_level") or 0
+  if threat > 2 then print("high alert!") end
 end
 ```
 
@@ -1707,12 +1678,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Use revision as a dirty flag to avoid re-evaluating unchanged data.
   local bb = lurek.patterns.newBlackboard()
-  local last_rev = bb:getRevision()
-
-  bb:set("k", 1)
-  -- Use revision to detect if anything changed since last check (dirty flag pattern).
-  if bb:getRevision() ~= last_rev then print("blackboard is dirty") end
+  local rev1 = bb:getRevision()
+  bb:set("score", 10)
+  local rev2 = bb:getRevision()
+  print("changed=" .. tostring(rev2 > rev1))
 end
 ```
 
@@ -1728,13 +1699,15 @@ Check whether a key exists on the blackboard.
 
 #### Example
 
-Exact example from [ai.lua](../blob/main/content/examples/ai.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local bb = lurek.ai.newBlackboard()
-  bb:setBool("alive", true)
-  if bb:has("alive") then lurek.log.debug("entry exists", "ai") end
+  -- Guard reads before using values that might not be set yet.
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("waypoint_x", 100)
+  if bb:has("waypoint_x") then print("waypoint assigned") end
+  print("has target=" .. tostring(bb:has("target_id")))
 end
 ```
 
@@ -1750,13 +1723,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Debug display of all blackboard data for AI inspector.
   local bb = lurek.patterns.newBlackboard()
-  bb:set("hp", 50); bb:set("mode", "patrol")
-
-  -- Iterate all stored data for serialization or debug display.
-  for _, k in ipairs(bb:keys()) do
-    print("  " .. k .. "=" .. tostring(bb:get(k)))
-  end
+  bb:set("hp", 80); bb:set("stance", "aggressive")
+  local all_keys = bb:keys()
+  print("blackboard has " .. #all_keys .. " entries")
 end
 ```
 
@@ -1775,13 +1746,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local bb = lurek.patterns.newBlackboard()
-
-  -- Supports multiple value types. nil clears the key.
-  bb:set("hp", 100)
-  bb:set("name", "Aria")
-  bb:set("is_hostile", true)
-  print("name=" .. bb:get("name"))
+  -- AI perception system writes detected info to the shared blackboard.
+  local bb = lurek.patterns.newBlackboard("perception")
+  bb:set("player_distance", 45.0)
+  bb:set("player_visible", true)
+  bb:set("cover_nearby", false)
+  print("distance=" .. bb:get("player_distance"))
 end
 ```
 
@@ -1948,10 +1918,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Clear history when opening a new document.
   local stack = lurek.patterns.newCommandStack(0)
-  stack:execute("a", function() end, function() end)
-
-  -- Clear when starting a new document or level.
+  stack:execute("op1", function() end, function() end)
+  stack:execute("op2", function() end, function() end)
   stack:clearAll()
   print("history after clear=" .. stack:getHistorySize())
 end
@@ -1973,16 +1943,15 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local stack = lurek.patterns.newCommandStack(0)
-  local doc = { text = "hello" }
-
-  -- Store state before the edit so undo can restore it.
-  local prev_text = doc.text
-  stack:execute("append_excl",
-    function() doc.text = doc.text .. "!" end,  -- forward
-    function() doc.text = prev_text end         -- undo restores previous
+  -- Level editor: record tile placement for undo support.
+  local stack = lurek.patterns.newCommandStack(32)
+  local grid = { [1] = "grass" }
+  local prev = grid[1]
+  stack:execute("place_wall",
+    function() grid[1] = "wall" end,
+    function() grid[1] = prev end
   )
-  print("doc=" .. doc.text)
+  print("tile[1]=" .. grid[1])  -- "wall"
 end
 ```
 
@@ -2220,13 +2189,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local d = lurek.patterns.newDebounce(0.4)
-  d:onFire(function() print("  typing paused, run search") end)
-  d:trigger()
-
-  -- Returns true on the frame the debounce fires.
-  local fired = d:update(0.5)  -- 0.5 > 0.4 wait, so it fires
-  print("fired=" .. tostring(fired))
+  -- Search-as-you-type: only search after player stops typing for 0.3s.
+  local search = lurek.patterns.newDebounce(0.3)
+  search:onFire(function() print("  executing search query") end)
+  search:trigger()
+  local fired = search:update(0.35)  -- waited long enough
+  print("search fired=" .. tostring(fired))
 end
 ```
 
@@ -2278,13 +2246,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Clear all listeners for a minigame event when exiting the minigame.
   local bus = lurek.patterns.newEventBus()
-  bus:on("minigame_end", function(score) print("  score: " .. score) end)
-  bus:on("minigame_end", function(score) print("  hud update: " .. score) end)
-
-  -- When the minigame scene unloads, clear all its listeners at once.
-  bus:clear("minigame_end")
-  print("after clear: " .. bus:getListenerCount("minigame_end") .. " listeners")
+  bus:on("puzzle_move", function() end)
+  bus:on("puzzle_move", function() end)
+  bus:clear("puzzle_move")
+  print("puzzle listeners=" .. bus:getListenerCount("puzzle_move"))
 end
 ```
 
@@ -2298,13 +2265,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Full reset when transitioning between major game modes.
   local bus = lurek.patterns.newEventBus()
-  bus:on("save", function() end)
-  bus:on("load", function() end)
-
-  -- Full reset when transitioning between major game states.
+  bus:on("a", function() end)
+  bus:on("b", function() end)
   bus:clearAll()
-  print("events remaining=" .. #bus:getEvents())
+  print("events after clearAll=" .. #bus:getEvents())
 end
 ```
 
@@ -2400,13 +2366,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Remove listener when the subscribing system is destroyed.
   local bus = lurek.patterns.newEventBus()
-  local id = bus:on("ping", function() print("pong") end)
-
-  -- Unsubscribe when the listener's owner is destroyed or no longer relevant.
+  local id = bus:on("tick", function() print("tick") end)
   bus:off(id)
-  bus:emit("ping")  -- no output: listener was removed
-  print("listeners=" .. bus:getListenerCount("ping"))
+  bus:emit("tick")  -- no output
+  print("removed, count=" .. bus:getListenerCount("tick"))
 end
 ```
 
@@ -2428,16 +2393,13 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local bus = lurek.patterns.newEventBus("game")
-
-  -- Priority 100 ensures this listener fires before default-priority (0) listeners.
-  -- Returns a numeric ID for later unsubscription.
-  local id = bus:on("level_clear", function(level_name)
-    print("  level cleared: " .. level_name)
+  -- HUD subscribes to score changes; high priority ensures it updates first.
+  local bus = lurek.patterns.newEventBus()
+  local id = bus:on("score_changed", function(new_score)
+    print("  HUD: score=" .. new_score)
   end, 100)
-
-  bus:emit("level_clear", "forest_01")
-  bus:off(id)
+  bus:emit("score_changed", 500)
+  print("listener id=" .. id)
 end
 ```
 
@@ -2510,12 +2472,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local f = lurek.patterns.newFactory()
-  f:register("x", function() end)
-
-  -- Full reset when loading a new mod or level pack.
-  f:clearAll()
-  print("types after clear=" .. #f:getTypes())
+  -- Reset factory when loading a different mod or expansion pack.
+  local factory = lurek.patterns.newFactory()
+  factory:register("a", function() end)
+  factory:register("b", function() end)
+  factory:clearAll()
+  print("types after clear=" .. #factory:getTypes())
 end
 ```
 
@@ -2582,11 +2544,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local f = lurek.patterns.newFactory()
-  f:register("npc", function() return { kind = "npc" } end)
-
-  -- Guard before create() to avoid silent nil returns.
-  if f:has("npc") then print("npc factory ready") end
+  -- Guard before spawning to handle unknown types gracefully.
+  local factory = lurek.patterns.newFactory()
+  factory:register("slime", function() return { kind = "slime" } end)
+  if factory:has("slime") then print("slime spawner ready") end
+  print("has dragon=" .. tostring(factory:has("dragon")))
 end
 ```
 
@@ -2605,12 +2567,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local f = lurek.patterns.newFactory()
-
-  -- Each type gets a constructor that returns a fresh instance.
-  f:register("orc", function(x, y) return { kind = "orc", hp = 30, x = x, y = y } end)
-  f:register("troll", function(x, y) return { kind = "troll", hp = 80, x = x, y = y } end)
-  print("registered types=" .. #f:getTypes())
+  -- Register enemy constructors for data-driven spawning.
+  local factory = lurek.patterns.newFactory()
+  factory:register("bat", function(x, y)
+    return { kind = "bat", x = x, y = y, hp = 10 }
+  end)
+  print("registered bat factory")
 end
 ```
 
@@ -2628,12 +2590,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local f = lurek.patterns.newFactory()
-  f:register("temp_enemy", function() return {} end)
-
-  -- Remove deprecated types to prevent accidental spawning.
-  f:remove("temp_enemy")
-  print("temp still registered=" .. tostring(f:has("temp_enemy")))
+  -- Remove deprecated enemy types from the spawn table.
+  local factory = lurek.patterns.newFactory()
+  factory:register("old_enemy", function() return {} end)
+  factory:remove("old_enemy")
+  print("old_enemy registered=" .. tostring(factory:has("old_enemy")))
 end
 ```
 
@@ -2786,12 +2747,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local f = lurek.patterns.newFunnel(60.0, 4)  -- max 4 entries before forced flush
-  f:onFlush(function(b) print("  batch size=" .. #b) end)
-
-  -- When maxEntries is reached, flush fires immediately.
-  f:push("kill", 1); f:push("kill", 1); f:push("kill", 1); f:push("kill", 1)
-  print("pending after max-flush=" .. f:pendingCount())
+  -- Batch analytics events to reduce network calls.
+  local funnel = lurek.patterns.newFunnel(5.0, 10)
+  funnel:onFlush(function(batch) print("  sent " .. #batch .. " events") end)
+  funnel:push("player_move", 1)
+  funnel:push("item_pickup", 1)
+  print("buffered=" .. funnel:pendingCount())
 end
 ```
 
@@ -2856,13 +2817,13 @@ do
 end
 ```
 
-### `LList:add(value: string)`
+### `LList:add(value: any)`
 
 Append a value to the end of the list.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to append.
+- `value` (`any`, required) - The value to append.
 
 #### Example
 
@@ -2870,12 +2831,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  -- add() is the primary way to grow the list.
-  lst:add("sword")
-  lst:add("shield")
-  lst:add("potion")
-  print("list size=" .. lst:len())
+  local list = lurek.patterns.newList()
+  list:add("sword")
+  list:add("shield")
+  list:add("potion")
+  lurek.log.debug("list size after adds: " .. list:len(), "patterns") -- 3
 end
 ```
 
@@ -2889,11 +2849,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  lst:add("a")
-  lst:add("b")
-  lst:clear()
-  print("length after clear=" .. lst:len())
+  local list = lurek.patterns.newList()
+  list:add("a")
+  list:add("b")
+  list:clear()
+  lurek.log.debug("list empty: " .. tostring(list:isEmpty()), "patterns") -- true
 end
 ```
 
@@ -2939,12 +2899,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  lst:add("apple")
-  lst:add("banana")
-  -- 1-based: index 2 is the second element.
-  local item = lst:get(2)
-  print("item[2]=" .. tostring(item))
+  local list = lurek.patterns.newList()
+  list:add("alpha")
+  list:add("beta")
+  local item = list:get(1)
+  lurek.log.debug("first item: " .. tostring(item), "patterns") -- "alpha"
 end
 ```
 
@@ -2960,39 +2919,39 @@ Find the 1-based index of the first occurrence of a value. Returns nil if not fo
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Use a plain Lua table — lurek.data has no newList() constructor.
-  -- Equivalent indexOf: iterate and find the matching value.
-  local fruits = {"apple", "banana", "cherry"}
-  local target = "banana"
-  local idx = nil
-  for i, v in ipairs(fruits) do if v == target then idx = i; break end end
-  lurek.log.info("banana at index " .. tostring(idx), "data")
+  -- Find where a specific item is in the inventory for UI highlighting.
+  local inv = lurek.patterns.newList()
+  inv:add("sword"); inv:add("shield"); inv:add("potion")
+  local idx = inv:indexOf("shield")
+  print("shield is at slot " .. tostring(idx))
 end
 ```
 
-### `LList:insert(index: integer, value: string)`
+### `LList:insert(index: integer, value: any)`
 
 Insert a value at a 1-based index, shifting subsequent items right.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`string`, required) - The value to insert.
+- `value` (`any`, required) - The value to insert.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Use plain Lua tables for list operations.
-  local t = {"a", "b", "c"}
-  table.insert(t, 2, "x")  -- insert "x" at position 2
-  lurek.log.info("after insert: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
+  -- Insert a priority quest at a specific position in the log.
+  local quests = lurek.patterns.newList()
+  quests:add("explore cave")
+  quests:add("talk to elder")
+  quests:insert(2, "defend village")  -- inserted between the two
+  print("quest 2=" .. quests:get(2) .. " total=" .. quests:len())
 end
 ```
 
@@ -3008,10 +2967,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  print("before add: empty=" .. tostring(lst:isEmpty()))
-  lst:add("item")
-  print("after add: empty=" .. tostring(lst:isEmpty()))
+  local list = lurek.patterns.newList()
+  lurek.log.debug("empty before add: " .. tostring(list:isEmpty()), "patterns") -- true
+  list:add("x")
+  lurek.log.debug("empty after add: " .. tostring(list:isEmpty()), "patterns") -- false
 end
 ```
 
@@ -3027,9 +2986,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  for i = 1, 5 do lst:add(i * 10) end
-  print("list length=" .. lst:len())
+  local list = lurek.patterns.newList()
+  list:add("a")
+  list:add("b")
+  list:add("c")
+  lurek.log.debug("len: " .. list:len(), "patterns") -- 3
 end
 ```
 
@@ -3041,35 +3002,40 @@ Remove and return the last value. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove with no index pops the last element (LIFO)
-  local t = {10, 20, 30}
-  local last = table.remove(t)
-  lurek.log.info("popped: " .. last .. ", remaining: " .. #t, "data")
+  local s = lurek.patterns.newStack(0)
+  s:push("menu"); s:push("gameplay")
+
+  -- Pop returns to the previous "screen" in the navigation stack.
+  local top = s:pop()
+  print("popped=" .. top .. " now at=" .. (s:peek() or "<empty>"))
 end
 ```
 
-### `LList:push(value: string)`
+### `LList:push(value: any)`
 
 Append a value to the end of the list (alias for add).
 
 **Parameters**
 
-- `value` (`string`, required) - The value to append.
+- `value` (`any`, required) - The value to append.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.insert with no index appends to the end
-  local t = {}
-  table.insert(t, "fire"); table.insert(t, "water"); table.insert(t, "earth")
-  lurek.log.info("list size: " .. #t, "data")
+  local s = lurek.patterns.newStack(4)
+
+  s:push("scene_main")
+  s:push("scene_options")
+  local ok = s:push("scene_keybinds")
+  -- ok is false if capacity is reached.
+  print("pushed=" .. tostring(ok) .. " depth=" .. s:len())
 end
 ```
 
@@ -3089,13 +3055,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  lst:add("quest_a")
-  lst:add("quest_b")
-  lst:add("quest_c")
-  -- Removes quest_b, shifts quest_c down to index 2.
-  local removed = lst:remove(2)
-  print("removed=" .. tostring(removed) .. " remaining=" .. lst:len())
+  local list = lurek.patterns.newList()
+  list:add("keep")
+  list:add("remove_me")
+  list:remove(2)
+  lurek.log.debug("len after remove: " .. list:len(), "patterns") -- 1
 end
 ```
 
@@ -3105,28 +3069,26 @@ Reverse the order of all items in the list in-place.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Reverse a plain Lua table in place
-  local t = {1, 2, 3, 4, 5}
-  local n = #t
-  for i = 1, math.floor(n / 2) do
-    t[i], t[n - i + 1] = t[n - i + 1], t[i]
-  end
-  lurek.log.info("reversed: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
+  -- Reverse a path for backtracking navigation.
+  local path = lurek.patterns.newList()
+  path:add("town"); path:add("forest"); path:add("cave")
+  path:reverse()
+  print("backtrack start=" .. path:get(1))  -- "cave"
 end
 ```
 
-### `LList:set(index: integer, value: string)`
+### `LList:set(index: integer, value: any)`
 
 Replace the value at a 1-based index. Errors if index is 0 or out of range.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based position.
-- `value` (`string`, required) - The new value.
+- `value` (`any`, required) - The new value.
 
 #### Example
 
@@ -3134,12 +3096,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  lst:add("iron_sword")
-  lst:add("leather_boots")
-  -- Overwrite slot 1 with an upgraded item.
-  lst:set(1, "mythril_sword")
-  print("slot 1=" .. tostring(lst:get(1)))
+  local list = lurek.patterns.newList()
+  list:add("old_value")
+  list:set(1, "new_value")
+  lurek.log.debug("after set: " .. tostring(list:get(1)), "patterns") -- "new_value"
 end
 ```
 
@@ -3151,14 +3111,16 @@ Remove and return the first value. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove(t, 1) removes and returns the first element (FIFO dequeue)
-  local t = {10, 20, 30}
-  local first = table.remove(t, 1)
-  lurek.log.info("shifted: " .. first .. ", remaining: " .. #t, "data")
+  -- Process events in FIFO order from a list used as a queue.
+  local events = lurek.patterns.newList()
+  events:add("spawn_wave_1")
+  events:add("spawn_wave_2")
+  local first = events:shift()
+  print("processing: " .. tostring(first) .. " remaining=" .. events:len())
 end
 ```
 
@@ -3174,34 +3136,33 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local lst = lurek.patterns.newList()
-  lst:add(10)
-  lst:add(20)
-  lst:add(30)
-  -- toArray() returns a plain Lua table for iteration.
-  local arr = lst:toArray()
-  print("arr[2]=" .. tostring(arr[2]))
+  local list = lurek.patterns.newList()
+  list:add("x")
+  list:add("y")
+  local arr = list:toArray()
+  lurek.log.debug("array len: " .. #arr .. " first: " .. arr[1], "patterns")
 end
 ```
 
-### `LList:unshift(value: string)`
+### `LList:unshift(value: any)`
 
 Insert a value at the beginning of the list.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to prepend.
+- `value` (`any`, required) - The value to prepend.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.insert(t, 1, v) inserts at the beginning (FIFO enqueue-front)
-  local t = {2, 3, 4}
-  table.insert(t, 1, 1)  -- prepend 1
-  lurek.log.info("unshifted: " .. t[1] .. "," .. t[2] .. "," .. t[3], "data")
+  -- Prepend urgent messages to a notification queue.
+  local notifications = lurek.patterns.newList()
+  notifications:add("old message")
+  notifications:unshift("URGENT: server restart")
+  print("first=" .. notifications:get(1))
 end
 ```
 
@@ -3262,14 +3223,15 @@ Remove all entries from the map. This method is available to Lua scripts.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Plain Lua table as map; clear by setting all keys to nil
-  local m = {hp = 100, mp = 50, name = "hero"}
-  for k in pairs(m) do m[k] = nil end
-  lurek.log.info("map cleared, empty=" .. tostring(next(m) == nil), "data")
+  local lst = lurek.patterns.newList()
+  lst:add("a")
+  lst:add("b")
+  lst:clear()
+  print("length after clear=" .. lst:len())
 end
 ```
 
@@ -3281,15 +3243,16 @@ Return an array of {key, value} tables for all entries.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Collect entries from a plain Lua table
-  local m = {gold = 100, gems = 5}
-  local entries = {}
-  for k, v in pairs(m) do entries[#entries + 1] = {k, v} end
-  lurek.log.info("entry count: " .. #entries, "data")
+  -- Serialize all settings for save file.
+  local settings = lurek.patterns.newMap()
+  settings:set("music", 0.7); settings:set("sfx", 1.0)
+  for _, entry in ipairs(settings:entries()) do
+    print("  " .. tostring(entry[1]) .. "=" .. tostring(entry[2]))
+  end
 end
 ```
 
@@ -3305,14 +3268,16 @@ Retrieve the value for a key. Returns nil if the key does not exist.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Plain table lookup: nil if key missing
-  local m = {health = 80, stamina = 40}
-  local hp = m["health"] or 0
-  lurek.log.info("hp=" .. hp, "data")
+  local lst = lurek.patterns.newList()
+  lst:add("apple")
+  lst:add("banana")
+  -- 1-based: index 2 is the second element.
+  local item = lst:get(2)
+  print("item[2]=" .. tostring(item))
 end
 ```
 
@@ -3328,14 +3293,15 @@ Check whether a key exists in the map.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Check key existence in a plain Lua table
-  local m = {sword = true, shield = true}
-  local has_sword = m["sword"] ~= nil
-  lurek.log.info("has sword: " .. tostring(has_sword), "data")
+  local s = lurek.patterns.newSet()
+  s:add("flying")
+
+  -- O(1) membership check for status effects.
+  if s:has("flying") then print("ignore gravity") end
 end
 ```
 
@@ -3347,14 +3313,15 @@ Check whether the map has no entries.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Check if table has any entries using next()
-  local m = {}
-  local empty = (next(m) == nil)
-  lurek.log.info("is empty: " .. tostring(empty), "data")
+  -- Guard against operating on an empty inventory.
+  local bag = lurek.patterns.newMap()
+  if bag:isEmpty() then print("inventory is empty, nothing to sell") end
+  bag:set("gold_ring", 1)
+  print("empty after add=" .. tostring(bag:isEmpty()))
 end
 ```
 
@@ -3366,15 +3333,17 @@ Return an array of all keys in the map.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Collect keys from a plain Lua table
-  local m = {r = 255, g = 128, b = 0}
-  local keys = {}
-  for k in pairs(m) do keys[#keys + 1] = k end
-  lurek.log.info("key count: " .. #keys, "data")
+  local bb = lurek.patterns.newBlackboard()
+  bb:set("hp", 50); bb:set("mode", "patrol")
+
+  -- Iterate all stored data for serialization or debug display.
+  for _, k in ipairs(bb:keys()) do
+    print("  " .. k .. "=" .. tostring(bb:get(k)))
+  end
 end
 ```
 
@@ -3386,15 +3355,14 @@ Return the number of key-value pairs.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Count entries in a plain Lua table (# operator doesn't work for hash tables)
-  local m = {x = 1, y = 2, z = 3}
-  local count = 0
-  for _ in pairs(m) do count = count + 1 end
-  lurek.log.info("map size: " .. count, "data")
+  -- Check how many config options are loaded.
+  local config = lurek.patterns.newMap()
+  config:set("volume", 0.8); config:set("difficulty", "hard")
+  print("config entries=" .. config:len())
 end
 ```
 
@@ -3408,15 +3376,17 @@ Copy all entries from another LMap into this map. Existing keys are overwritten.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Merge two plain Lua tables
-  local base = {hp = 100, mp = 50}
-  local override = {mp = 80, speed = 10}
-  for k, v in pairs(override) do base[k] = v end
-  lurek.log.info("merged mp=" .. base.mp .. " speed=" .. base.speed, "data")
+  -- Merge default settings with user overrides.
+  local defaults = lurek.patterns.newMap()
+  defaults:set("volume", 0.5); defaults:set("lang", "en")
+  local overrides = lurek.patterns.newMap()
+  overrides:set("volume", 0.9)  -- user prefers louder
+  defaults:merge(overrides)
+  print("final volume=" .. defaults:get("volume"))
 end
 ```
 
@@ -3432,38 +3402,40 @@ Remove a key from the map. Returns true if it was present.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Remove a key from a plain Lua table by setting to nil
-  local m = {fire = 10, ice = 5, poison = 3}
-  local removed = m["poison"]
-  m["poison"] = nil
-  lurek.log.info("removed poison=" .. tostring(removed), "data")
+  -- Remove a consumed buff from the active effects map.
+  local effects = lurek.patterns.newMap()
+  effects:set("speed_boost", 1.5)
+  effects:set("shield", 100)
+  local removed = effects:remove("speed_boost")
+  print("removed speed_boost=" .. tostring(removed) .. " remaining=" .. effects:len())
 end
 ```
 
-### `LMap:set(key: string, value: string)`
+### `LMap:set(key: string, value: any)`
 
 Set a key-value pair in the map. Replaces any existing value for the same key.
 
 **Parameters**
 
 - `key` (`string`, required) - The key.
-- `value` (`string`, required) - The value to store.
+- `value` (`any`, required) - The value to store.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Plain table assignment
-  local m = {}
-  m["score"] = 1500
-  m["level"] = 7
-  lurek.log.info("score=" .. m["score"] .. " level=" .. m["level"], "data")
+  local lst = lurek.patterns.newList()
+  lst:add("iron_sword")
+  lst:add("leather_boots")
+  -- Overwrite slot 1 with an upgraded item.
+  lst:set(1, "mythril_sword")
+  print("slot 1=" .. tostring(lst:get(1)))
 end
 ```
 
@@ -3475,15 +3447,16 @@ Return an array of all values in the map.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Collect values from a plain Lua table
-  local m = {str = 15, dex = 12, int = 18}
-  local vals = {}
-  for _, v in pairs(m) do vals[#vals + 1] = v end
-  lurek.log.info("value count: " .. #vals, "data")
+  -- Sum all stat bonuses from equipped items.
+  local bonuses = lurek.patterns.newMap()
+  bonuses:set("helmet", 5); bonuses:set("armor", 12); bonuses:set("boots", 3)
+  local total = 0
+  for _, v in ipairs(bonuses:values()) do total = total + v end
+  print("total defense=" .. total)
 end
 ```
 
@@ -3570,10 +3543,9 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Full mediator reset when transitioning between game modes.
   local m = lurek.patterns.newMediator()
-  m:on("x", function() end); m:on("y", function() end)
-
-  -- Full reset between game sessions.
+  m:on("old_channel", function() end)
   m:clear()
   print("channels after clear=" .. #m:channels())
 end
@@ -3770,7 +3742,7 @@ Add an object to the pool's idle set, making it available for future acquisition
 
 **Parameters**
 
-- `value` (`any`, required) - The object to store in the pool.
+- `value` (`any`, required) - The object value to store in the pool.
 
 #### Example
 
@@ -3778,13 +3750,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local bullets = lurek.patterns.newObjectPool()
-
-  -- Pre-warm at load time: create all objects up front to avoid runtime allocation.
-  for i = 1, 32 do
-    bullets:add({ x = 0, y = 0, alive = false, sprite_id = i })
+  -- Pre-warm particle pool at scene load.
+  local particles = lurek.patterns.newObjectPool()
+  for i = 1, 16 do
+    particles:add({ x = 0, y = 0, life = 0, color = "white" })
   end
-  print("pool pre-warmed: " .. bullets:getAvailableCount() .. " bullets ready")
+  print("particle pool ready: " .. particles:getAvailableCount() .. " idle")
 end
 ```
 
@@ -3798,10 +3769,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Free all pooled objects when unloading a scene.
   local pool = lurek.patterns.newObjectPool()
   pool:add({}); pool:add({})
-
-  -- Use when changing levels or scenes to free all pooled resources.
+  pool:acquire()
   pool:clearAll()
   print("after clearAll: total=" .. pool:getTotalCount())
 end
@@ -3881,7 +3852,7 @@ Return an active object back to the pool's idle set so it can be reused.
 
 **Parameters**
 
-- `value` (`any`, required) - The object to release back into the pool.
+- `value` (`any`, required) - The object value to release back into the pool.
 
 #### Example
 
@@ -3946,12 +3917,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local o = lurek.patterns.newObserver()
-  o:set("score", 1500)
-
-  -- Read current value without triggering any notifications.
-  local s = o:get("score") or 0
-  print("current score=" .. s)
+  -- Read the current value without triggering notifications.
+  local obs = lurek.patterns.newObserver()
+  obs:set("level", 5)
+  local lvl = obs:get("level") or 1
+  print("player level=" .. lvl)
 end
 ```
 
@@ -3991,15 +3961,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local o = lurek.patterns.newObserver("player_data")
-
-  -- Subscriber fires every time the value changes.
-  o:subscribe("hp", function(key, value)
-    print("  HUD: " .. key .. "=" .. value)
-  end)
-
-  o:set("hp", 100)  -- triggers subscriber
-  o:set("hp", 75)   -- triggers again with new value
+  -- Score changes automatically update the HUD through subscription.
+  local obs = lurek.patterns.newObserver()
+  obs:subscribe("gold", function(k, v) print("  wallet: " .. v .. " gold") end)
+  obs:set("gold", 100)
+  obs:set("gold", 150)  -- triggers notification again
 end
 ```
 
@@ -4063,26 +4029,19 @@ Lua-facing graph data structure with directed/undirected edges, BFS, DFS, and co
 
 #### Example
 
-Exact example from [graph.lua](../blob/main/content/examples/graph.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- Performs a breadth-first search from a start node and returns nodes in visit order.
 do
-  -- BFS visits nodes level by level (closest first). Use for:
-  -- influence spread, finding nearest resource, or flood-fill logic.
-  -- NOTE: bfs() is on lurek.patterns.newGraph() (algorithmic graph), not lurek.graph.newGraph()
-  local g = lurek.patterns.newGraph()
-  local center = g:addNode("center")
-  local ring1 = g:addNode("ring1")
-  local ring2 = g:addNode("ring2")
-  g:addEdge(center, ring1, 1.0, "path")
-  g:addEdge(ring1, ring2, 1.0, "path")
-
-  local visit_order = g:bfs(center)
-  lurek.log.info("BFS visited " .. #visit_order .. " nodes", "algorithm")
+  -- Quest dependency graph: directed edges show unlock order.
+  local g = lurek.patterns.newGraph(false)
+  local start = g:addNode("tutorial")
+  local mid = g:addNode("dungeon_1")
+  local boss = g:addNode("final_boss")
+  g:addEdge(start, mid, 1.0)
+  g:addEdge(mid, boss, 1.0)
+  print("quest graph: " .. g:nodeCount() .. " quests, " .. g:edgeCount() .. " dependencies")
 end
-
---@api-stub: LGraph:clearAll
 ```
 
 ### `LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number`
@@ -4153,14 +4112,14 @@ do
     bullet.x, bullet.y = 100, 200
 ```
 
-### `LPatternGraph:addNode([label]: string, [value]: any) -> number`
+### `LPatternGraph:addNode([label]: string, [value]: table) -> number`
 
 Add a node to the graph with an optional label and payload value.
 
 **Parameters**
 
 - `label` (`string`, optional) - Optional node label.
-- `value` (`any`, optional) - Optional payload stored with the node.
+- `value` (`table`, optional) - Optional payload stored with the node.
 
 **Returns**: `number` - The new node's ID.
 
@@ -4949,10 +4908,9 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Flush all pending tasks when aborting an AI plan.
   local pq = lurek.patterns.newPriorityQueue()
   pq:push(1, "x"); pq:push(2, "y")
-
-  -- Clear when switching AI contexts or resetting the scheduler.
   pq:clearAll()
   print("after clear: len=" .. pq:len())
 end
@@ -4970,12 +4928,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Drain loop: process all pending AI decisions.
   local pq = lurek.patterns.newPriorityQueue()
-  pq:push(1, "process_input")
-
-  -- Drain loop: process all tasks in priority order.
+  pq:push(1, "decide_move")
   while not pq:isEmpty() do
-    print("  processing: " .. pq:pop())
+    print("  AI decided: " .. tostring(pq:pop()))
   end
 end
 ```
@@ -4992,12 +4949,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Monitor queue backlog for load shedding decisions.
   local pq = lurek.patterns.newPriorityQueue()
-  pq:push(1, "a"); pq:push(2, "b"); pq:push(3, "c")
-
-  -- Use len() to check load and shed low-priority work if overwhelmed.
-  if pq:len() > 100 then print("queue saturated, shedding tasks") end
-  print("queue size=" .. pq:len())
+  for i = 1, 5 do pq:push(i, "task_" .. i) end
+  print("backlog=" .. pq:len())
 end
 ```
 
@@ -5013,12 +4968,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Preview what's next without consuming it.
   local pq = lurek.patterns.newPriorityQueue()
-  pq:push(5, "build_wall"); pq:push(20, "render_frame")
-
-  -- Peek to check what's next without consuming it.
-  local next_job = pq:peek()
-  if next_job then print("next up: " .. next_job) end
+  pq:push(50, "render_pass")
+  local next_item = pq:peek()
+  print("next job: " .. tostring(next_item) .. " still queued=" .. pq:len())
 end
 ```
 
@@ -5034,12 +4988,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local pq = lurek.patterns.newPriorityQueue()
-  pq:push(1, "low_task"); pq:push(99, "critical_task")
-
-  -- Always returns the highest priority item first.
-  local job = pq:pop()
-  if job then print("executing: " .. job) end  -- "critical_task"
+  -- Process the most urgent job from the queue.
+  local jobs = lurek.patterns.newPriorityQueue()
+  jobs:push(5, "low_priority_job")
+  jobs:push(99, "critical_fix")
+  local top = jobs:pop()
+  print("processing: " .. tostring(top))  -- "critical_fix"
 end
 ```
 
@@ -5050,7 +5004,7 @@ Add an item with a numeric priority. Higher priority items are dequeued first.
 **Parameters**
 
 - `priority` (`integer`, required) - The priority value (higher = dequeued sooner).
-- `value` (`any`, required) - The payload to store.
+- `value` (`any`, required) - The payload value to store.
 - `label` (`string`, optional) - Optional human-readable label for debugging.
 
 **Returns**: `number` - The internal ID of the enqueued item.
@@ -5061,13 +5015,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local pq = lurek.patterns.newPriorityQueue("ai")
-
-  -- Third argument is an optional label for debugging.
-  pq:push(10, { kind = "patrol" }, "low_priority")
-  pq:push(50, { kind = "attack" }, "urgent")
-  pq:push(20, { kind = "investigate" }, "medium")
-  print("queued=" .. pq:len())
+  -- AI task scheduler: urgent tasks processed before idle ones.
+  local tasks = lurek.patterns.newPriorityQueue()
+  tasks:push(10, "sweep_floor", "low")
+  tasks:push(90, "extinguish_fire", "critical")
+  tasks:push(40, "restock_shelves", "medium")
+  print("queued " .. tasks:len() .. " tasks")
 end
 ```
 
@@ -5116,14 +5069,14 @@ Return the back value without removing it. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Queue: plain Lua table, peek at back = last element
-  local q = {10, 20, 30}
-  local back = q[#q]
-  lurek.log.info("queue back: " .. back, "data")
+  -- Peek at the newest item in the queue.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("oldest"); q:enqueue("newest")
+  print("back=" .. tostring(q:back()))  -- "newest"
 end
 ```
 
@@ -5137,12 +5090,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Flush pending input commands on scene change.
   local q = lurek.patterns.newQueue(0)
-  q:enqueue("x"); q:enqueue("y")
-
-  -- Clear pending commands when aborting an action sequence.
+  q:enqueue("stale_input_1"); q:enqueue("stale_input_2")
   q:clear()
-  print("size after clear=" .. q:len())
+  print("cleared, len=" .. q:len())
 end
 ```
 
@@ -5175,24 +5127,25 @@ Remove and return the back value. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove(q) removes and returns last element (pop-back / dequeue-back)
-  local q = {10, 20, 30}
-  local val = table.remove(q)
-  lurek.log.info("dequeued back: " .. val .. ", size=" .. #q, "data")
+  -- Remove the least recent item (opposite of normal FIFO dequeue).
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("first"); q:enqueue("second"); q:enqueue("third")
+  local back = q:dequeueBack()
+  print("removed from back: " .. tostring(back))  -- "third"
 end
 ```
 
-### `LQueue:enqueue(value: string) -> boolean`
+### `LQueue:enqueue(value: any) -> boolean`
 
 Add a value to the back of the queue. Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to enqueue.
+- `value` (`any`, required) - The value to enqueue.
 
 **Returns**: `boolean` - True if enqueued, false if full.
 
@@ -5210,26 +5163,27 @@ do
 end
 ```
 
-### `LQueue:enqueueFront(value: string) -> boolean`
+### `LQueue:enqueueFront(value: any) -> boolean`
 
 Add a value to the front of the queue (priority insertion). Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to insert at the front.
+- `value` (`any`, required) - The value to insert at the front.
 
 **Returns**: `boolean` - True if enqueued, false if full.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.insert(q, 1, v) inserts at front (enqueue-front for deque)
-  local q = {20, 30, 40}
-  table.insert(q, 1, 10)
-  lurek.log.info("after enqueue-front: q[1]=" .. q[1], "data")
+  -- Priority messages jump to the front of the processing queue.
+  local q = lurek.patterns.newQueue(10)
+  q:enqueue("normal_msg")
+  q:enqueueFront("URGENT_msg")
+  print("front=" .. q:front())  -- "URGENT_msg"
 end
 ```
 
@@ -5254,27 +5208,28 @@ do
 end
 ```
 
-### `LQueue:insertAt(index: integer, value: string) -> boolean`
+### `LQueue:insertAt(index: integer, value: any) -> boolean`
 
 Insert a value at a 1-based index in the queue. Returns false if at capacity.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`string`, required) - The value to insert.
+- `value` (`any`, required) - The value to insert.
 
 **Returns**: `boolean` - True if inserted, false if full.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.insert(q, i, v) inserts at a specific index
-  local q = {"a", "c", "d"}
-  table.insert(q, 2, "b")  -- insert "b" at position 2
-  lurek.log.info("after insert: " .. q[1] .. q[2] .. q[3] .. q[4], "data")
+  -- Insert a priority item at a specific position.
+  local q = lurek.patterns.newQueue(10)
+  q:enqueue("a"); q:enqueue("c")
+  q:insertAt(2, "b")  -- insert between a and c
+  print("order: " .. q:peekAt(1) .. "," .. q:peekAt(2) .. "," .. q:peekAt(3))
 end
 ```
 
@@ -5290,13 +5245,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Check before dequeue to avoid nil handling.
   local q = lurek.patterns.newQueue(0)
-  q:enqueue("task")
-
-  -- Drain loop pattern.
-  while not q:isEmpty() do
-    print("  handled: " .. q:dequeue())
-  end
+  q:enqueue("last_item")
+  q:dequeue()
+  if q:isEmpty() then print("all commands processed") end
 end
 ```
 
@@ -5332,9 +5285,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Monitor queue depth for backpressure.
   local q = lurek.patterns.newQueue(0)
-  for i = 1, 4 do q:enqueue("event_" .. i) end
-  print("queue size=" .. q:len())
+  q:enqueue("x"); q:enqueue("y"); q:enqueue("z")
+  print("queue depth=" .. q:len())
 end
 ```
 
@@ -5350,14 +5304,14 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Direct index access on a plain Lua table
-  local q = {10, 20, 30, 40}
-  local val = q[2]  -- peek at index 2
-  lurek.log.info("peek at 2: " .. val, "data")
+  -- Inspect queue contents at specific positions for debug display.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("alpha"); q:enqueue("beta"); q:enqueue("gamma")
+  print("position 2=" .. tostring(q:peekAt(2)))  -- "beta"
 end
 ```
 
@@ -5373,14 +5327,15 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove(q, i) removes at a specific index
-  local q = {10, 20, 30, 40}
-  local val = table.remove(q, 2)
-  lurek.log.info("removed at 2: " .. val .. ", size=" .. #q, "data")
+  -- Cancel a specific pending command by position.
+  local q = lurek.patterns.newQueue(0)
+  q:enqueue("move"); q:enqueue("attack"); q:enqueue("heal")
+  local removed = q:removeAt(2)
+  print("cancelled: " .. tostring(removed) .. " remaining=" .. q:len())
 end
 ```
 
@@ -5396,10 +5351,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Export queue contents for save file serialization.
   local q = lurek.patterns.newQueue(0)
-  q:enqueue("alpha"); q:enqueue("beta"); q:enqueue("gamma")
-
-  for i, v in ipairs(q:toArray()) do print("  " .. i .. ": " .. v) end
+  q:enqueue("cmd_1"); q:enqueue("cmd_2"); q:enqueue("cmd_3")
+  local arr = q:toArray()
+  print("exported " .. #arr .. " commands")
 end
 ```
 
@@ -5431,7 +5387,7 @@ do
   -- Query relationships for gameplay decisions.
   local level = rel:getLevel(player_id, merchant_id, "diplomacy")
   local value = rel:getValue(player_id, merchant_id)
-  print("merchant is " .. level .. " (score=" .. value .. ")")
+  print("merchant is " .. tostring(level) .. " (score=" .. tostring(value) .. ")")
 end
 ```
 
@@ -5737,12 +5693,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local r = lurek.patterns.newRing(8)
-  r:push(10, "x"); r:push(20, "x")
-
-  -- Clear when switching measurement contexts.
+  -- Clear ring data when switching measurement contexts.
+  local r = lurek.patterns.newRing(16)
+  r:push(1, "old"); r:push(2, "old")
   r:clear()
-  print("len after clear=" .. r:len())
+  print("after clear: len=" .. r:len())
 end
 ```
 
@@ -5758,11 +5713,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local r = lurek.patterns.newRing(4)
-  for i = 1, 4 do r:push(i, "warmup") end
-
-  -- Only report average once the ring is fully warmed up.
-  if r:isFull() then print("warm: avg=" .. string.format("%.1f", r:average())) end
+  -- Only show average after ring is fully warmed up.
+  local r = lurek.patterns.newRing(3)
+  r:push(60, "fps"); r:push(59, "fps"); r:push(61, "fps")
+  if r:isFull() then print("stable avg=" .. string.format("%.1f", r:average())) end
 end
 ```
 
@@ -5800,11 +5754,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local r = lurek.patterns.newRing(10)
-  r:push(1, "x"); r:push(2, "x"); r:push(3, "x")
-
-  -- Check if we have enough samples for a meaningful average.
-  if r:len() >= 3 then print("enough samples for analysis") end
+  -- Check if enough samples collected for meaningful statistics.
+  local r = lurek.patterns.newRing(60)
+  r:push(1, "x"); r:push(2, "x")
+  if r:len() < 10 then print("warming up, only " .. r:len() .. " samples") end
 end
 ```
 
@@ -5825,11 +5778,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local r = lurek.patterns.newRing(8)
-
-  -- Push more than capacity: oldest values are silently dropped.
-  for i = 1, 10 do r:push(i * 1.5, "latency") end
-  print("len=" .. r:len() .. " full=" .. tostring(r:isFull()))
+  -- Track frame times for rolling performance analysis.
+  local frame_times = lurek.patterns.newRing(120)
+  for i = 1, 130 do
+    frame_times:push(16.0 + (i % 3), "ms")
+  end
+  print("ring samples=" .. frame_times:len())  -- capped at 120
 end
 ```
 
@@ -5865,13 +5819,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Export ring data for charting or file logging.
   local r = lurek.patterns.newRing(4)
-  r:push(60, "fps"); r:push(58, "fps"); r:push(61, "fps")
-
-  -- Iterate for debug display or graph rendering.
-  for _, entry in ipairs(r:toArray()) do
-    print("  " .. entry.tag .. "=" .. entry.value)
-  end
+  r:push(10, "latency"); r:push(12, "latency"); r:push(8, "latency")
+  local entries = r:toArray()
+  print("exported " .. #entries .. " ring entries")
 end
 ```
 
@@ -5921,12 +5873,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local sl = lurek.patterns.newServiceLocator()
-  sl:provide("x", 1); sl:provide("y", 2)
-
   -- Full reset between game sessions.
+  local sl = lurek.patterns.newServiceLocator()
+  sl:provide("a", 1); sl:provide("b", 2)
   sl:clearAll()
-  print("services after clear=" .. #sl:getServices())
+  print("services after reset=" .. #sl:getServices())
 end
 ```
 
@@ -5966,11 +5917,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Guard optional services before attempting to use them.
   local sl = lurek.patterns.newServiceLocator()
-  sl:provide("analytics", { enabled = true })
-
-  -- Guard optional services before use.
-  if sl:has("analytics") then print("telemetry active") end
+  sl:provide("audio", { play = function() end })
+  if sl:has("audio") then print("audio system available") end
+  print("has network=" .. tostring(sl:has("network")))
 end
 ```
 
@@ -6007,7 +5958,7 @@ Register a service instance under a given name. Replaces any previously register
 **Parameters**
 
 - `name` (`string`, required) - Unique identifier for the service.
-- `value` (`any`, required) - The service to register.
+- `value` (`any`, required) - The service value to register.
 
 #### Example
 
@@ -6038,12 +5989,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Remove a service when shutting down a subsystem.
   local sl = lurek.patterns.newServiceLocator()
-  sl:provide("network", { online = true })
-
-  -- Remove when going offline or shutting down a subsystem.
-  sl:remove("network")
-  print("network registered=" .. tostring(sl:has("network")))
+  sl:provide("multiplayer", { connected = true })
+  sl:remove("multiplayer")
+  print("multiplayer active=" .. tostring(sl:has("multiplayer")))
 end
 ```
 
@@ -6090,12 +6040,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-
-  -- Returns true only on the first add (detects duplicates).
-  local was_new = s:add("collected_gem")
-  if was_new then print("first gem collected!") end
-  s:add("collected_gem")  -- returns false, already present
+  -- Track unique achievements unlocked during gameplay.
+  local achievements = lurek.patterns.newSet()
+  local new1 = achievements:add("first_kill")
+  local new2 = achievements:add("first_kill")  -- duplicate
+  print("first add=" .. tostring(new1) .. " second=" .. tostring(new2))
 end
 ```
 
@@ -6109,12 +6058,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  s:add("seen_intro"); s:add("opened_chest")
-
-  -- Clear when starting a new game.
-  s:clear()
-  print("size after clear=" .. s:len())
+  -- Clear all visited flags for a new game.
+  local flags = lurek.patterns.newSet()
+  flags:add("intro_seen"); flags:add("tutorial_done")
+  flags:clear()
+  print("flags after new game=" .. flags:len())
 end
 ```
 
@@ -6134,11 +6082,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  s:add("flying")
-
-  -- O(1) membership check for status effects.
-  if s:has("flying") then print("ignore gravity") end
+  -- Check if player has required key before opening a door.
+  local keys = lurek.patterns.newSet()
+  keys:add("silver_key")
+  if keys:has("silver_key") then print("silver door: unlocked") end
+  if not keys:has("gold_key") then print("gold door: locked") end
 end
 ```
 
@@ -6179,10 +6127,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  if s:isEmpty() then print("no keys collected yet") end
-  s:add("brass_key")
-  print("empty=" .. tostring(s:isEmpty()))
+  -- Check if player has any active buffs.
+  local buffs = lurek.patterns.newSet()
+  if buffs:isEmpty() then print("no active buffs") end
+  buffs:add("haste")
+  print("empty after buff=" .. tostring(buffs:isEmpty()))
 end
 ```
 
@@ -6198,11 +6147,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  s:add("orc"); s:add("goblin"); s:add("orc")  -- duplicate ignored
-
-  -- Unique count only.
-  print("unique enemies killed=" .. s:len())
+  -- Count unique rooms visited for exploration percentage.
+  local visited = lurek.patterns.newSet()
+  visited:add("room_1"); visited:add("room_2"); visited:add("room_1")
+  print("unique rooms visited=" .. visited:len())
 end
 ```
 
@@ -6222,12 +6170,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  s:add("buff_speed")
-
-  -- Remove when an effect expires.
-  local existed = s:remove("buff_speed")
-  print("removed=" .. tostring(existed) .. " size=" .. s:len())
+  -- Remove an expired status effect.
+  local effects = lurek.patterns.newSet()
+  effects:add("poisoned")
+  local was_there = effects:remove("poisoned")
+  print("removed poison=" .. tostring(was_there) .. " size=" .. effects:len())
 end
 ```
 
@@ -6243,11 +6190,13 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newSet()
-  s:add("red"); s:add("green"); s:add("blue")
-
-  -- Convert for serialization or display.
-  for _, k in ipairs(s:toArray()) do print("  color: " .. k) end
+  local lst = lurek.patterns.newList()
+  lst:add('10')
+  lst:add('20')
+  lst:add('30')
+  -- toArray() returns a plain Lua table for iteration.
+  local arr = lst:toArray()
+  print("arr[2]=" .. tostring(arr[2]))
 end
 ```
 
@@ -6351,12 +6300,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Reset FSM when loading a completely different entity type.
   local sm = lurek.patterns.newSimpleState()
-  sm:addState("temp", {})
-
-  -- Reset when loading a completely new entity configuration.
+  sm:addState("old_state", {})
   sm:clearAll()
-  print("states left=" .. #sm:getStates())
+  print("states after clear=" .. #sm:getStates())
 end
 ```
 
@@ -6372,12 +6320,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Use current state for conditional logic outside the FSM.
   local sm = lurek.patterns.newSimpleState()
-  sm:addState("paused", {})
-  sm:transitionTo("paused")
-
-  -- Use for conditional logic outside the FSM.
-  if sm:getCurrent() == "paused" then print("game is paused") end
+  sm:addState("idle", {}); sm:addState("combat", {})
+  sm:transitionTo("combat")
+  local state = sm:getCurrent()
+  if state == "combat" then print("showing combat UI") end
 end
 ```
 
@@ -6465,13 +6413,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Per-frame state logic: enemy moves while in "patrol" state.
   local sm = lurek.patterns.newSimpleState()
-  sm:addState("run", {
-    update = function(dt) print("  . running at dt=" .. dt) end,
+  sm:addState("patrol", {
+    update = function(dt) print("  patrolling dt=" .. dt) end,
   })
-  sm:transitionTo("run")
-
-  -- Call each frame with the real delta time.
+  sm:transitionTo("patrol")
   sm:update(0.016)
 end
 ```
@@ -6529,36 +6476,36 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(0)
-  s:push("a"); s:push("b")
-
-  -- Clear on major state transition (e.g. returning to title screen).
-  s:clear()
-  print("len after clear=" .. s:len())
+  -- Clear navigation stack when returning to title screen.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("game"); nav:push("pause")
+  nav:clear()
+  print("stack cleared, len=" .. nav:len())
 end
 ```
 
-### `LStack:insertAt(index: integer, value: string) -> boolean`
+### `LStack:insertAt(index: integer, value: any) -> boolean`
 
 Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 
 **Parameters**
 
 - `index` (`integer`, required) - 1-based insertion position.
-- `value` (`string`, required) - The value to insert.
+- `value` (`any`, required) - The value to insert.
 
 **Returns**: `boolean` - True if inserted, false if full.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Use a plain Lua table as a stack; insert at position
-  local s = {1, 2, 4, 5}
-  table.insert(s, 3, 3)  -- insert 3 at position 3
-  lurek.log.info("inserted: s[3]=" .. s[3], "data")
+  -- Insert a layer between existing layers (e.g., notification between HUD and dialog).
+  local layers = lurek.patterns.newStack(10)
+  layers:push("hud"); layers:push("dialog")
+  layers:insertAt(2, "notification")
+  print("middle layer=" .. tostring(layers:peekAt(2)))
 end
 ```
 
@@ -6574,12 +6521,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(0)
-  s:push("only_item")
-  s:pop()
-
-  -- Empty stack = user navigated all the way back.
-  if s:isEmpty() then print("at root, quit to main menu") end
+  -- If stack is empty, player has navigated all the way back.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("only_screen")
+  nav:pop()
+  if nav:isEmpty() then print("at root, show exit prompt") end
 end
 ```
 
@@ -6595,11 +6541,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(2)
-  s:push("a"); s:push("b")
-
-  -- Prevent pushing more dialogs when at max depth.
-  if s:isFull() then print("dialog stack full, close one first") end
+  -- Prevent pushing more screens when at max depth.
+  local nav = lurek.patterns.newStack(3)
+  nav:push("a"); nav:push("b"); nav:push("c")
+  if nav:isFull() then print("max dialog depth reached") end
 end
 ```
 
@@ -6615,9 +6560,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(0)
-  s:push("a"); s:push("b"); s:push("c")
-  print("stack depth=" .. s:len())
+  -- Check stack depth for navigation breadcrumb display.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("a"); nav:push("b"); nav:push("c")
+  print("navigation depth=" .. nav:len())
 end
 ```
 
@@ -6634,15 +6580,15 @@ Move an item from one 1-based index to another within the stack.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Swap or move within a plain Lua table
-  local s = {"a", "b", "c", "d"}
-  local moved = table.remove(s, 2)    -- remove from position 2
-  table.insert(s, 4, moved)           -- re-insert at position 4
-  lurek.log.info("moved to pos 4: " .. s[#s], "data")
+  -- Reorder layers (move a UI element to a different z-depth).
+  local z_order = lurek.patterns.newStack(0)
+  z_order:push("background"); z_order:push("entities"); z_order:push("effects")
+  z_order:moveWithin(1, 3)  -- move background to top
+  print("new top=" .. tostring(z_order:peek()))
 end
 ```
 
@@ -6679,14 +6625,14 @@ Return the value at a 1-based index without removing it. Returns nil if out of r
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Direct index access on a plain Lua table
-  local s = {10, 20, 30}
-  local val = s[#s]  -- peek at top
-  lurek.log.info("top of stack: " .. val, "data")
+  -- Inspect a specific position for breadcrumb display.
+  local breadcrumbs = lurek.patterns.newStack(0)
+  breadcrumbs:push("Home"); breadcrumbs:push("Shop"); breadcrumbs:push("Weapons")
+  print("breadcrumb[2]=" .. tostring(breadcrumbs:peekAt(2)))
 end
 ```
 
@@ -6698,14 +6644,14 @@ Return the bottom value without removing it. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Bottom of stack = index 1
-  local s = {5, 10, 15}
-  local bottom = s[1]
-  lurek.log.info("stack bottom: " .. bottom, "data")
+  -- Check the base screen without modifying the stack.
+  local nav = lurek.patterns.newStack(0)
+  nav:push("title_screen"); nav:push("options")
+  print("base screen=" .. tostring(nav:peekBottom()))
 end
 ```
 
@@ -6721,12 +6667,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(0)
-  s:push("menu"); s:push("gameplay")
-
-  -- Pop returns to the previous "screen" in the navigation stack.
-  local top = s:pop()
-  print("popped=" .. top .. " now at=" .. (s:peek() or "<empty>"))
+  -- Pop to go back to previous screen.
+  local screens = lurek.patterns.newStack(0)
+  screens:push("world"); screens:push("inventory")
+  local closed = screens:pop()
+  print("closed " .. tostring(closed) .. ", now at " .. tostring(screens:peek()))
 end
 ```
 
@@ -6738,14 +6683,15 @@ Remove and return the bottom value. Returns nil if empty.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove(s, 1) removes from bottom (LIFO from bottom)
-  local s = {5, 10, 15}
-  local val = table.remove(s, 1)
-  lurek.log.info("popped bottom: " .. val, "data")
+  -- Remove the oldest entry from the bottom of a history stack.
+  local history = lurek.patterns.newStack(0)
+  history:push("page_1"); history:push("page_2"); history:push("page_3")
+  local oldest = history:popBottom()
+  print("removed oldest: " .. tostring(oldest))
 end
 ```
 
@@ -6761,26 +6707,25 @@ Pop up to `count` values from the top and return them as an array table.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Pop N items from the top of a plain Lua table stack
-  local s = {1, 2, 3, 4, 5}
-  local n = 3
-  local popped = {}
-  for _ = 1, n do popped[#popped + 1] = table.remove(s) end
-  lurek.log.info("popped " .. #popped .. " items, top was " .. popped[1], "data")
+  -- Close multiple dialog layers at once (e.g., force-close all popups).
+  local dialogs = lurek.patterns.newStack(0)
+  dialogs:push("confirm"); dialogs:push("tooltip"); dialogs:push("dropdown")
+  local closed = dialogs:popMany(2)
+  print("closed " .. #closed .. " dialogs, remaining=" .. dialogs:len())
 end
 ```
 
-### `LStack:push(value: string) -> boolean`
+### `LStack:push(value: any) -> boolean`
 
 Push a value onto the top of the stack. Returns false if the stack is at capacity.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to push.
+- `value` (`any`, required) - The value to push.
 
 **Returns**: `boolean` - True if pushed, false if full.
 
@@ -6790,36 +6735,35 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(4)
-
-  s:push("scene_main")
-  s:push("scene_options")
-  local ok = s:push("scene_keybinds")
-  -- ok is false if capacity is reached.
-  print("pushed=" .. tostring(ok) .. " depth=" .. s:len())
+  -- Push dialog screens onto a navigation stack.
+  local nav = lurek.patterns.newStack(8)
+  local ok = nav:push("main_menu")
+  nav:push("settings")
+  print("pushed=" .. tostring(ok) .. " depth=" .. nav:len())
 end
 ```
 
-### `LStack:pushBottom(value: string) -> boolean`
+### `LStack:pushBottom(value: any) -> boolean`
 
 Push a value onto the bottom of the stack. Returns false if at capacity.
 
 **Parameters**
 
-- `value` (`string`, required) - The value to insert at the bottom.
+- `value` (`any`, required) - The value to insert at the bottom.
 
 **Returns**: `boolean` - True if pushed, false if full.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.insert(s, 1, v) inserts at the bottom
-  local s = {2, 3, 4}
-  table.insert(s, 1, 1)
-  lurek.log.info("stack bottom after push: " .. s[1], "data")
+  -- Insert a persistent base layer under existing screens.
+  local layers = lurek.patterns.newStack(8)
+  layers:push("game_hud")
+  layers:pushBottom("background")
+  print("bottom=" .. layers:peekBottom() .. " top=" .. layers:peek())
 end
 ```
 
@@ -6835,14 +6779,15 @@ Remove and return the value at a 1-based index. Returns nil if out of range.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- table.remove(s, i) removes at specific index
-  local s = {10, 20, 30, 40}
-  local val = table.remove(s, 2)
-  lurek.log.info("removed index 2: " .. val, "data")
+  -- Remove a specific item from the middle of the stack.
+  local cards = lurek.patterns.newStack(0)
+  cards:push("ace"); cards:push("king"); cards:push("queen")
+  local removed = cards:removeAt(2)
+  print("removed=" .. tostring(removed) .. " remaining=" .. cards:len())
 end
 ```
 
@@ -6858,11 +6803,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStack(0)
-  s:push("Main"); s:push("Settings"); s:push("Audio")
-
-  -- Useful for breadcrumb display: Main > Settings > Audio
-  for i, v in ipairs(s:toArray()) do print("  " .. i .. ": " .. v) end
+  -- Export stack contents for breadcrumb trail UI.
+  local trail = lurek.patterns.newStack(0)
+  trail:push("Home"); trail:push("World"); trail:push("Dungeon")
+  local arr = trail:toArray()
+  print("trail: " .. table.concat(arr, " > "))
 end
 ```
 
@@ -6909,10 +6854,9 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Reset when loading a new configuration that defines fresh strategies.
   local s = lurek.patterns.newStrategy()
-  s:register("x", function() end)
-
-  -- Reset when loading new configuration.
+  s:register("a", function() end); s:register("b", function() end)
   s:clear()
   print("strategies after clear=" .. #s:names())
 end
@@ -6982,11 +6926,11 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Validate strategy exists before switching.
   local s = lurek.patterns.newStrategy()
-  s:register("legacy", function() return 0 end)
-
-  -- Guard before set() to handle missing strategies gracefully.
-  if s:has("legacy") then s:set("legacy") end
+  s:register("fast", function() return 1 end)
+  if s:has("fast") then print("fast strategy available") end
+  print("has slow=" .. tostring(s:has("slow")))
 end
 ```
 
@@ -7053,10 +6997,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Remove a deprecated algorithm.
   local s = lurek.patterns.newStrategy()
-  s:register("deprecated", function() end)
-
-  local removed = s:remove("deprecated")
+  s:register("old_algo", function() return 0 end)
+  local removed = s:remove("old_algo")
   print("removed=" .. tostring(removed))
 end
 ```
@@ -7077,12 +7021,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local s = lurek.patterns.newStrategy()
-  s:register("fast", function(x) return x * 2 end)
-
-  -- set() returns false if the strategy name does not exist.
-  local ok = s:set("fast")
-  if not ok then print("ERROR: strategy not found") end
+  -- Switch pathfinding algorithm based on terrain type.
+  local pathfinder = lurek.patterns.newStrategy()
+  pathfinder:register("astar", function(from, to) return "path_via_astar" end)
+  pathfinder:register("dijkstra", function(from, to) return "path_via_dijkstra" end)
+  local ok = pathfinder:set("astar")
+  print("set astar=" .. tostring(ok))
 end
 ```
 
@@ -7125,11 +7069,10 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
+  -- Track total shots fired for statistics.
   local t = lurek.patterns.newThrottle(0.1)
   t:onFire(function() end)
-
-  -- Simulate several intervals passing.
-  for i = 1, 5 do t:update(0.1) end
+  t:update(0.1); t:update(0.1); t:update(0.1)
   print("total fires=" .. t:getFireCount())
 end
 ```
@@ -7170,13 +7113,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local t = lurek.patterns.newThrottle(0.5)
-
-  -- onFire sets the action that executes when the interval elapses.
-  t:onFire(function()
-    print("  periodic tick")
+  -- Rate-limit network position updates to 10 per second.
+  local net_send = lurek.patterns.newThrottle(0.1)
+  net_send:onFire(function()
+    print("  sending position update to server")
   end)
-  -- In a real game: function lurek.process(dt) t:update(dt) end
+  net_send:update(0.1)  -- fires
 end
 ```
 
@@ -7240,13 +7182,12 @@ Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  local t = lurek.patterns.newThrottle(0.25)
-  t:onFire(function() print("  autosave check") end)
-
-  -- update() returns true on the frame the throttle fires.
-  -- Use the return value to trigger additional logic.
-  local fired = t:update(0.30)
-  if fired then print("  additional post-fire logic") end
+  -- Weapon cooldown: fire rate limited to 2 shots/second.
+  local weapon = lurek.patterns.newThrottle(0.5)
+  weapon:onFire(function() print("  shot fired!") end)
+  local fired1 = weapon:update(0.3)  -- not enough time
+  local fired2 = weapon:update(0.3)  -- total 0.6 > 0.5, fires
+  print("attempt1=" .. tostring(fired1) .. " attempt2=" .. tostring(fired2))
 end
 ```
 
@@ -7286,29 +7227,30 @@ do
 end
 ```
 
-### `LWeightedRandom:add(weight: number, value: string, [label]: string) -> number`
+### `LWeightedRandom:add(weight: number, value: any, [label]: string) -> number`
 
 Add an item with a relative weight. Higher weight = higher selection probability.
 
 **Parameters**
 
 - `weight` (`number`, required) - The selection weight (must be > 0).
-- `value` (`string`, required) - The payload value returned on pick.
+- `value` (`any`, required) - The payload value returned on pick.
 - `label` (`string`, optional) - Optional human-readable label.
 
 **Returns**: `number` - The internal ID of the added entry.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Equivalent: append {item, weight} to the pool table
-  local pool = {}
-  local function wr_add(item, weight) pool[#pool + 1] = {item, weight} end
-  wr_add("common", 60.0); wr_add("rare", 30.0); wr_add("epic", 10.0)
-  lurek.log.info("pool size: " .. #pool, "data")
+  local lst = lurek.patterns.newList()
+  -- add() is the primary way to grow the list.
+  lst:add("sword")
+  lst:add("shield")
+  lst:add("potion")
+  print("list size=" .. lst:len())
 end
 ```
 
@@ -7318,57 +7260,16 @@ Remove all entries from the pool. This method is available to Lua scripts.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
-
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
-
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
-
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
-
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  -- Reset loot table when switching between dungeon floors.
+  local wr = lurek.patterns.newWeightedRandom()
+  wr:add(50.0, "floor_1_loot", "f1")
+  wr:clearAll()
+  print("entries after clear=" .. wr:len())
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
 ### `LWeightedRandom:getRevision() -> number`
@@ -7379,57 +7280,17 @@ Return the revision counter. Increments on any add/remove/weight change.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
+  local bb = lurek.patterns.newBlackboard()
+  local last_rev = bb:getRevision()
 
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
-
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
-
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
-
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  bb:set("k", 1)
+  -- Use revision to detect if anything changed since last check (dirty flag pattern).
+  if bb:getRevision() ~= last_rev then print("blackboard is dirty") end
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
 ### `LWeightedRandom:isEmpty() -> boolean`
@@ -7440,57 +7301,15 @@ Check whether the pool has no entries.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
-
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
-
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
-
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
-
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  local lst = lurek.patterns.newList()
+  print("before add: empty=" .. tostring(lst:isEmpty()))
+  lst:add("item")
+  print("after add: empty=" .. tostring(lst:isEmpty()))
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
 ### `LWeightedRandom:len() -> number`
@@ -7501,57 +7320,14 @@ Return the number of entries in the pool.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
-
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
-
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
-
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
-
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  local lst = lurek.patterns.newList()
+  for i = 1, 5 do lst:add(i * 10) end
+  print("list length=" .. lst:len())
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
 ### `LWeightedRandom:pick(sample: number) -> string`
@@ -7566,21 +7342,16 @@ Pick one item using a random sample value in [0, 1). Returns its value or nil.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Pick using cumulative weight distribution
-  local pool = {{"sword", 50.0}, {"staff", 30.0}, {"bow", 20.0}}
-  local total = 0
-  for _, e in ipairs(pool) do total = total + e[2] end
-  local r = math.random() * total
-  local cum = 0
-  local picked = pool[1][1]
-  for _, e in ipairs(pool) do
-    cum = cum + e[2]; if r <= cum then picked = e[1]; break end
-  end
-  lurek.log.info("loot drop: " .. picked, "data")
+  -- Roll a loot drop using a random number.
+  local loot = lurek.patterns.newWeightedRandom()
+  loot:add(80.0, "gold", "common")
+  loot:add(20.0, "diamond", "rare")
+  local drop = loot:pick(math.random())
+  print("dropped: " .. tostring(drop))
 end
 ```
 
@@ -7597,57 +7368,19 @@ Pick multiple unique items. Requires an array of random samples.
 
 #### Example
 
-Module-level example from [patterns.lua](../blob/main/content/examples/patterns.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
--- content/examples/patterns.lua
--- lurek.patterns API examples: data structures, design patterns, and game architecture utilities.
--- Run: cargo run -- content/examples/patterns.lua
-
---@api-stub: lurek.patterns.newEventBus
--- Create a new publish/subscribe event bus for decoupled communication between game systems
 do
-  -- EventBus decouples producers from consumers. Systems publish events without
-  -- knowing who listens. Ideal for game-wide signals: damage dealt, level cleared,
-  -- item picked up. Priority controls execution order of multiple subscribers.
-  local bus = lurek.patterns.newEventBus("combat_bus")
-
-  -- Subscribe to "hp_changed" so the HUD updates whenever any system modifies HP.
-  -- Priority 100 means this runs before lower-priority listeners on the same event.
-  local hud_id = bus:on("hp_changed", function(hp, max_hp)
-    print("HUD: health bar " .. hp .. "/" .. max_hp)
-  end, 100)
-
-  -- A second listener with lower priority logs to analytics after HUD updates.
-  bus:on("hp_changed", function(hp)
-    if hp <= 0 then print("Analytics: player died") end
-  end, 0)
-
-  -- Any system can emit without knowing about listeners.
-  bus:emit("hp_changed", 42, 100)
-
-  -- Unsubscribe the HUD listener when leaving the game screen.
-  bus:off(hud_id)
+  -- Generate a loot chest with 3 unique drops.
+  local pool = lurek.patterns.newWeightedRandom()
+  pool:add(40.0, "potion", "consumable")
+  pool:add(30.0, "arrow_bundle", "ammo")
+  pool:add(20.0, "gem", "material")
+  pool:add(10.0, "rare_ring", "equip")
+  local drops = pool:pickN(3, { math.random(), math.random(), math.random() })
+  print("chest contains " .. #drops .. " items")
 end
-
---@api-stub: lurek.patterns.newObjectPool
--- Create a new object pool for reusing pre-allocated game objects to reduce allocation overhead
-do
-  -- Object pools eliminate per-frame allocations for frequently spawned entities
-  -- like bullets, particles, or hit effects. Pre-warm the pool at load time,
-  -- then acquire/release during gameplay for zero-allocation spawning.
-  local pool = lurek.patterns.newObjectPool()
-
-  -- Pre-warm: add 32 bullet templates at scene load (not during gameplay).
-  for i = 1, 32 do
-    pool:add({ x = 0, y = 0, vx = 0, vy = 0, alive = false })
-  end
-
-  -- During gameplay: acquire reuses an existing bullet instead of allocating.
-  ---@type {x:number, y:number, vx:number, vy:number, alive:boolean}?
-  local bullet = pool:acquire()
-  if bullet then
-    bullet.x, bullet.y = 100, 200
 ```
 
 ### `LWeightedRandom:remove(id: integer) -> boolean`
@@ -7662,17 +7395,17 @@ Remove an item by its ID. Returns true if it existed.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Remove item from pool by value
-  local pool = {{"apple", 5.0}, {"banana", 3.0}, {"cherry", 2.0}}
-  local to_remove = "banana"
-  for i = #pool, 1, -1 do
-    if pool[i][1] == to_remove then table.remove(pool, i) end
-  end
-  lurek.log.info("pool after remove: " .. #pool .. " items", "data")
+  local lst = lurek.patterns.newList()
+  lst:add("quest_a")
+  lst:add("quest_b")
+  lst:add("quest_c")
+  -- Removes quest_b, shifts quest_c down to index 2.
+  local removed = lst:remove(2)
+  print("removed=" .. tostring(removed) .. " remaining=" .. lst:len())
 end
 ```
 
@@ -7689,17 +7422,17 @@ Change the weight of an existing entry.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Update weight: find item and update its weight
-  local pool = {{"common", 70.0}, {"rare", 25.0}, {"epic", 5.0}}
-  local target = "rare"
-  for _, e in ipairs(pool) do
-    if e[1] == target then e[2] = 5.0; break end  -- luck buff increases rare chance
-  end
-  lurek.log.info("weight updated for " .. target, "data")
+  -- Pity system: increase rare drop chance after each failed attempt.
+  local loot = lurek.patterns.newWeightedRandom()
+  local rare_id = loot:add(5.0, "epic_sword", "rare")
+  loot:add(95.0, "common_coin", "common")
+  -- After 10 failed rolls, boost the rare weight.
+  loot:setWeight(rare_id, 25.0)
+  print("rare weight boosted, total=" .. string.format("%.1f", loot:totalWeight()))
 end
 ```
 
@@ -7711,15 +7444,16 @@ Return the sum of all entry weights.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [patterns.lua](../blob/main/content/examples/patterns.lua):
 
 ```lua
 do
-  -- Sum all weights
-  local pool = {{"common", 70.0}, {"rare", 25.0}, {"epic", 5.0}}
-  local total = 0
-  for _, e in ipairs(pool) do total = total + e[2] end
-  lurek.log.info("total weight=" .. total .. " (common chance=" .. (70/total*100) .. "%)", "data")
+  -- Verify weight distribution sums correctly for probability display.
+  local wr = lurek.patterns.newWeightedRandom()
+  wr:add(60.0, "common", "tier_1")
+  wr:add(30.0, "uncommon", "tier_2")
+  wr:add(10.0, "rare", "tier_3")
+  print("total weight=" .. wr:totalWeight())  -- 100.0
 end
 ```
 

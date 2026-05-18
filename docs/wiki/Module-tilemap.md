@@ -248,7 +248,7 @@ do
   function lurek.draw() map:render(-cam_x, -cam_y) end
 end
 
---@api-stub: TileMap:drawToImage
+--@api-stub: LTileMap:drawToImage
 -- Draws or renders this tile map to the current render target
 do
   -- Rasterize the map into an image for minimap thumbnails or screenshots.
@@ -259,7 +259,7 @@ do
   lurek.log.info("rendered map preview to ImageData", "tilemap")
 end
 
---@api-stub: TileMap:update
+--@api-stub: LTileMap:update
 -- Advances this tile map by the given delta time
 do
   -- Call in lurek.process(dt) to advance tile animations.
@@ -273,7 +273,7 @@ end
 -- TileMap — Tile Callbacks
 -- =============================================================================
 
---@api-stub: TileMap:onTileEnter
+--@api-stub: LTileMap:onTileEnter
 -- Fires the callback registered for the tile enter event on this tile map
 do
   -- Register a callback for when an entity first enters a tile with this GID.
@@ -286,7 +286,7 @@ do
   lurek.log.info("tile enter callback registered for gid=5", "tilemap")
 end
 
---@api-stub: TileMap:onTileStep
+--@api-stub: LTileMap:onTileStep
 ```
 
 ## Key Types
@@ -1318,8 +1318,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local sheet = lurek.tilemap.newAutoTileSheet(16, 24, "blob47")
-  lurek.log.info("autotile tile height = " .. sheet:getTileHeight() .. " px", "tilemap")
+  -- Confirm tall tiles for a side-view autotile sheet.
+  local sheet = lurek.tilemap.newAutoTileSheet(16, 32, "minimal16")
+  lurek.log.info("autotile h=" .. sheet:getTileHeight() .. " px", "tilemap")
 end
 ```
 
@@ -1335,8 +1336,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local sheet = lurek.tilemap.newAutoTileSheet(32, 32, "composite48")
-  lurek.log.info("autotile tile width = " .. sheet:getTileWidth() .. " px", "tilemap")
+  -- Verify tile dimensions match the atlas before applying rules.
+  local sheet = lurek.tilemap.newAutoTileSheet(32, 16, "blob47")
+  lurek.log.info("autotile w=" .. sheet:getTileWidth() .. " px", "tilemap")
 end
 ```
 
@@ -1352,8 +1354,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
-  lurek.log.info("LAutoTileSheet:type = " .. sheet:type(), "tilemap")
+  local obj = lurek.tilemap.newAutoTileSheet(16, 16, "minimal16")
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LAutoTileSheet"
 end
 ```
 
@@ -1373,9 +1375,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
-  lurek.log.info("is LAutoTileSheet: " .. tostring(sheet:typeOf("LAutoTileSheet")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(sheet:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newAutoTileSheet(16, 16, "minimal16")
+  lurek.log.debug("typeOf LAutoTileSheet: " .. tostring(obj:typeOf("LAutoTileSheet")), "example") -- true
 end
 ```
 
@@ -1517,9 +1518,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local world = lurek.tilemap.newChunkMap(64)
-  local size = world:getChunkSize()
-  lurek.log.info("chunk side = " .. size .. " tiles", "tilemap")
+  -- Calculate total tiles per chunk for memory estimation.
+  local world = lurek.tilemap.newChunkMap(32)
+  local cs = world:getChunkSize()
+  lurek.log.info("tiles per chunk = " .. cs * cs, "tilemap")
 end
 ```
 
@@ -1562,10 +1564,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local world = lurek.tilemap.newChunkMap(32)
-  world:setTile(-5, 12, 9)
-  local gid = world:getTile(-5, 12)
-  lurek.log.info("tile at (-5, 12) gid=" .. gid, "tilemap")
+  -- Read a tile from the infinite world for collision checks.
+  local world = lurek.tilemap.newChunkMap(16)
+  world:setTile(5, 5, 42)
+  local gid = world:getTile(5, 5)
+  lurek.log.info("chunk tile at (5,5) gid=" .. gid, "tilemap")
 end
 ```
 
@@ -1609,11 +1612,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Place tiles at any world coordinate (including negative).
-  -- The chunk is auto-created if it doesn't exist yet.
+  -- Place a tree tile in the open world when the player plants a seed.
   local world = lurek.tilemap.newChunkMap(16)
-  world:setTile(20, 20, 3)
-  lurek.log.info("chunk tile set at (20,20)", "tilemap")
+  world:setTile(-10, 20, 15)
+  lurek.log.info("planted tree at (-10,20)", "tilemap")
 end
 ```
 
@@ -1629,8 +1631,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local cm = lurek.tilemap.newChunkMap(16)
-  lurek.log.info("LChunkMap:type = " .. cm:type(), "tilemap")
+  local obj = lurek.tilemap.newChunkMap(16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LChunkMap"
 end
 ```
 
@@ -1650,9 +1652,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local cm = lurek.tilemap.newChunkMap(16)
-  lurek.log.info("is LChunkMap: " .. tostring(cm:typeOf("LChunkMap")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(cm:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newChunkMap(16)
+  lurek.log.debug("typeOf LChunkMap: " .. tostring(obj:typeOf("LChunkMap")), "example") -- true
 end
 ```
 
@@ -1759,8 +1760,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local iso = lurek.tilemap.newIsoMap(20, 30, 64, 32, 24)
-  lurek.log.info("iso map is " .. iso:getHeight() .. " tiles tall", "tilemap")
+  -- Use height for iterating over all rows in the iso map.
+  local iso = lurek.tilemap.newIsoMap(24, 18, 64, 32, 24)
+  lurek.log.info("iso height=" .. iso:getHeight() .. " tiles", "tilemap")
 end
 ```
 
@@ -1907,8 +1909,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local iso = lurek.tilemap.newIsoMap(20, 30, 64, 32, 24)
-  lurek.log.info("iso map is " .. iso:getWidth() .. " tiles wide", "tilemap")
+  -- Use width for iterating over all columns in the iso map.
+  local iso = lurek.tilemap.newIsoMap(24, 18, 64, 32, 24)
+  lurek.log.info("iso width=" .. iso:getWidth() .. " tiles", "tilemap")
 end
 ```
 
@@ -2091,8 +2094,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
-  lurek.log.info("LIsoMap:type = " .. iso:type(), "tilemap")
+  local obj = lurek.tilemap.newIsoMap(20, 15, 64, 32, 0)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LIsoMap"
 end
 ```
 
@@ -2112,9 +2115,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
-  lurek.log.info("is LIsoMap: " .. tostring(iso:typeOf("LIsoMap")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(iso:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newIsoMap(20, 15, 64, 32, 0)
+  lurek.log.debug("typeOf LIsoMap: " .. tostring(obj:typeOf("LIsoMap")), "example") -- true
 end
 ```
 
@@ -2192,11 +2194,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
-  local data = {}; for i = 1, 4 * 4 do data[i] = i end
-  lmr:setMapData(data, 4, 4)
-  local id = lmr:getTile(1, 2)
-  lurek.log.info("tile(1,2)=" .. tostring(id), "tilemap")
+  local map = lurek.tilemap.newLargeMapRenderer(16, 16)
+  local tile_id = map:getTile(0, 0)
+  lurek.log.debug("tile at (0,0): " .. tostring(tile_id), "example")
 end
 ```
 
@@ -2442,11 +2442,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
-  local data = {}; for i = 1, 8 * 8 do data[i] = 1 end
-  lmr:setMapData(data, 8, 8)
-  lmr:setTile(3, 2, 5)  -- column 3, row 2 (0-based) -> tile 5
-  lurek.log.info("tile(3,2)=" .. tostring(lmr:getTile(3, 2)), "tilemap")
+  local map = lurek.tilemap.newLargeMapRenderer(16, 16)
+  map:setTile(1, 1, 5)
+  lurek.log.debug("tile set at (1,1)", "example")
 end
 ```
 
@@ -2504,8 +2502,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
-  lurek.log.info("LLargeMapRenderer:type = " .. lmr:type(), "tilemap")
+  local obj = lurek.tilemap.newLargeMapRenderer(16, 16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LLargeMapRenderer"
 end
 ```
 
@@ -2525,9 +2523,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
-  lurek.log.info("is LLargeMapRenderer: " .. tostring(lmr:typeOf("LLargeMapRenderer")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(lmr:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newLargeMapRenderer(16, 16)
+  lurek.log.debug("typeOf LLargeMapRenderer: " .. tostring(obj:typeOf("LLargeMapRenderer")), "example") -- true
 end
 ```
 
@@ -2637,11 +2634,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
+  -- Identify which procedural block was placed during generation.
   local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
-  block:setName("corridor_h")
-  if block:getName():match("^corridor") then
-    lurek.log.info("block is a corridor variant", "tilemap")
-  end
+  block:setName("corridor_ew")
+  lurek.log.info("block name=" .. block:getName(), "tilemap")
 end
 ```
 
@@ -2704,10 +2700,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
-  block:setTile(1, 3, 3, 5)
-  local gid = block:getTile(1, 3, 3)
-  lurek.log.info("block tile (3,3) gid=" .. gid, "tilemap")
+  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+  local data = {}; for i = 1, 4 * 4 do data[i] = i end
+  lmr:setMapData(data, 4, 4)
+  local id = lmr:getTile(1, 2)
+  lurek.log.info("tile(1,2)=" .. tostring(id), "tilemap")
 end
 ```
 
@@ -2825,11 +2822,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Populate the block's tile grid. layer, x, y are 1-based.
-  local block = lurek.tilemap.newMapBlock(8, 8, 1, 4)
-  block:setTile(1, 2, 3, 1)  -- layer 1, col 2, row 3, gid 1
-  block:setTile(1, 4, 4, 2)
-  lurek.log.info("map block tiles set", "tilemap")
+  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+  local data = {}; for i = 1, 8 * 8 do data[i] = 1 end
+  lmr:setMapData(data, 8, 8)
+  lmr:setTile(3, 2, 5)  -- column 3, row 2 (0-based) -> tile 5
+  lurek.log.info("tile(3,2)=" .. tostring(lmr:getTile(3, 2)), "tilemap")
 end
 ```
 
@@ -2867,8 +2864,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local mb = lurek.tilemap.newMapBlock(8, 8, 1, 4)
-  lurek.log.info("LMapBlock:type = " .. mb:type(), "tilemap")
+  local obj = lurek.tilemap.newMapBlock(16, 16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LMapBlock"
 end
 ```
 
@@ -2888,9 +2885,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local mb = lurek.tilemap.newMapBlock(8, 8, 1, 4)
-  lurek.log.info("is LMapBlock: " .. tostring(mb:typeOf("LMapBlock")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(mb:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newMapBlock(16, 16)
+  lurek.log.debug("typeOf LMapBlock: " .. tostring(obj:typeOf("LMapBlock")), "example") -- true
 end
 ```
 
@@ -2957,10 +2953,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local grp = lurek.tilemap.newMapGroup("test")
-  grp:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
-  local gen = lurek.tilemap.newMapGen(grp, "small", 8)
-  lurek.log.info("LMapGen:type = " .. gen:type(), "tilemap")
+  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+  lurek.log.info("LargeMapRenderer:type = " .. lmr:type(), "tilemap")
 end
 ```
 
@@ -2980,11 +2974,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local grp = lurek.tilemap.newMapGroup("test")
-  grp:addBlock(lurek.tilemap.newMapBlock(8, 8, 1, 4))
-  local gen = lurek.tilemap.newMapGen(grp, "small", 8)
-  lurek.log.info("is LMapGen: " .. tostring(gen:typeOf("LMapGen")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(gen:typeOf("Object")), "tilemap")
+  local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+  lurek.log.info("is LLargeMapRenderer: " .. tostring(lmr:typeOf("LLargeMapRenderer")), "tilemap")
 end
 ```
 
@@ -3138,8 +3129,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local mg = lurek.tilemap.newMapGroup("test")
-  lurek.log.info("LMapGroup:type = " .. mg:type(), "tilemap")
+  local obj = lurek.tilemap.newMapGroup("test_group")
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LMapGroup"
 end
 ```
 
@@ -3159,9 +3150,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local mg = lurek.tilemap.newMapGroup("test")
-  lurek.log.info("is LMapGroup: " .. tostring(mg:typeOf("LMapGroup")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(mg:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newMapGroup("test_group")
+  lurek.log.debug("typeOf LMapGroup: " .. tostring(obj:typeOf("LMapGroup")), "example") -- true
 end
 ```
 
@@ -3236,8 +3226,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local ms = lurek.tilemap.newMapScript()
-  lurek.log.info("LMapScript:type = " .. ms:type(), "tilemap")
+  local obj = lurek.tilemap.newMapScript()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LMapScript"
 end
 ```
 
@@ -3257,9 +3247,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local ms = lurek.tilemap.newMapScript()
-  lurek.log.info("is LMapScript: " .. tostring(ms:typeOf("LMapScript")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(ms:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newMapScript()
+  lurek.log.debug("typeOf LMapScript: " .. tostring(obj:typeOf("LMapScript")), "example") -- true
 end
 ```
 
@@ -3520,11 +3509,12 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Erase a wall tile when the player destroys it (set to GID 0).
+  -- Destroy a wall tile when player uses a bomb.
   local map = lurek.tilemap.newTileMap(16, 16)
-  local layer = map:addLayer("walls", 32, 32)
-  map:fill(layer, 5)
-  map:clearTile(layer, 10, 10)  -- player blew up the wall at (10,10)
+  map:addLayer("walls", 16, 16)
+  map:setTile(1, 8, 8, 5)
+  map:clearTile(1, 8, 8)
+  lurek.log.info("wall destroyed at (8,8)", "tilemap")
 end
 ```
 
@@ -3664,8 +3654,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local map = lurek.tilemap.newTileMap(16, 16, 32)
-  lurek.log.info("map chunk size = " .. map:getChunkSize(), "tilemap")
+  -- Log storage parameters for debugging memory usage.
+  local map = lurek.tilemap.newTileMap(16, 16, 64)
+  lurek.log.info("internal chunk=" .. map:getChunkSize() .. " tiles/side", "tilemap")
 end
 ```
 
@@ -3705,10 +3696,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
+  -- Iterate all layers for serialization.
   local map = lurek.tilemap.newTileMap(16, 16)
-  map:addLayer("background", 32, 32)
-  map:addLayer("collision", 32, 32)
-  lurek.log.info("layers in map: " .. map:getLayerCount(), "tilemap")
+  map:addLayer("bg", 32, 32)
+  map:addLayer("fg", 32, 32)
+  lurek.log.info("total layers=" .. map:getLayerCount(), "tilemap")
 end
 ```
 
@@ -3848,13 +3840,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Check what tile is at a position before placing something.
+  -- Check if a position already has a tile before placing.
   local map = lurek.tilemap.newTileMap(16, 16)
-  map:addLayer("collision", 32, 32)
-  local gid = map:getTile(1, 4, 4)
-  if gid == 0 then
-    lurek.log.info("(4,4) is empty / walkable", "tilemap")
-  end
+  map:addLayer("ground", 16, 16)
+  local gid = map:getTile(1, 5, 5)
+  lurek.log.info("tile at (5,5) gid=" .. gid, "tilemap")
 end
 ```
 
@@ -3888,9 +3878,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local map = lurek.tilemap.newTileMap(16, 32)
-  local row_h = map:getTileHeight()
-  lurek.log.info("row height = " .. row_h .. " px", "tilemap")
+  -- Calculate entity snap-to-grid offset.
+  local map = lurek.tilemap.newTileMap(16, 24)
+  lurek.log.info("row height=" .. map:getTileHeight() .. " px", "tilemap")
 end
 ```
 
@@ -3950,9 +3940,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
+  -- Calculate world-space position from tile coordinate.
   local map = lurek.tilemap.newTileMap(32, 32)
-  local step = map:getTileWidth()
-  lurek.log.info("grid snap step = " .. step .. " px", "tilemap")
+  local px = 5 * map:getTileWidth()
+  lurek.log.info("tile col 5 starts at x=" .. px, "tilemap")
 end
 ```
 
@@ -4271,11 +4262,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Place a tile at (column, row) on a layer. GID 0 = empty.
+  -- Place a chest tile at the end of a corridor.
   local map = lurek.tilemap.newTileMap(16, 16)
-  map:addLayer("ground", 32, 32)
-  map:setTile(1, 4, 5, 2)
-  lurek.log.info("placed gid=2 at (4,5): " .. map:getTile(1, 4, 5), "tilemap")
+  map:addLayer("objects", 20, 20)
+  map:setTile(1, 10, 10, 42)
+  lurek.log.info("chest placed at (10,10)", "tilemap")
 end
 ```
 
@@ -4326,12 +4317,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Limit rendering to a viewport rectangle. Only tiles within this area
-  -- are drawn. Update each frame to match camera position.
+  -- Match viewport to camera view for efficient rendering.
   local map = lurek.tilemap.newTileMap(16, 16)
-  map:addLayer("ground", 64, 64)
-  map:setViewport(0, 0, 320, 240)
-  lurek.log.info("tilemap viewport set to 320x240", "tilemap")
+  map:addLayer("bg", 64, 64)
+  map:setViewport(100, 50, 320, 240)
+  lurek.log.info("viewport set to camera view", "tilemap")
 end
 ```
 
@@ -4467,8 +4457,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local tm = lurek.tilemap.newTileMap(32, 32)
-  lurek.log.info("LTileMap:type = " .. tm:type(), "tilemap")
+  local obj = lurek.tilemap.newTileMap(20, 15, 16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LTileMap"
 end
 ```
 
@@ -4488,9 +4478,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local tm = lurek.tilemap.newTileMap(32, 32)
-  lurek.log.info("is LTileMap: " .. tostring(tm:typeOf("LTileMap")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(tm:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newTileMap(20, 15, 16)
+  lurek.log.debug("typeOf LTileMap: " .. tostring(obj:typeOf("LTileMap")), "example") -- true
 end
 ```
 
@@ -4722,11 +4711,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- getQuad returns the source rectangle for a tile (used for custom drawing).
-  -- Fields: .x, .y, .width, .height (pixel coords in the atlas).
+  -- Read atlas rect for custom batch drawing.
   local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
-  local q = ts:getQuad(5)
-  lurek.log.info("tile 5 quad x=" .. q.x .. " y=" .. q.y .. " w=" .. q.width .. " h=" .. q.height, "tilemap")
+  local q = ts:getQuad(3)
+  lurek.log.info("tile 3 atlas rect x=" .. q.x .. " y=" .. q.y, "tilemap")
 end
 ```
 
@@ -4761,11 +4749,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Mark the first 32 tiles as solid (walls), rest as walkable (floors).
-  local ts = lurek.tilemap.newTileSet(1, 96, 12, 16, 16)
-  for id = 1, ts:getTileCount() do
-    ts:setSolid(id, id <= 32)
-  end
+  -- Iterate all tiles for a minimap legend.
+  local ts = lurek.tilemap.newTileSet(1, 128, 16, 16, 16)
+  lurek.log.info("tileset has " .. ts:getTileCount() .. " tiles", "tilemap")
 end
 ```
 
@@ -4781,10 +4767,10 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- getTileDimensions returns both w,h in one call (avoids two method calls).
+  -- Get both dimensions in one call for aspect ratio check.
   local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
-  local tw, th = ts:getTileDimensions()
-  lurek.log.info("tile is " .. tw .. "x" .. th .. " px", "tilemap")
+  local w, h = ts:getTileDimensions()
+  lurek.log.info("tile dims=" .. w .. "x" .. h, "tilemap")
 end
 ```
 
@@ -4800,9 +4786,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 24)
-  local box_h = ts:getTileHeight()
-  lurek.log.info("collision height = " .. box_h, "physics")
+  -- Use tile height for vertical collision offset.
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 32)
+  lurek.log.info("tile pixel height=" .. ts:getTileHeight(), "tilemap")
 end
 ```
 
@@ -4818,10 +4804,9 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  -- Use tile dimensions for collision box sizing in physics.
-  local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 16)
-  local box_w = ts:getTileWidth()
-  lurek.log.info("collision width matches tile = " .. box_w, "physics")
+  -- Confirm tile size matches rendering expectations.
+  local ts = lurek.tilemap.newTileSet(1, 64, 8, 24, 24)
+  lurek.log.info("tile pixel width=" .. ts:getTileWidth(), "tilemap")
 end
 ```
 
@@ -4841,10 +4826,11 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
+  -- Verify solidity before allowing player movement onto a tile.
   local ts = lurek.tilemap.newTileSet(1, 64, 8, 16, 16)
-  ts:setSolid(7, true)
-  if ts:isSolid(7) then
-    lurek.log.info("tile 7 will block movement", "tilemap")
+  ts:setSolid(10, true)
+  if ts:isSolid(10) then
+    lurek.log.info("tile 10 blocks movement", "tilemap")
   end
 end
 ```
@@ -4963,8 +4949,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local ts = lurek.tilemap.newTileSet(1, 16, 4, 32, 32)
-  lurek.log.info("LTileSet:type = " .. ts:type(), "tilemap")
+  local obj = lurek.tilemap.newTileSet(1, 256, 16, 16, 16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LTileSet"
 end
 ```
 
@@ -4984,9 +4970,8 @@ Exact example from [tilemap.lua](../blob/main/content/examples/tilemap.lua):
 
 ```lua
 do
-  local ts = lurek.tilemap.newTileSet(1, 16, 4, 32, 32)
-  lurek.log.info("is LTileSet: " .. tostring(ts:typeOf("LTileSet")), "tilemap")
-  lurek.log.info("is Object: " .. tostring(ts:typeOf("Object")), "tilemap")
+  local obj = lurek.tilemap.newTileSet(1, 256, 16, 16, 16)
+  lurek.log.debug("typeOf LTileSet: " .. tostring(obj:typeOf("LTileSet")), "example") -- true
 end
 ```
 

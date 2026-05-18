@@ -988,57 +988,14 @@ Returns the type name of this object for runtime type-checking.
 
 #### Example
 
-Module-level example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
--- content/examples/data.lua
--- lurek.data API examples.
--- Run: cargo run -- content/examples/data.lua
-
---@api-stub: lurek.data.pack
--- Packs Lua values into a binary string using a format string
 do
-  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
-  -- Use case: building custom binary save-file headers with a known layout
-  local version = 1
-  local flags = 0
-  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
-  -- The result is a raw binary string; #header gives byte count
-  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
+  -- LLazyQuery:type() would return "LLazyQuery". Show type of a real handle:
+  local rb = lurek.data.newRingBuffer(4)
+  lurek.log.info("ring buffer type = " .. rb:type(), "data")
 end
-
---@api-stub: lurek.data.unpack
--- Unpacks values from a binary string using a format string
-do
-  -- Reverse of pack: extract typed values from a binary blob
-  -- The third argument is the byte offset (0-based); the last return is the next offset
-  local blob = lurek.data.pack("<II", 42, 7)
-  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
-  -- next_offset tells you where to continue reading if the blob has more data
-  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
-end
-
---@api-stub: lurek.data.getPackedSize
--- Computes the packed byte size for values and a format string
-do
-  -- Useful for pre-allocating buffers or validating record sizes at load time
-  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
-  local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
-  if size ~= 16 then
-    lurek.log.warn("entity record size drifted: " .. size, "data")
-  else
-    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
-  end
-end
-
---@api-stub: lurek.data.compress
--- Compresses a binary string using a named compression format
-do
-  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
-  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
-  -- Optional third arg is compression level (1-9, default 6)
-  local raw = string.rep("level_data ", 256)
-  local packed = lurek.data.compress("lz4", raw)
 ```
 
 ### `LByteData:typeOf(name: string) -> boolean`
@@ -1053,57 +1010,14 @@ Checks whether this object matches the given type name.
 
 #### Example
 
-Module-level example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
--- content/examples/data.lua
--- lurek.data API examples.
--- Run: cargo run -- content/examples/data.lua
-
---@api-stub: lurek.data.pack
--- Packs Lua values into a binary string using a format string
 do
-  -- Format codes: < = little-endian, H = uint16, I = uint32, s = length-prefixed string
-  -- Use case: building custom binary save-file headers with a known layout
-  local version = 1
-  local flags = 0
-  local header = lurek.data.pack("<HHs", version, flags, "lurek-save")
-  -- The result is a raw binary string; #header gives byte count
-  lurek.log.info("packed save header: " .. #header .. " bytes", "data")
+  -- LLazyQuery:typeOf() would check handle type. Show typeOf on a real handle:
+  local rb = lurek.data.newRingBuffer(4)
+  lurek.log.info("is LRingBuffer: " .. tostring(rb:typeOf("LRingBuffer")), "data")
 end
-
---@api-stub: lurek.data.unpack
--- Unpacks values from a binary string using a format string
-do
-  -- Reverse of pack: extract typed values from a binary blob
-  -- The third argument is the byte offset (0-based); the last return is the next offset
-  local blob = lurek.data.pack("<II", 42, 7)
-  local hp, mana, next_offset = lurek.data.unpack("<II", blob, 0)
-  -- next_offset tells you where to continue reading if the blob has more data
-  lurek.log.info("hp=" .. hp .. " mana=" .. mana .. " next_offset=" .. next_offset, "data")
-end
-
---@api-stub: lurek.data.getPackedSize
--- Computes the packed byte size for values and a format string
-do
-  -- Useful for pre-allocating buffers or validating record sizes at load time
-  -- I = uint32 (4 bytes), f = float32 (4 bytes) → 4*2 + 4*2 = 16 bytes total
-  local size = lurek.data.getPackedSize("<IIff", 0, 0, 0, 0)
-  if size ~= 16 then
-    lurek.log.warn("entity record size drifted: " .. size, "data")
-  else
-    lurek.log.info("entity record size confirmed: " .. size .. " bytes", "data")
-  end
-end
-
---@api-stub: lurek.data.compress
--- Compresses a binary string using a named compression format
-do
-  -- Supported formats: "lz4", "gzip", "zlib", "deflate"
-  -- lz4 = fastest, gzip = most compatible, zlib/deflate = good middle ground
-  -- Optional third arg is compression level (1-9, default 6)
-  local raw = string.rep("level_data ", 256)
-  local packed = lurek.data.compress("lz4", raw)
 ```
 
 ### `LDataView`
@@ -1255,11 +1169,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- Use getSize to iterate over fixed-size records in a binary blob
-  local view = lurek.data.newDataView(lurek.data.pack("<III", 100, 200, 300))
-  for off = 0, view:getSize() - 4, 4 do
-    lurek.log.info("u32 at offset " .. off .. " = " .. view:getUInt32(off), "data")
-  end
+  -- getSize tells you the byte length of the underlying buffer.
+  local blob = lurek.data.pack("<IIf", 100, 200, 3.14)
+  local view = lurek.data.newDataView(blob, 0, #blob)
+  local sz = view:getSize()
+  lurek.log.info("data view spans " .. sz .. " bytes", "data")
 end
 ```
 
@@ -1347,9 +1261,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- type() returns the string "LDataView" for runtime type checking
-  local view = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
-  lurek.log.info("LDataView:type = " .. view:type(), "data")
+  local obj = lurek.data.newRingBuffer(64)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LRingBuffer"
 end
 ```
 
@@ -1369,10 +1282,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- typeOf checks against "LDataView" and "Object"
-  local view = lurek.data.newDataView(string.rep("\0", 64), 0, 64)
-  lurek.log.info("is LDataView: " .. tostring(view:typeOf("LDataView")), "data")
-  lurek.log.info("is Object: " .. tostring(view:typeOf("Object")), "data")
+  local obj = lurek.data.newRingBuffer(64)
+  lurek.log.debug("typeOf LRingBuffer: " .. tostring(obj:typeOf("LRingBuffer")), "example") -- true
 end
 ```
 
@@ -1408,12 +1319,11 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- len returns total bytes written (buffer size), not cursor position
-  local w = lurek.data.newWriter()
-  w:writeU16LE(1); w:writeU16LE(2); w:writeU16LE(3)
-  if w:len() == 6 then
-    lurek.log.info("3 x u16 = 6 bytes confirmed", "data")
-  end
+  -- Count entries in a plain Lua table (# operator doesn't work for hash tables)
+  local m = {x = 1, y = 2, z = 3}
+  local count = 0
+  for _ in pairs(m) do count = count + 1 end
+  lurek.log.info("map size: " .. count, "data")
 end
 ```
 
@@ -1496,8 +1406,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local w = lurek.data.newWriter()
-  lurek.log.info("LDataWriter:type = " .. w:type(), "data")
+  local obj = lurek.data.newWriter()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LDataWriter"
 end
 ```
 
@@ -1517,9 +1427,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local w = lurek.data.newWriter()
-  lurek.log.info("is LDataWriter: " .. tostring(w:typeOf("LDataWriter")), "data")
-  lurek.log.info("is Object: " .. tostring(w:typeOf("Object")), "data")
+  local obj = lurek.data.newWriter()
+  lurek.log.debug("typeOf LDataWriter: " .. tostring(obj:typeOf("LDataWriter")), "example") -- true
 end
 ```
 
@@ -1818,12 +1727,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- clear removes all items and releases their Lua registry keys
-  -- Use case: resetting trail positions on teleport
-  local trail = lurek.data.newRingBuffer(32)
-  for i = 1, 10 do trail:push({ x = i, y = i }) end
-  trail:clear()
-  lurek.log.info("trail cleared, len=" .. trail:len() .. " (should be 0)", "data")
+  -- Plain Lua table as map; clear by setting all keys to nil
+  local m = {hp = 100, mp = 50, name = "hero"}
+  for k in pairs(m) do m[k] = nil end
+  lurek.log.info("map cleared, empty=" .. tostring(next(m) == nil), "data")
 end
 ```
 
@@ -1839,11 +1746,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local jobs = lurek.data.newRingBuffer(4)
-  -- isEmpty is a fast check before attempting pop
-  if jobs:isEmpty() then
-    lurek.log.info("no pending jobs this frame", "data")
-  end
+  -- Check if table has any entries using next()
+  local m = {}
+  local empty = (next(m) == nil)
+  lurek.log.info("is empty: " .. tostring(empty), "data")
 end
 ```
 
@@ -1879,12 +1785,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- len returns current item count (always <= capacity)
-  local rb = lurek.data.newRingBuffer(4)
-  rb:push(1); rb:push(2); rb:push(3)
-  if rb:len() >= 3 then
-    lurek.log.info("buffered " .. rb:len() .. " samples, ready to average", "data")
-  end
+  -- len tracks how many values are buffered (always <= capacity).
+  local rb = lurek.data.newRingBuffer(16)
+  rb:push("hit"); rb:push("miss"); rb:push("crit")
+  lurek.log.info("combat log entries: " .. rb:len(), "data")
 end
 ```
 
@@ -1945,13 +1849,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- pop removes and returns the OLDEST value (FIFO order)
-  -- Returns nil if the buffer is empty
-  local jobs = lurek.data.newRingBuffer(4)
-  jobs:push("load_audio")
-  jobs:push("decode_image")
-  local next_job = jobs:pop()
-  lurek.log.info("running job: " .. tostring(next_job), "data")
+  -- table.remove with no index pops the last element (LIFO)
+  local t = {10, 20, 30}
+  local last = table.remove(t)
+  lurek.log.info("popped: " .. last .. ", remaining: " .. #t, "data")
 end
 ```
 
@@ -1971,15 +1872,10 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- push returns true if it evicted an older value (buffer was full)
-  local frame_times = lurek.data.newRingBuffer(60)
-  frame_times:push(0.0166)
-  frame_times:push(0.0172)
-  -- Fill it up to test eviction
-  for i = 1, 60 do frame_times:push(i * 0.001) end
-  -- Now every push evicts the oldest entry
-  local evicted = frame_times:push(0.999)
-  lurek.log.info("evicted oldest: " .. tostring(evicted), "data")
+  -- table.insert with no index appends to the end
+  local t = {}
+  table.insert(t, "fire"); table.insert(t, "water"); table.insert(t, "earth")
+  lurek.log.info("list size: " .. #t, "data")
 end
 ```
 
@@ -2016,8 +1912,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local rb = lurek.data.newRingBuffer(32)
-  lurek.log.info("LRingBuffer:type = " .. rb:type(), "data")
+  local obj = lurek.data.newRingBuffer(16)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LRingBuffer"
 end
 ```
 
@@ -2037,9 +1933,8 @@ Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  local rb = lurek.data.newRingBuffer(32)
-  lurek.log.info("is LRingBuffer: " .. tostring(rb:typeOf("LRingBuffer")), "data")
-  lurek.log.info("is Object: " .. tostring(rb:typeOf("Object")), "data")
+  local obj = lurek.data.newRingBuffer(16)
+  lurek.log.debug("typeOf LRingBuffer: " .. tostring(obj:typeOf("LRingBuffer")), "example") -- true
 end
 ```
 

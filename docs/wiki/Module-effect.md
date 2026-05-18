@@ -684,11 +684,10 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- clear() is equivalent to clearEffects() — use whichever name
-  -- reads better in your context.
-  local chain = lurek.effect.newImageEffect({{ type = "crt" }})
+  -- Reset a chain before rebuilding it with a different look.
+  local chain = lurek.effect.newImageEffect({{ type = "blur" }, { type = "vignette" }})
   chain:clear()
-  lurek.log.debug("chain cleared", "fx")
+  lurek.log.debug("chain cleared, count=" .. chain:effectCount(), "fx")
 end
 ```
 
@@ -900,11 +899,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Returns "ImageEffect" — the Lua handle type.
   local chain = lurek.effect.newImageEffect()
-  if chain:type() == "ImageEffect" then
-    lurek.log.debug("per-image chain detected", "fx")
-  end
+  lurek.log.info("ImageEffect:type = " .. chain:type(), "fx")
 end
 ```
 
@@ -925,7 +921,7 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 ```lua
 do
   local chain = lurek.effect.newImageEffect()
-  assert(chain:typeOf("Object"), "ImageEffect should be an Object")
+  lurek.log.info("is Object: " .. tostring(chain:typeOf("Object")), "fx")
 end
 ```
 
@@ -1517,11 +1513,11 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- isActive() is true when ANY overlay feature is running (shake, flash,
-  -- weather, fog, etc). Use to skip overlay:render() when nothing is visible.
+  -- Skip render call when nothing is visible to save draw overhead.
   local overlay = lurek.effect.newOverlay()
+  overlay:flash(1, 1, 1, 1, 0.2)
   if overlay:isActive() then
-    function lurek.draw() overlay:render() end
+    lurek.log.debug("overlay has active effects", "fx")
   end
 end
 ```
@@ -2551,7 +2547,6 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Returns "Overlay" (the Lua handle type).
   local overlay = lurek.effect.newOverlay()
   lurek.log.info("Overlay:type = " .. overlay:type(), "fx")
 end
@@ -2574,9 +2569,7 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 ```lua
 do
   local overlay = lurek.effect.newOverlay()
-  if overlay:typeOf("Object") then
-    lurek.log.debug("overlay is an Object", "fx")
-  end
+  lurek.log.info("is Object: " .. tostring(overlay:typeOf("Object")), "fx")
 end
 ```
 
@@ -2594,10 +2587,9 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- update(dt) MUST be called every frame to advance all overlay animations:
-  -- shake decay, flash fade, weather movement, fog animation, etc.
-  -- Without this call, overlay effects freeze in their initial state.
+  -- Call every frame to animate weather, shake decay, and flash fade.
   local overlay = lurek.effect.newOverlay()
+  overlay:shake(4.0, 0.3)
   function lurek.process(dt)
     overlay:update(dt)
   end
@@ -2861,14 +2853,10 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Effects can be toggled without removing them from the stack.
-  -- This is cheaper than add/remove for effects you toggle often
-  -- (e.g. bloom off during inventory screens for clarity).
+  -- Check before applying expensive effects in a quality-options menu.
   local bloom = lurek.effect.newEffect("bloom")
   bloom:setEnabled(false)
-  if not bloom:isEnabled() then
-    lurek.log.debug("bloom currently muted", "fx")
-  end
+  lurek.log.debug("bloom enabled=" .. tostring(bloom:isEnabled()), "fx")
 end
 ```
 
@@ -2929,11 +2917,10 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Toggle effects on/off based on game state.
-  -- Example: disable heavy CRT filter on low-end hardware.
+  -- Toggle effects from a settings screen without removing them.
   local crt = lurek.effect.newEffect("crt")
-  local low_quality = true
-  crt:setEnabled(not low_quality)
+  crt:setEnabled(false)
+  lurek.log.debug("crt disabled for performance", "fx")
 end
 ```
 
@@ -3131,10 +3118,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- type() returns the Lua object type string "PostFxEffect" — not the
-  -- effect's renderer type. Use getTypeName() for the effect identity.
   local eff = lurek.effect.newEffect("bloom")
-  lurek.log.debug("handle type: " .. eff:type(), "fx")
+  lurek.log.info("PostFxEffect:type = " .. eff:type(), "fx")
 end
 ```
 
@@ -3154,12 +3139,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- typeOf() checks Lua type inheritance. All handles inherit from "Object".
-  -- Use this for polymorphic code that handles multiple effect handle types.
-  local eff = lurek.effect.newEffect("blur")
-  if eff:typeOf("Object") then
-    lurek.log.debug("eff inherits from Object", "fx")
-  end
+  local eff = lurek.effect.newEffect("bloom")
+  lurek.log.info("is Object: " .. tostring(eff:typeOf("Object")), "fx")
 end
 ```
 
@@ -3268,12 +3249,11 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- clear() removes all effects and resets pass state.
-  -- Use when switching scenes that need completely different effects.
+  -- Wipe the pipeline for a new scene with different visual needs.
   local stack = lurek.effect.newStack()
   stack:add(lurek.effect.newEffect("crt"))
   stack:clear()
-  lurek.log.info("pipeline cleared, count=" .. stack:getEffectCount(), "fx")
+  lurek.log.debug("stack cleared, count=" .. stack:getEffectCount(), "fx")
 end
 ```
 
@@ -3354,11 +3334,10 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Returns width, height as two values. Useful for aspect ratio
-  -- calculations or passing to overlay/UI systems.
-  local stack = lurek.effect.newStack()
+  -- Get both width and height in one call.
+  local stack = lurek.effect.newStack(1920, 1080)
   local w, h = stack:getDimensions()
-  lurek.log.info("stack target = " .. w .. "x" .. h, "fx")
+  lurek.log.info("stack " .. w .. "x" .. h, "fx")
 end
 ```
 
@@ -3378,13 +3357,11 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- getEffect() uses 1-based indexing (Lua convention).
-  -- Returns nil for out-of-range indices. Use to modify effects
-  -- already in the stack without keeping a separate reference.
+  -- Retrieve an effect by slot to modify its parameters at runtime.
   local stack = lurek.effect.newStack()
-  stack:add(lurek.effect.newEffect("vignette"))
-  local first = stack:getEffect(1)
-  if first then first:setStrength(0.8) end
+  stack:add(lurek.effect.newEffect("bloom"))
+  local eff = stack:getEffect(1)
+  if eff then eff:setIntensity(1.5) end
 end
 ```
 
@@ -3400,15 +3377,11 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
+  -- Monitor stack size to prevent unbounded growth.
   local stack = lurek.effect.newStack()
   stack:add(lurek.effect.newEffect("bloom"))
-  stack:add(lurek.effect.newEffect("crt"))
-  -- Use getEffectCount() to iterate effects by index, build debug
-  -- displays, or validate that the stack matches expected configuration.
-  for i = 1, stack:getEffectCount() do
-    local effect = assert(stack:getEffect(i))
-    lurek.log.info("slot " .. i .. " = " .. effect:getTypeName(), "fx")
-  end
+  stack:add(lurek.effect.newEffect("vignette"))
+  lurek.log.info("stack count=" .. stack:getEffectCount(), "fx")
 end
 ```
 
@@ -3467,12 +3440,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Stack height is the render target height. Check this against
-  -- minimum requirements for UI rendering above the effect layer.
   local stack = lurek.effect.newStack(1280, 720)
-  if stack:getHeight() < 480 then
-    lurek.log.warn("stack height too small for HUD layout", "fx")
-  end
+  lurek.log.info("stack height=" .. stack:getHeight(), "fx")
 end
 ```
 
@@ -3488,12 +3457,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- The stack width is the render target width in pixels.
-  -- Verify this matches your game's internal resolution.
-  local stack = lurek.effect.newStack(1920, 1080)
-  if stack:getWidth() ~= 1920 then
-    lurek.log.warn("stack width drift: " .. stack:getWidth(), "fx")
-  end
+  local stack = lurek.effect.newStack(1280, 720)
+  lurek.log.info("stack width=" .. stack:getWidth(), "fx")
 end
 ```
 
@@ -3656,13 +3621,10 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Call resize() when the window changes size or when switching
-  -- between internal resolutions (e.g. settings menu resolution change).
-  -- This recreates the render targets at the new dimensions.
+  -- Recreate render targets when the window size changes.
   local stack = lurek.effect.newStack(800, 600)
-  local new_w, new_h = 1600, 900
-  stack:resize(new_w, new_h)
-  lurek.log.info("stack resized to " .. new_w .. "x" .. new_h, "fx")
+  stack:resize(1920, 1080)
+  lurek.log.info("stack resized to " .. stack:getWidth() .. "x" .. stack:getHeight(), "fx")
 end
 ```
 
@@ -3725,11 +3687,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- Returns "PostFxStack" — the Lua handle type, not the effect type.
   local stack = lurek.effect.newStack()
-  if stack:type() == "PostFxStack" then
-    lurek.log.debug("got a real post-fx stack", "fx")
-  end
+  lurek.log.info("PostFxStack:type = " .. stack:type(), "fx")
 end
 ```
 
@@ -3749,9 +3708,8 @@ Exact example from [effect.lua](../blob/main/content/examples/effect.lua):
 
 ```lua
 do
-  -- All Lurek handles inherit from "Object".
   local stack = lurek.effect.newStack()
-  assert(stack:typeOf("Object"), "PostFxStack should inherit Object")
+  lurek.log.info("is Object: " .. tostring(stack:typeOf("Object")), "fx")
 end
 ```
 

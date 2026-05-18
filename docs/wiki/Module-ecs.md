@@ -29,7 +29,7 @@
   - [LUniverse:defineTag(name: string) -> integer](#luniversedefinetagname-string-integer)
   - [LUniverse:deserialize(snapshot: table)](#luniversedeserializesnapshot-table)
   - [LUniverse:each(name: string, callback: function)](#luniverseeachname-string-callback-function)
-  - [LUniverse:emit(event: string, ...: any)](#luniverseemitevent-string-any)
+  - [LUniverse:emit(event: string, ...: table)](#luniverseemitevent-string-table)
   - [LUniverse:extendBlueprint(name: string, parent: string, overrides: table)](#luniverseextendblueprintname-string-parent-string-overrides-table)
   - [LUniverse:flushObservers()](#luniverseflushobservers)
   - [LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil](#luniversegetid-integer-name-string-tablenumberstringbooleannil)
@@ -73,7 +73,7 @@
   - [LUniverse:removeTag(id: integer, tag: string)](#luniverseremovetagid-integer-tag-string)
   - [LUniverse:render()](#luniverserender)
   - [LUniverse:serialize() -> table](#luniverseserialize-table)
-  - [LUniverse:set(id: integer, name: string, value: any)](#luniversesetid-integer-name-string-value-any)
+  - [LUniverse:set(id: integer, name: string, value: table)](#luniversesetid-integer-name-string-value-table)
   - [LUniverse:setLayer(id: integer, layer: integer)](#luniversesetlayerid-integer-layer-integer)
   - [LUniverse:setParent(child_id: integer, [parent_id]: integer)](#luniversesetparentchildid-integer-parentid-integer)
   - [LUniverse:snapshot() -> table](#luniversesnapshot-table)
@@ -118,7 +118,7 @@ Module example from [ecs.lua](../blob/main/content/examples/ecs.lua):
   function lurek.process(dt) world:update(dt) end
 end
 
---@api-stub: Universe:render
+--@api-stub: LUniverse:render
 -- Runs all registered render-phase systems (render or draw callbacks)
 do
   local world = lurek.ecs.newUniverse()
@@ -139,7 +139,7 @@ do
   function lurek.draw() world:render() end
 end
 
---@api-stub: Universe:emit
+--@api-stub: LUniverse:emit
 -- Dispatches a named event to all systems that define a matching method
 do
   local world = lurek.ecs.newUniverse()
@@ -567,14 +567,14 @@ do
 end
 ```
 
-### `LUniverse:emit(event: string, ...: any)`
+### `LUniverse:emit(event: string, ...: table)`
 
 Calls matching event-named functions on registered systems.
 
 **Parameters**
 
 - `event` (`string`, required) - Function name looked up on each system table.
-- `...` (`any`, required) - Extra values forwarded after the system and universe arguments.
+- `...` (`table`, required) - Extra values forwarded after the system and universe arguments.
 
 #### Example
 
@@ -1849,7 +1849,7 @@ do
 end
 ```
 
-### `LUniverse:set(id: integer, name: string, value: any)`
+### `LUniverse:set(id: integer, name: string, value: table)`
 
 Stores or replaces a component value on an entity.
 
@@ -1857,7 +1857,7 @@ Stores or replaces a component value on an entity.
 
 - `id` (`integer`, required) - Entity id that receives the component.
 - `name` (`string`, required) - Component name.
-- `value` (`any`, required) - Lua value stored as the component payload.
+- `value` (`table`, required) - Lua value stored as the component payload.
 
 #### Example
 

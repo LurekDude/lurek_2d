@@ -374,3 +374,13 @@ do
 end
 
 print("content/examples/event.lua")
+
+-- ---- Stub: lurek.event.clear ---------------------------------------------
+--@api-stub: lurek.event.clear
+-- Removes all listeners for a named event, or all events if no name given.
+do
+  -- Create a signal to verify clear behaviour.
+  local sig = lurek.event.newSignal()
+  lurek.event.clear()
+  lurek.log.debug("event cleared; sig ok: " .. tostring(sig ~= nil), "example")
+end

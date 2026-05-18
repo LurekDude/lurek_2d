@@ -84,11 +84,8 @@ local function hover_info(gid)
 end
 
 function lurek.init()
-    local ok_font, f = pcall(R.newFont, "fonts/OpenSans.ttf", 8)
-    if ok_font and f then
-        ui_font = f
-        R.setFont(ui_font)
-    end
+    ui_font = lurek.render.newFont(7)
+    R.setFont(ui_font)
 
     lurek.province.sanitizeMarkedPng("map.png", SANITIZED_MAP_PATH)
     reg = lurek.province.newFromPng("eu2", SANITIZED_MAP_PATH)

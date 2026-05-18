@@ -874,7 +874,7 @@ lurek.input.bind("quit",        "escape")
 function lurek.init()
     lurek.window.setTitle("Factory — Lurek2D")
     lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
-    for _, sz in ipairs({11, 12, 14, 16, 18, 20, 48}) do
+    for _, sz in ipairs({7, 10, 14, 18, 22}) do
         fonts[sz] = lurek.render.newFont(sz)
     end
 end

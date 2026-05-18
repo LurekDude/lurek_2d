@@ -139,7 +139,7 @@ do
   end
 end
 
---@api-stub: Minimap:type
+--@api-stub: LMinimap:type
 -- Returns the Lua-visible type name string for this minimap handle.
 do
   -- type() returns "LMinimap" — the internal type name of the handle.
@@ -148,7 +148,7 @@ do
   lurek.log.info("handle type: " .. mm:type(), "ui")
 end
 
---@api-stub: Minimap:typeOf
+--@api-stub: LMinimap:typeOf
 -- Returns true if this handle matches the given type name string.
 do
   -- typeOf(name) checks against "LMinimap", "Minimap", and "Object".
@@ -162,7 +162,7 @@ do
   end
 end
 
---@api-stub: Minimap:render
+--@api-stub: LMinimap:render
 -- Enqueues render commands to draw the minimap at a screen position.
 do
   -- render(x, y) draws the minimap on screen at pixel coordinates.
@@ -834,7 +834,7 @@ do
   end
 end
 
---@api-stub: Minimap:getFogColor
+--@api-stub: LMinimap:getFogColor
 -- Returns the fog color used when rendering fogged cells.
 do
   -- getFogColor() returns r, g, b, a of the fog overlay.
@@ -845,7 +845,7 @@ do
   lurek.log.info("fog rgba: " .. r .. "," .. g .. "," .. b .. "," .. a, "fog")
 end
 
---@api-stub: Minimap:setFogData
+--@api-stub: LMinimap:setFogData
 -- Sets all fog levels from a flat array (row-major, like setTerrainData).
 do
   -- setFogData(data) bulk-sets fog for every cell at once.
@@ -859,7 +859,7 @@ do
   lurek.log.info("fog state restored from save", "minimap")
 end
 
---@api-stub: Minimap:isObjectTypeVisible
+--@api-stub: LMinimap:isObjectTypeVisible
 -- Returns true if the given object type is currently visible on the minimap.
 do
   -- isObjectTypeVisible(type_idx) checks draw visibility per type.

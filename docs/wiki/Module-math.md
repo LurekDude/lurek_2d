@@ -941,11 +941,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Straight-line distance. Use for range checks, AI proximity, etc.
   local d = lurek.math.distance(0, 0, 3, 4)
-  if d < 10 then
-    lurek.log.debug("near target", "ai")
-  end
+  assert(math.abs(d - 5) < 0.001, "distance 3-4-5 triangle")
+  lurek.log.debug("distance: " .. d, "example")
 end
 ```
 
@@ -1020,12 +1018,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- FBM layers multiple octaves of noise for natural-looking detail.
-  -- Args: x, y, seed, octaves, lacunarity (frequency multiplier), gain (amplitude decay)
-  -- More octaves = more detail but slower.
-  local h = lurek.math.fbm(4.5, 2.0, 12345, 6, 2.0, 0.5)
-  local altitude = math.floor(h * 1000)
-  lurek.log.info("fbm altitude=" .. altitude, "world")
+  -- Fractional Brownian Motion: layered noise for terrain height maps.
+  local h = lurek.math.fbm(0.3, 0.7, 4, 2.0, 0.5)
+  lurek.log.debug("fbm height: " .. string.format("%.3f", h), "math")
 end
 ```
 
@@ -1603,10 +1598,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- lerp(a, b, t) blends between a and b. t=0 gives a, t=1 gives b.
-  -- The workhorse of animation: smoothly move between any two numeric values.
-  local hp_bar = lurek.math.lerp(0, 200, 0.42)
-  lurek.log.debug("hp bar pixels=" .. hp_bar, "ui")
+  -- Linear interpolation: lerp(a, b, t) where t=0 -> a, t=1 -> b.
+  local v = lurek.math.lerp(10, 20, 0.25)
+  lurek.log.debug("lerp(10,20,0.25) = " .. v, "math") -- 12.5
 end
 ```
 
@@ -2178,12 +2172,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Stateless version: no generator object needed, pass seed directly.
-  -- Good for one-off samples or shader-like usage.
-  local n = lurek.math.perlin2d(0.5, 1.25, 42)
-  if n > 0.6 then
-    lurek.log.info("hill peak", "terrain")
-  end
+  -- Smooth gradient noise in 2D. Good for terrain height or cloud density.
+  local n = lurek.math.perlin2d(0.5, 0.3)
+  lurek.log.debug("perlin2d: " .. string.format("%.3f", n), "math")
 end
 ```
 
@@ -2206,14 +2197,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- 3D Perlin: the Z axis can be time for animated effects like clouds or water
-  local t = 0
-  function lurek.process(dt)
-    t = t + dt
-    -- Scroll through noise space over time for animated cloud density
-    local cloud = lurek.math.perlin3d(0.1, 0.2, t, 7)
-    lurek.log.debug("cloud=" .. cloud, "sky")
-  end
+  -- 3D Perlin noise: adds a time/z axis for animated effects.
+  local n = lurek.math.perlin3d(0.5, 0.3, 1.0)
+  lurek.log.debug("perlin3d: " .. string.format("%.3f", n), "math")
 end
 ```
 
@@ -2458,11 +2444,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- random() with no args: float in [0..1)
-  -- random(n): integer in [1..n]
-  -- random(a, b): integer in [a..b]
-  local rolled = lurek.math.random(1, 6)
-  lurek.log.info("dice=" .. rolled, "rng")
+  -- Module-level random float in [0,1).
+  local v = lurek.math.random()
+  lurek.log.debug("random float: " .. string.format("%.3f", v), "math")
 end
 ```
 
@@ -2483,9 +2467,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Explicit integer random in [lo..hi]. Clearer intent than random(a,b).
-  local slot = lurek.math.randomInt(1, 8)
-  lurek.log.debug("loot slot=" .. slot, "rng")
+  local n = lurek.math.randomInt(1, 6) -- dice roll
+  lurek.log.debug("dice roll: " .. n, "math")
 end
 ```
 
@@ -2690,11 +2673,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Simplex noise has fewer directional artifacts than Perlin and is slightly faster
-  local s = lurek.math.simplex2d(2.0, 3.0, 99)
-  if s > 0 then
-    lurek.log.debug("simplex above zero", "noise")
-  end
+  -- Simplex noise: faster than Perlin, no directional artifacts.
+  local n = lurek.math.simplex2d(0.5, 0.3)
+  lurek.log.debug("simplex2d: " .. string.format("%.3f", n), "math")
 end
 ```
 
@@ -3136,10 +3117,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- type() returns the string name of this userdata type.
-  local aabb_tree_obj = lurek.math.aabbTree()
-  local t = aabb_tree_obj:type()
-  lurek.log.info("LAabbTree:type = " .. t, "math")
+  local vec3_obj = lurek.math.vec3(0, 0, 0)
+  local t = vec3_obj:type()
+  lurek.log.info("LVec3:type = " .. t, "math")
 end
 ```
 
@@ -3159,10 +3139,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- typeOf(name) checks type identity. Supports the class name and "Object".
-  local aabb_tree_obj = lurek.math.aabbTree()
-  lurek.log.info("is LAabbTree: " .. tostring(aabb_tree_obj:typeOf("LAabbTree")), "math")
-  lurek.log.info("is wrong: " .. tostring(aabb_tree_obj:typeOf("Unknown")), "math")
+  local vec3_obj = lurek.math.vec3(0, 0, 0)
+  lurek.log.info("is LVec3: " .. tostring(vec3_obj:typeOf("LVec3")), "math")
+  lurek.log.info("is wrong: " .. tostring(vec3_obj:typeOf("Unknown")), "math")
 end
 ```
 
@@ -3526,9 +3505,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local bezier_curve_obj = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
-  local t = bezier_curve_obj:type()
-  lurek.log.info("LBezierCurve:type = " .. t, "math")
+  local obj = lurek.math.newBezierCurve({0,0, 100,0, 100,100, 200,100})
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LBezierCurve"
 end
 ```
 
@@ -3548,9 +3526,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local bezier_curve_obj = lurek.math.newBezierCurve({0,0, 100,50, 200,0})
-  lurek.log.info("is LBezierCurve: " .. tostring(bezier_curve_obj:typeOf("LBezierCurve")), "math")
-  lurek.log.info("is wrong: " .. tostring(bezier_curve_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newBezierCurve({0,0, 100,0, 100,100, 200,100})
+  lurek.log.debug("typeOf LBezierCurve: " .. tostring(obj:typeOf("LBezierCurve")), "example") -- true
 end
 ```
 
@@ -3608,10 +3585,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- len() returns the number of control points in the spline.
+  -- Check point count before iterating segments.
   ---@type LCatmullRom
-  local cr = lurek.math.catmullRom({{x=0,y=0},{x=10,y=10},{x=20,y=0},{x=30,y=10}})
-  lurek.log.info("control points=" .. cr:len(), "spline")
+  local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=50},{x=100,y=0},{x=150,y=50}})
+  lurek.log.info("spline points=" .. cr:len(), "spline")
 end
 ```
 
@@ -3656,12 +3633,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- sample(t) evaluates the spline at normalized t in [0..1].
-  -- t=0 is the first point, t=1 is the last.
+  -- Evaluate a patrol path at 25% for enemy position.
   ---@type LCatmullRom
-  local cr = lurek.math.catmullRom({{x=0,y=0},{x=100,y=200},{x=300,y=200},{x=400,y=0}})
+  local cr = lurek.math.catmullRom({{x=0,y=0},{x=50,y=100},{x=150,y=100},{x=200,y=0}})
   local x, y = cr:sample(0.25)
-  lurek.log.debug("sample " .. x .. "," .. y, "spline")
+  lurek.log.debug("patrol pos=" .. x .. "," .. y, "spline")
 end
 ```
 
@@ -3703,9 +3679,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local catmull_rom_obj = lurek.math.catmullRom({{0,0},{100,50},{200,0},{300,50}})
-  local t = catmull_rom_obj:type()
-  lurek.log.info("LCatmullRom:type = " .. t, "math")
+  local obj = lurek.math.catmullRom({{0,0},{100,50},{200,0}})
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LCatmullRom"
 end
 ```
 
@@ -3725,9 +3700,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local catmull_rom_obj = lurek.math.catmullRom({{0,0},{100,50},{200,0},{300,50}})
-  lurek.log.info("is LCatmullRom: " .. tostring(catmull_rom_obj:typeOf("LCatmullRom")), "math")
-  lurek.log.info("is wrong: " .. tostring(catmull_rom_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.catmullRom({{0,0},{100,50},{200,0}})
+  lurek.log.debug("typeOf LCatmullRom: " .. tostring(obj:typeOf("LCatmullRom")), "example") -- true
 end
 ```
 
@@ -3805,11 +3779,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- contains(px, py) checks if a point is inside this circle.
-  local c = lurek.math.newCircle(50, 50, 25)
-  if c:contains(60, 60) then
-    lurek.log.debug("inside", "geo")
-  end
+  -- Check if a click is inside a circular button.
+  local btn = lurek.math.newCircle(200, 150, 30)
+  local inside = btn:contains(210, 145)
+  lurek.log.debug("click inside=" .. tostring(inside), "ui")
 end
 ```
 
@@ -3884,9 +3857,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local circle_obj = lurek.math.newCircle(0, 0, 50)
-  local t = circle_obj:type()
-  lurek.log.info("LCircle:type = " .. t, "math")
+  local obj = lurek.math.newCircle(100, 100, 40)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LCircle"
 end
 ```
 
@@ -3906,9 +3878,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local circle_obj = lurek.math.newCircle(0, 0, 50)
-  lurek.log.info("is LCircle: " .. tostring(circle_obj:typeOf("LCircle")), "math")
-  lurek.log.info("is wrong: " .. tostring(circle_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newCircle(100, 100, 40)
+  lurek.log.debug("typeOf LCircle: " .. tostring(obj:typeOf("LCircle")), "example") -- true
 end
 ```
 
@@ -4003,9 +3974,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local hermite_obj = lurek.math.hermite(0, 0, 1, 0, 100, 0, 1, 0)
-  local t = hermite_obj:type()
-  lurek.log.info("LHermite:type = " .. t, "math")
+  local obj = lurek.math.hermite(0,0,100,50,0,1,0,1)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LHermite"
 end
 ```
 
@@ -4025,9 +3995,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local hermite_obj = lurek.math.hermite(0, 0, 1, 0, 100, 0, 1, 0)
-  lurek.log.info("is LHermite: " .. tostring(hermite_obj:typeOf("LHermite")), "math")
-  lurek.log.info("is wrong: " .. tostring(hermite_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.hermite(0,0,100,50,0,1,0,1)
+  lurek.log.debug("typeOf LHermite: " .. tostring(obj:typeOf("LHermite")), "example") -- true
 end
 ```
 
@@ -4414,9 +4383,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local noise_generator_obj = lurek.math.newNoiseGenerator(42)
-  local t = noise_generator_obj:type()
-  lurek.log.info("LNoiseGenerator:type = " .. t, "math")
+  local obj = lurek.math.newNoiseGenerator(42)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LNoiseGenerator"
 end
 ```
 
@@ -4436,9 +4404,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local noise_generator_obj = lurek.math.newNoiseGenerator(42)
-  lurek.log.info("is LNoiseGenerator: " .. tostring(noise_generator_obj:typeOf("LNoiseGenerator")), "math")
-  lurek.log.info("is wrong: " .. tostring(noise_generator_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newNoiseGenerator(42)
+  lurek.log.debug("typeOf LNoiseGenerator: " .. tostring(obj:typeOf("LNoiseGenerator")), "example") -- true
 end
 ```
 
@@ -4560,10 +4527,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- getSeed() retrieves the seed this generator was created with.
-  local rng = lurek.math.newRandomGenerator(20260422)
-  local seed = rng:getSeed()
-  lurek.log.info("rng seed=" .. seed, "rng")
+  -- Display the world seed on the pause screen for sharing.
+  local rng = lurek.math.newRandomGenerator(98765)
+  lurek.log.info("world seed=" .. rng:getSeed(), "world")
 end
 ```
 
@@ -4695,11 +4661,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- setSeed() resets the generator to produce the same sequence from this seed.
-  -- Use to replay a procedural level with a known seed.
+  -- Reset RNG to replay a procedural level.
   local rng = lurek.math.newRandomGenerator(0)
-  rng:setSeed(12345)
-  lurek.log.debug("after reseed=" .. rng:randomInt(1, 6), "rng")
+  rng:setSeed(42)
+  lurek.log.debug("reseeded, first roll=" .. rng:randomInt(1, 100), "rng")
 end
 ```
 
@@ -4738,9 +4703,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local random_generator_obj = lurek.math.newRandomGenerator(42)
-  local t = random_generator_obj:type()
-  lurek.log.info("LRandomGenerator:type = " .. t, "math")
+  local obj = lurek.math.newRandomGenerator(12345)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LRandomGenerator"
 end
 ```
 
@@ -4760,9 +4724,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local random_generator_obj = lurek.math.newRandomGenerator(42)
-  lurek.log.info("is LRandomGenerator: " .. tostring(random_generator_obj:typeOf("LRandomGenerator")), "math")
-  lurek.log.info("is wrong: " .. tostring(random_generator_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newRandomGenerator(12345)
+  lurek.log.debug("typeOf LRandomGenerator: " .. tostring(obj:typeOf("LRandomGenerator")), "example") -- true
 end
 ```
 
@@ -4795,11 +4758,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Resets the packer so you can reuse it for a new atlas layout pass
-  local packer = lurek.math.newRectPacker(128, 128, 2)
-  packer:pack(40, 16, "tmp")
+  -- Reset atlas packer between texture atlas pages.
+  local packer = lurek.math.newRectPacker(256, 256, 1)
+  packer:pack(64, 64, "sprite_a")
   packer:clear()
-  lurek.log.debug("atlas cleared", "atlas")
+  lurek.log.debug("packer cleared for new page", "atlas")
 end
 ```
 
@@ -4907,10 +4870,12 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- clear() empties the entire hash. Use at scene transitions.
-  local h = lurek.math.newSpatialHash(64)
-  h:insert("a", 0, 0, 16, 16)
-  h:clear()
+  -- Reset spatial index between scenes.
+  local hash = lurek.math.newSpatialHash(64)
+  hash:insert("a", 0, 0, 10, 10)
+  hash:insert("b", 50, 50, 10, 10)
+  hash:clear()
+  lurek.log.debug("spatial hash cleared", "spatial")
 end
 ```
 
@@ -4970,11 +4935,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- insert(id, x, y, w, h) adds an entity by string id and bounding rect.
-  local sh = lurek.math.newSpatialHash(64)
-  sh:insert("entity_01", 100, 100, 32, 32)
-  sh:insert("entity_02", 200, 150, 32, 32)
-  lurek.log.info("items: " .. sh:getItemCount(), "math")
+  -- Register an enemy in the spatial index for broad-phase queries.
+  local hash = lurek.math.newSpatialHash(64)
+  hash:insert("goblin", 200, 150, 24, 24)
+  lurek.log.debug("goblin inserted into spatial hash", "spatial")
 end
 ```
 
@@ -5076,10 +5040,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- remove(id) takes an entity out of the hash. Call when an entity is destroyed.
-  local h = lurek.math.newSpatialHash(64)
-  h:insert("npc", 0, 0, 32, 32)
-  h:remove("npc")
+  -- Remove a defeated enemy from the spatial index.
+  local hash = lurek.math.newSpatialHash(64)
+  hash:insert("enemy_1", 50, 50, 16, 16)
+  hash:remove("enemy_1")
+  lurek.log.debug("enemy removed from spatial hash", "spatial")
 end
 ```
 
@@ -5095,9 +5060,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local spatial_hash_obj = lurek.math.newSpatialHash(64)
-  local t = spatial_hash_obj:type()
-  lurek.log.info("LSpatialHash:type = " .. t, "math")
+  local obj = lurek.math.newSpatialHash(64)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LSpatialHash"
 end
 ```
 
@@ -5117,9 +5081,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local spatial_hash_obj = lurek.math.newSpatialHash(64)
-  lurek.log.info("is LSpatialHash: " .. tostring(spatial_hash_obj:typeOf("LSpatialHash")), "math")
-  lurek.log.info("is wrong: " .. tostring(spatial_hash_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newSpatialHash(64)
+  lurek.log.debug("typeOf LSpatialHash: " .. tostring(obj:typeOf("LSpatialHash")), "example") -- true
 end
 ```
 
@@ -5141,12 +5104,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- update(id, x, y, w, h) moves an existing entity to a new position.
-  -- Call this when entities move instead of remove+insert.
-  local sh = lurek.math.newSpatialHash(64)
-  sh:insert("player", 100, 100, 32, 32)
-  sh:update("player", 110, 105, 32, 32)
-  lurek.log.info("player position updated", "math")
+  -- Move an entity to a new position in the spatial index.
+  local hash = lurek.math.newSpatialHash(64)
+  hash:insert("player", 100, 100, 32, 32)
+  hash:update("player", 120, 105, 32, 32)
+  lurek.log.debug("player position updated in hash", "spatial")
 end
 ```
 
@@ -5284,10 +5246,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- reset() returns the transform to identity (no translation, rotation, or scale).
-  local t = lurek.math.newTransform(10, 20, 0.5)
+  -- Clear a transform before applying fresh camera state.
+  local t = lurek.math.newTransform(50, 50, 1.0, 2, 2)
   t:reset()
-  lurek.log.debug("reset to identity", "xform")
+  local wx, wy = t:transformPoint(10, 10)
+  lurek.log.debug("after reset, 10,10 -> " .. wx .. "," .. wy, "xform")
 end
 ```
 
@@ -5305,10 +5268,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- rotate(angle) adds rotation in radians. Compounds with existing rotation.
-  local t = lurek.math.newTransform()
-  t:rotate(math.pi / 4)
-  lurek.log.debug("rotated 45deg", "xform")
+  -- Rotate a turret sprite to face a target.
+  local t = lurek.math.newTransform(100, 100)
+  t:rotate(math.pi / 3)
+  lurek.log.debug("turret rotated 60deg", "xform")
 end
 ```
 
@@ -5327,10 +5290,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- scale(sx, sy) multiplies the current scale. sy defaults to sx if omitted.
+  -- Scale a UI element for a zoom-in effect.
   local t = lurek.math.newTransform()
-  t:scale(2, 0.5)
-  lurek.log.debug("scaled", "xform")
+  t:scale(1.5, 1.5)
+  lurek.log.debug("scaled 150%", "xform")
 end
 ```
 
@@ -5428,10 +5391,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- translate(dx, dy) shifts the transform. Compounds with existing translation.
+  -- Shift a sprite's transform by a velocity vector.
   local t = lurek.math.newTransform()
-  t:translate(50, -10)
-  lurek.log.debug("translated", "xform")
+  t:translate(64, -32)
+  local wx, wy = t:transformPoint(0, 0)
+  lurek.log.debug("after translate origin at " .. wx .. "," .. wy, "xform")
 end
 ```
 
@@ -5447,9 +5411,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local transform_obj = lurek.math.newTransform()
-  local t = transform_obj:type()
-  lurek.log.info("LTransform:type = " .. t, "math")
+  local obj = lurek.math.newTransform()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LTransform"
 end
 ```
 
@@ -5469,9 +5432,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local transform_obj = lurek.math.newTransform()
-  lurek.log.info("is LTransform: " .. tostring(transform_obj:typeOf("LTransform")), "math")
-  lurek.log.info("is wrong: " .. tostring(transform_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.newTransform()
+  lurek.log.debug("typeOf LTransform: " .. tostring(obj:typeOf("LTransform")), "example") -- true
 end
 ```
 
@@ -5749,9 +5711,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local box = { x = 0 }
-  local tw = lurek.tween.tween(0.5, box, { x = 100 })
-  lurek.log.info("Tween:type = " .. tw:type(), "tween")  -- "LTween"
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(0.5, obj, { x = 10 })
+  lurek.log.info("LTween:type = " .. tw:type(), "tween")
 end
 ```
 
@@ -5771,9 +5733,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local box = { x = 0 }
-  local tw = lurek.tween.tween(0.5, box, { x = 100 })
-  lurek.log.info("is Tween: " .. tostring(tw:typeOf("LTween")), "tween")  -- true
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(0.5, obj, { x = 10 })
+  lurek.log.info("is LTween: " .. tostring(tw:typeOf("LTween")), "tween")
 end
 ```
 
@@ -5793,12 +5755,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- update(dt) advances the clock. Returns true when the tween completes.
-  -- Call this every frame in lurek.process(dt).
-  local tw = lurek.math.newTween(1.0, "inOutQuad")
-  tw:addValue(0, 200)
-  tw:update(0.5)
-  lurek.log.info("x at t=0.5: " .. tw:getValue(1), "math")
+  -- Advance a health bar tween by one frame's delta time.
+  local tw = lurek.math.newTween(1.0, "outQuad")
+  tw:addValue(0, 100)
+  local done = tw:update(0.5)
+  lurek.log.debug("tween done=" .. tostring(done), "anim")
 end
 ```
 
@@ -5853,11 +5814,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- 2D cross product: returns a scalar (the Z component of the 3D cross).
-  -- Positive = b is counter-clockwise from a. Useful for winding order checks.
+  -- Determine winding order: positive = counter-clockwise.
   local a = lurek.math.vec2(1, 0)
   local b = lurek.math.vec2(0, 1)
-  lurek.log.debug("cross=" .. a:cross(b), "math")
+  lurek.log.debug("winding=" .. a:cross(b), "geo")
 end
 ```
 
@@ -5877,10 +5837,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Object-oriented distance: a:distance(b) instead of lurek.math.distance(...)
-  local a = lurek.math.vec2(0, 0)
-  local b = lurek.math.vec2(3, 4)
-  lurek.log.info("dist=" .. a:distance(b), "math")
+  -- Check if a projectile is close enough to detonate.
+  local bullet = lurek.math.vec2(95, 48)
+  local target = lurek.math.vec2(100, 50)
+  lurek.log.debug("dist=" .. bullet:distance(target), "combat")
 end
 ```
 
@@ -5900,11 +5860,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Dot product measures alignment: 1 = same direction, 0 = perpendicular, -1 = opposite.
-  -- Use to check if an enemy is facing the player.
-  local a = lurek.math.vec2(1, 0)
-  local b = lurek.math.vec2(0, 1)
-  lurek.log.debug("dot=" .. a:dot(b), "math")
+  -- Check alignment between movement direction and wall normal.
+  local move = lurek.math.vec2(1, 0)
+  local wall = lurek.math.vec2(0, 1)
+  lurek.log.debug("alignment=" .. move:dot(wall), "physics")
 end
 ```
 
@@ -5945,10 +5904,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- length() returns the magnitude (Euclidean norm) of the vector.
-  local v = lurek.math.vec2(3, 4)
-  local len = v:length()
-  lurek.log.info("len=" .. len, "math")
+  -- Check if velocity exceeds speed limit.
+  local vel = lurek.math.vec2(3, 4)
+  lurek.log.debug("speed=" .. vel:length(), "physics")
 end
 ```
 
@@ -5964,10 +5922,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- lengthSquared() avoids sqrt — use for distance comparisons.
-  local v = lurek.math.vec2(3, 4)
-  if v:lengthSquared() > 25 then
-    lurek.log.debug("vector longer than 5", "math")
+  -- Compare distances without expensive sqrt.
+  local offset = lurek.math.vec2(5, 5)
+  if offset:lengthSquared() < 100 then
+    lurek.log.debug("close enough to snap", "ui")
   end
 end
 ```
@@ -5989,12 +5947,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Vector lerp smoothly blends between two positions.
-  -- t=0 gives vector a, t=1 gives vector b.
-  local a = lurek.math.vec2(0, 0)
-  local b = lurek.math.vec2(100, 0)
-  local mid = a:lerp(b, 0.5)
-  lurek.log.debug("mid x=" .. mid.x, "math")
+  -- Smoothly chase a target position.
+  local current = lurek.math.vec2(0, 0)
+  local target = lurek.math.vec2(100, 50)
+  local step = current:lerp(target, 0.1)
+  lurek.log.debug("chase pos=" .. step.x .. "," .. step.y, "ai")
 end
 ```
 
@@ -6010,10 +5967,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- normalize() returns a unit vector (length=1) pointing in the same direction.
-  -- Essential for converting velocity to direction.
-  local dir = lurek.math.vec2(10, 0):normalize()
-  lurek.log.debug("dir x=" .. dir.x, "math")
+  -- Get a unit direction for applying speed.
+  local raw = lurek.math.vec2(10, 5)
+  local dir = raw:normalize()
+  lurek.log.debug("unit dir=" .. dir.x .. "," .. dir.y, "math")
 end
 ```
 
@@ -6095,11 +6052,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- rotate(angle) returns a new vector rotated by the given radians.
-  -- Useful for aiming projectiles at an offset angle.
-  local v = lurek.math.vec2(10, 0)
-  local r = v:rotate(math.pi / 2)
-  lurek.log.debug("rotated x=" .. r.x .. " y=" .. r.y, "math")
+  -- Rotate a shot direction by a spread angle for shotgun pellets.
+  local base = lurek.math.vec2(1, 0)
+  local pellet = base:rotate(0.1)
+  lurek.log.debug("pellet dir=" .. pellet.x .. "," .. pellet.y, "combat")
 end
 ```
 
@@ -6115,9 +6071,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local vec2_obj = lurek.math.vec2(0, 0)
-  local t = vec2_obj:type()
-  lurek.log.info("LVec2:type = " .. t, "math")
+  local obj = lurek.math.vec2(1, 0)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LVec2"
 end
 ```
 
@@ -6137,9 +6092,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local vec2_obj = lurek.math.vec2(0, 0)
-  lurek.log.info("is LVec2: " .. tostring(vec2_obj:typeOf("LVec2")), "math")
-  lurek.log.info("is wrong: " .. tostring(vec2_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.vec2(1, 0)
+  lurek.log.debug("typeOf LVec2: " .. tostring(obj:typeOf("LVec2")), "example") -- true
 end
 ```
 
@@ -6155,10 +6109,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Access x component directly via .x field
-  local v = lurek.math.vec2(7, 9)
-  local x = v.x
-  lurek.log.debug("x=" .. x, "math")
+  -- Read the horizontal component of a direction vector.
+  local dir = lurek.math.vec2(0.7, 0.7)
+  lurek.log.debug("dir.x=" .. dir.x, "math")
 end
 ```
 
@@ -6174,10 +6127,9 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- Access y component directly via .y field
-  local v = lurek.math.vec2(7, 9)
-  local y = v.y
-  lurek.log.debug("y=" .. y, "math")
+  -- Read the vertical component for gravity calculations.
+  local gravity = lurek.math.vec2(0, 9.81)
+  lurek.log.debug("gravity.y=" .. gravity.y, "physics")
 end
 ```
 
@@ -6313,9 +6265,10 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
+  -- Measure 3D distance for audio attenuation.
   ---@type LVec3
-  local v = lurek.math.vec3(1, 2, 2)
-  lurek.log.debug("len=" .. v:length(), "math")
+  local pos = lurek.math.vec3(3, 4, 0)
+  lurek.log.debug("3d dist=" .. pos:length(), "audio")
 end
 ```
 
@@ -6399,11 +6352,11 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  -- scale(s) multiplies all components by scalar s. Good for velocity * speed.
+  -- Apply speed to a normalized direction.
   ---@type LVec3
-  local base = lurek.math.vec3(1, 0, 0)
-  local v = base:scale(9.81)
-  lurek.log.debug("scaled.x=" .. v.x, "physics")
+  local dir = lurek.math.vec3(0, 0, 1)
+  local vel = dir:scale(50)
+  lurek.log.debug("velocity z=" .. vel.z, "physics")
 end
 ```
 
@@ -6469,9 +6422,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local vec3_obj = lurek.math.vec3(0, 0, 0)
-  local t = vec3_obj:type()
-  lurek.log.info("LVec3:type = " .. t, "math")
+  local obj = lurek.math.vec3(1, 0, 0)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LVec3"
 end
 ```
 
@@ -6491,9 +6443,8 @@ Exact example from [math.lua](../blob/main/content/examples/math.lua):
 
 ```lua
 do
-  local vec3_obj = lurek.math.vec3(0, 0, 0)
-  lurek.log.info("is LVec3: " .. tostring(vec3_obj:typeOf("LVec3")), "math")
-  lurek.log.info("is wrong: " .. tostring(vec3_obj:typeOf("Unknown")), "math")
+  local obj = lurek.math.vec3(1, 0, 0)
+  lurek.log.debug("typeOf LVec3: " .. tostring(obj:typeOf("LVec3")), "example") -- true
 end
 ```
 

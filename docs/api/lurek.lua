@@ -4829,7 +4829,7 @@ function LDataFrame:entropy(col) end
 
 --- Replaces nil cells in a column with a value.
 ---@param col string Column name string or one-based column index.
----@param val string Replacement cell value.
+---@param val any Replacement cell value.
 function LDataFrame:fillNil(col, val) end
 
 --- Returns rows whose column value matches a comparison.
@@ -5232,7 +5232,7 @@ function LLazyQuery:dropNil(col) end
 --- Adds a filter step to the lazy query.
 ---@param col string Column name to filter.
 ---@param op string Comparison operator string.
----@param val string Filter comparison value.
+---@param val any Filter comparison value.
 ---@return LLazyQuery New lazy query handle with the filter step.
 function LLazyQuery:filter(col, op, val) end
 
@@ -5623,7 +5623,7 @@ lurek.devtools.fatal = function(message) end
 
 --- Returns Lua call stack frames using the Lua debug library.
 ---@param max_depth? number Optional maximum number of frames to return; defaults to 20 and is capped at 100.
----@return string[] Array of frames with source, line, name, and what fields.
+---@return any[] Array of frame tables; each has source (string), line (integer), name (string), and what (string) fields.
 lurek.devtools.getCallStack = function(max_depth) end
 
 --- Returns retained CPU frame duration samples in insertion order.

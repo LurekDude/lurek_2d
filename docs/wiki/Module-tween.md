@@ -122,7 +122,7 @@ do
   end
 end
 
---@api-stub: lurek.tween.tween
+--@api-stub: LTweenParallel:tween
 -- Creates and starts a property tween that smoothly interpolates numeric fields on the target table over the given duration
 do
   -- Fade in a HUD overlay and slide it down from above.
@@ -227,13 +227,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Schedule a callback to fire after a fixed wait time.
-  -- Common for respawn timers, wave countdowns, or delayed sound effects.
-  lurek.tween.delay(1.5, function()
-    lurek.log.info("respawn now", "spawn")
-  end)
-  -- The callback parameter is optional — without it, the delay acts
-  -- as a standalone timer you can :await() from a coroutine.
+  -- Create a tween that waits N seconds before proceeding in a sequence.
+  local pause = lurek.tween.delay(1.5)
+  lurek.log.debug("delay tween: " .. pause:type(), "tween")
 end
 ```
 
@@ -459,13 +455,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Fade in a HUD overlay and slide it down from above.
-  -- The tween modifies the table fields in-place each frame.
-  local hud = { alpha = 0, y = -32 }
-  lurek.tween.tween(0.4, hud, { alpha = 1, y = 0 }, "outQuad")
-  -- Parameters: duration (seconds), target table, end values, easing name.
-  -- The easing parameter is optional — defaults to "linear" if omitted.
-  -- After 0.4 seconds, hud.alpha = 1 and hud.y = 0.
+  local state = { x = 0 }
+  lurek.tween.tween(1.0, state, { x = 100 }, "linear")
+  lurek.log.debug("tween started", "example")
 end
 ```
 
@@ -539,11 +531,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Call once per frame inside lurek.process to drive all tween animations.
-  -- Without this call, no tween will advance regardless of how many you create.
-  function lurek.process(dt)
-    lurek.tween.update(dt)
-  end
+  local obj = {x = 0}
+  lurek.tween.tween(1.0, obj, {x = 100})
+  -- Manually advance the tween by 0.5 s (simulating a frame tick).
+  lurek.tween.update(0.5)
+  lurek.log.debug("x after half-step: " .. string.format("%.1f", obj.x), "tween") -- ~50
 end
 ```
 
@@ -583,11 +575,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Stop following the player when a cutscene starts.
-  local cam = { x = 0 }
-  local sp = lurek.tween.spring(cam, { x = 320 })
-  sp:cancel()
-  -- cam.x freezes at whatever value it reached.
+  -- Cancel interrupts the tween mid-flight; target fields freeze at current values.
+  local target = { x = 0 }
+  local tw = lurek.tween.tween(1.0, target, { x = 100 })
+  tw:cancel()
+  lurek.log.info("tween cancelled, target.x=" .. tostring(target.x), "tween")
 end
 ```
 
@@ -736,9 +728,8 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local cam = { x = 0 }
-  local sp = lurek.tween.spring(cam, { x = 320 })
-  lurek.log.debug("spring type: " .. sp:type(), "tween")  -- "LSpring"
+  local tween_state_obj = lurek.tween.newState(0.5)
+  lurek.log.info("LTweenState:type = " .. tween_state_obj:type(), "tween")
 end
 ```
 
@@ -758,9 +749,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local cam = { x = 0 }
-  local sp = lurek.tween.spring(cam, { x = 320 })
-  lurek.log.info("is Spring: " .. tostring(sp:typeOf("LSpring")), "tween")
+  local tween_state_obj = lurek.tween.newState(0.5)
+  lurek.log.info("is LTweenState: " .. tostring(tween_state_obj:typeOf("LTweenState")), "tween")
+  lurek.log.info("is Object: " .. tostring(tween_state_obj:typeOf("Object")), "tween")
 end
 ```
 
@@ -817,13 +808,12 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Must be called from inside a coroutine.
-  -- Enables sequential async-style animation scripting.
-  local obj = { x = 0 }
-  local tw = lurek.tween.tween(0.2, obj, { x = 1 }, "linear")
+  -- Write sequential animation scripts using coroutines.
+  local badge = { scale = 0 }
+  local tw = lurek.tween.tween(0.3, badge, { scale = 1 }, "outBack")
   local co = coroutine.create(function()
     tw:await()
-    lurek.log.debug("await complete — obj.x is now 1", "tween")
+    lurek.log.debug("badge pop-in done", "ui")
   end)
   coroutine.resume(co)
 end
@@ -839,11 +829,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Cancel interrupts the tween mid-flight; target fields freeze at current values.
-  local target = { x = 0 }
-  local tw = lurek.tween.tween(1.0, target, { x = 100 })
+  local obj = {x = 0}
+  local tw = lurek.tween.to(obj, {x = 100}, 2.0)
+  -- Cancel the tween before it completes.
   tw:cancel()
-  lurek.log.info("tween cancelled, target.x=" .. tostring(target.x), "tween")
+  lurek.log.debug("tween cancelled; obj.x frozen at: " .. obj.x, "tween")
 end
 ```
 
@@ -918,11 +908,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Use progress to drive a visual indicator (loading bar, progress ring).
-  local bar = { fill = 0 }
-  local tw = lurek.tween.tween(2.0, bar, { fill = 1 }, "linear")
-  local p = tw:getProgress()
-  lurek.log.debug("loading=" .. string.format("%.0f%%", p * 100), "ui")
+  -- Use progress to drive a fill indicator alongside the tween.
+  local meter = { fill = 0 }
+  local tw = lurek.tween.tween(1.0, meter, { fill = 1 }, "linear")
+  lurek.tween.update(0.5)
+  lurek.log.debug("meter progress=" .. string.format("%.2f", tw:getProgress()), "ui")
 end
 ```
 
@@ -958,11 +948,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Check if an animation is still in-flight before starting a new one.
-  local card = { y = 0 }
-  local tw = lurek.tween.tween(0.6, card, { y = 200 })
+  -- Guard against starting a new animation while one is in-flight.
+  local hp_bar = { width = 100 }
+  local tw = lurek.tween.tween(0.3, hp_bar, { width = 60 }, "outQuad")
   if tw:isActive() then
-    lurek.log.debug("card still moving — skip new animation", "ui")
+    lurek.log.debug("hp bar animating — skip new tween", "ui")
   end
 end
 ```
@@ -1010,10 +1000,10 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Chain onComplete for fire-and-forget animations with cleanup.
-  local box = { x = 0 }
-  lurek.tween.tween(0.5, box, { x = 100 }, "outQuad"):onComplete(function()
-    lurek.log.debug("box arrived at x=100", "tween")
+  -- Chain a sound effect after a slide animation finishes.
+  local panel = { x = -200 }
+  lurek.tween.tween(0.4, panel, { x = 0 }, "outQuad"):onComplete(function()
+    lurek.log.info("panel arrived — play whoosh", "ui")
   end)
 end
 ```
@@ -1185,9 +1175,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local box = { x = 0 }
-  local tw = lurek.tween.tween(0.5, box, { x = 100 })
-  lurek.log.info("Tween:type = " .. tw:type(), "tween")  -- "LTween"
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(0.5, obj, { x = 10 })
+  lurek.log.info("LTween:type = " .. tw:type(), "tween")
 end
 ```
 
@@ -1207,9 +1197,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local box = { x = 0 }
-  local tw = lurek.tween.tween(0.5, box, { x = 100 })
-  lurek.log.info("is Tween: " .. tostring(tw:typeOf("LTween")), "tween")  -- true
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(0.5, obj, { x = 10 })
+  lurek.log.info("is LTween: " .. tostring(tw:typeOf("LTween")), "tween")
 end
 ```
 
@@ -1271,13 +1261,14 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Stop a multi-property exit animation if the actor is destroyed.
+  -- Abort a multi-property exit animation if the actor respawns.
   local actor = { x = 0, alpha = 1 }
   local par = lurek.tween.parallel()
-    :tween(0.6, actor, { x = 200 })
-    :tween(0.6, actor, { alpha = 0 })
+    :tween(0.6, actor, { x = 300 }, "outQuad")
+    :tween(0.6, actor, { alpha = 0 }, "linear")
     :start()
   par:cancel()
+  lurek.log.debug("parallel cancelled, active=" .. tostring(par:isActive()), "tween")
 end
 ```
 
@@ -1293,14 +1284,14 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Check if the combined animation has finished before proceeding.
+  -- Wait for all simultaneous tweens to finish before spawning loot.
   local actor = { x = 0, alpha = 1 }
   local par = lurek.tween.parallel()
-    :tween(0.6, actor, { x = 200 })
-    :tween(0.6, actor, { alpha = 0 })
+    :tween(0.4, actor, { x = 100 })
+    :tween(0.4, actor, { alpha = 0 })
     :start()
   if par:isActive() then
-    lurek.log.debug("actor exit animation in progress", "scene")
+    lurek.log.debug("death anim in progress — defer loot spawn", "tween")
   end
 end
 ```
@@ -1322,13 +1313,12 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Know exactly when a complex multi-property animation is done.
-  local actor = { x = 0, alpha = 1 }
-  lurek.tween.parallel()
-    :tween(0.6, actor, { x = 200 }, "outQuad")
-    :tween(0.6, actor, { alpha = 0 }, "linear")
+  -- Trigger game logic after the full sequence completes.
+  local door = { y = 0 }
+  lurek.tween.sequence()
+    :tween(0.4, door, { y = 64 })
     :onComplete(function()
-      lurek.log.debug("actor fully exited — safe to despawn", "tween")
+      lurek.log.debug("sequence done — enable player input", "scene")
     end)
     :start()
 end
@@ -1346,13 +1336,13 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Call :start() after building the group to activate it.
-  local pos = { x = 0 }
-  local col = { a = 1.0 }
-  lurek.tween.parallel()
-    :tween(0.4, pos, { x = 100 }, "outQuad")
-    :tween(0.4, col, { a = 0 }, "linear")
-    :start()
+  -- Build the sequence first, then :start() activates it.
+  local door = { y = 0 }
+  local seq = lurek.tween.sequence()
+    :tween(0.4, door, { y = 64 }, "outQuad")
+    :delay(1.0)
+    :tween(0.4, door, { y = 0 }, "inQuad")
+  seq:start()
 end
 ```
 
@@ -1375,11 +1365,11 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Inline syntax for building parallel groups without separate handles.
-  local obj = { x = 0, alpha = 1.0 }
-  lurek.tween.parallel()
-    :tween(0.5, obj, { x = 200 }, "outQuad")
-    :tween(0.5, obj, { alpha = 0.0 }, "linear")
+  -- Each :tween() step runs after the previous one finishes.
+  local pos = { x = 0, y = 0 }
+  lurek.tween.sequence()
+    :tween(0.3, pos, { x = 100 }, "outQuad")   -- step 1: move right
+    :tween(0.3, pos, { y = 80 }, "outQuad")    -- step 2: move down
     :start()
 end
 ```
@@ -1397,7 +1387,7 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 ```lua
 do
   local par = lurek.tween.parallel()
-  lurek.log.info("TweenParallel:type = " .. par:type(), "tween")  -- "LTweenParallel"
+  lurek.log.info("LTweenParallel:type = " .. par:type(), "tween")
 end
 ```
 
@@ -1418,7 +1408,7 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 ```lua
 do
   local par = lurek.tween.parallel()
-  lurek.log.info("is Parallel: " .. tostring(par:typeOf("LTweenParallel")), "tween")
+  lurek.log.info("is LTweenParallel: " .. tostring(par:typeOf("LTweenParallel")), "tween")
 end
 ```
 
@@ -1432,13 +1422,9 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Schedule a callback to fire after a fixed wait time.
-  -- Common for respawn timers, wave countdowns, or delayed sound effects.
-  lurek.tween.delay(1.5, function()
-    lurek.log.info("respawn now", "spawn")
-  end)
-  -- The callback parameter is optional — without it, the delay acts
-  -- as a standalone timer you can :await() from a coroutine.
+  -- Create a tween that waits N seconds before proceeding in a sequence.
+  local pause = lurek.tween.delay(1.5)
+  lurek.log.debug("delay tween: " .. pause:type(), "tween")
 end
 ```
 
@@ -1500,11 +1486,14 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Interrupt a door animation if the player backs away.
-  local door = { y = 0 }
-  local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
+  -- Interrupt a cutscene sequence when the player presses skip.
+  local cam = { x = 0 }
+  local seq = lurek.tween.sequence()
+    :tween(1.0, cam, { x = 200 }, "inOutQuad")
+    :delay(0.5)
+    :start()
   seq:cancel()
-  -- After cancel, seq:isActive() returns false.
+  lurek.log.debug("cutscene skipped, active=" .. tostring(seq:isActive()), "scene")
 end
 ```
 
@@ -1567,11 +1556,13 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Guard against starting overlapping sequences.
+  -- Prevent overlapping door sequences.
   local door = { y = 0 }
-  local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
+  local seq = lurek.tween.sequence()
+    :tween(0.4, door, { y = 64 }, "outQuad")
+    :start()
   if seq:isActive() then
-    lurek.log.debug("door is still opening — wait", "scene")
+    lurek.log.debug("door already opening", "scene")
   end
 end
 ```
@@ -1593,12 +1584,13 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Trigger game logic after the full sequence completes.
-  local door = { y = 0 }
+  -- Enable player input after the intro sequence finishes.
+  local title = { alpha = 0 }
   lurek.tween.sequence()
-    :tween(0.4, door, { y = 64 })
+    :tween(0.6, title, { alpha = 1 }, "outQuad")
+    :delay(1.0)
     :onComplete(function()
-      lurek.log.debug("sequence done — enable player input", "scene")
+      lurek.log.info("intro done — enable input", "scene")
     end)
     :start()
 end
@@ -1616,13 +1608,12 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Build the sequence first, then :start() activates it.
-  local door = { y = 0 }
+  local obj = {x = 0, y = 0}
   local seq = lurek.tween.sequence()
-    :tween(0.4, door, { y = 64 }, "outQuad")
-    :delay(1.0)
-    :tween(0.4, door, { y = 0 }, "inQuad")
+  seq:tween(0.5, obj, {x = 100})
+  seq:tween(0.5, obj, {y = 100})
   seq:start()
+  lurek.log.debug("sequence started", "tween")
 end
 ```
 
@@ -1645,12 +1636,12 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  -- Each :tween() step runs after the previous one finishes.
-  local pos = { x = 0, y = 0 }
-  lurek.tween.sequence()
-    :tween(0.3, pos, { x = 100 }, "outQuad")   -- step 1: move right
-    :tween(0.3, pos, { y = 80 }, "outQuad")    -- step 2: move down
-    :start()
+  local obj = {alpha = 1}
+  local seq = lurek.tween.sequence()
+  -- Chain two tweens: fade out then fade in.
+  seq:tween(0.3, obj, {alpha = 0})
+  seq:tween(0.3, obj, {alpha = 1})
+  lurek.log.debug("sequence has 2 tweens", "tween")
 end
 ```
 
@@ -1667,7 +1658,7 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 ```lua
 do
   local seq = lurek.tween.sequence()
-  lurek.log.info("TweenSequence:type = " .. seq:type(), "tween")  -- "LTweenSequence"
+  lurek.log.info("LTweenSequence:type = " .. seq:type(), "tween")
 end
 ```
 
@@ -1688,7 +1679,7 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 ```lua
 do
   local seq = lurek.tween.sequence()
-  lurek.log.info("is Sequence: " .. tostring(seq:typeOf("LTweenSequence")), "tween")
+  lurek.log.info("is LTweenSequence: " .. tostring(seq:typeOf("LTweenSequence")), "tween")
 end
 ```
 
@@ -1839,8 +1830,8 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local tween_state_obj = lurek.tween.newState(0.5)
-  lurek.log.info("LTweenState:type = " .. tween_state_obj:type(), "tween")
+  local obj = lurek.tween.newState(1.0)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LTweenState"
 end
 ```
 
@@ -1860,9 +1851,8 @@ Exact example from [tween.lua](../blob/main/content/examples/tween.lua):
 
 ```lua
 do
-  local tween_state_obj = lurek.tween.newState(0.5)
-  lurek.log.info("is LTweenState: " .. tostring(tween_state_obj:typeOf("LTweenState")), "tween")
-  lurek.log.info("is Object: " .. tostring(tween_state_obj:typeOf("Object")), "tween")
+  local obj = lurek.tween.newState(1.0)
+  lurek.log.debug("typeOf LTweenState: " .. tostring(obj:typeOf("LTweenState")), "example") -- true
 end
 ```
 

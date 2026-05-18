@@ -123,7 +123,7 @@ Module example from [animation.lua](../blob/main/content/examples/animation.lua)
   end
 end
 
---@api-stub: Animation:crossfade
+--@api-stub: LAnimation:crossfade
 -- Performs the crossfade operation on this animation.
 do
   -- crossfade() smoothly blends from the current clip to a new clip over a duration.
@@ -147,7 +147,7 @@ end
 -- LAnimation methods — query state
 -- =============================================================================
 
---@api-stub: Animation:getQuad
+--@api-stub: LAnimStateMachine:getQuad
 -- Returns the quad of this animation.
 do
   -- getQuad() returns the current frame's texture rectangle as {x, y, w, h}.
@@ -874,19 +874,16 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  -- getQuad() returns the current frame's texture rectangle as {x, y, w, h}.
-  -- Use this to set the source rect when drawing a sprite with lurek.render.
+  -- getQuad() returns {x, y, w, h} for the active frame in the spritesheet.
+  -- Use this as the source rectangle when drawing the sprite.
   local anim = lurek.animation.new()
-  anim:addFrame(0, 0, 32, 32)
-  anim:addFrame(32, 0, 32, 32)
+  anim:addFrame(0, 0, 48, 48)
+  anim:addFrame(48, 0, 48, 48)
   anim:addClip("idle", {0, 1}, 4, true)
   anim:play("idle")
-
-  -- In your draw callback, read the current quad for the sprite source rect.
   local q = anim:getQuad()
   if q then
-    -- q.x, q.y = top-left corner in spritesheet; q.w, q.h = frame dimensions
-    lurek.log.debug("drawing frame at (" .. q.x .. "," .. q.y .. ") size " .. q.w .. "x" .. q.h, "anim")
+    lurek.log.debug("frame rect: " .. q.x .. "," .. q.y .. " " .. q.w .. "x" .. q.h, "anim")
   end
 end
 ```
@@ -1204,9 +1201,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local anim = lurek.animation.new()
-  local t = anim:type()
-  lurek.log.info("LAnimation:type = " .. t, "animation")  -- "LAnimation"
+  local obj = lurek.animation.new()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LAnimation"
 end
 ```
 
@@ -1226,11 +1222,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local anim = lurek.animation.new()
-  -- typeOf() checks against "LAnimation" and the generic "Object" base.
-  lurek.log.info("is LAnimation: " .. tostring(anim:typeOf("LAnimation")), "animation")
-  lurek.log.info("is Object: " .. tostring(anim:typeOf("Object")), "animation")
-  lurek.log.info("is wrong: " .. tostring(anim:typeOf("Unknown")), "animation")
+  local obj = lurek.animation.new()
+  lurek.log.debug("typeOf LAnimation: " .. tostring(obj:typeOf("LAnimation")), "example") -- true
 end
 ```
 
@@ -1248,18 +1241,15 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  -- Call update(dt) every frame to advance the animation clock.
-  -- This drives frame switching based on the clip's FPS setting.
+  -- Call update(dt) each frame to advance the animation clock.
+  -- This drives frame transitions based on the clip's configured FPS.
   local anim = lurek.animation.new()
   anim:addFrame(0, 0, 32, 32)
   anim:addFrame(32, 0, 32, 32)
-  anim:addClip("walk", {0, 1}, 8, true)
-  anim:play("walk")
-
-  -- In your game loop, pass the frame delta time from lurek.process().
-  function lurek.process(dt)
-    anim:update(dt)
-  end
+  anim:addClip("run", {0, 1}, 10, true)
+  anim:play("run")
+  anim:update(0.016)
+  lurek.log.debug("animation advanced by 16ms", "anim")
 end
 ```
 
@@ -1324,15 +1314,13 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  -- clear() removes all keyframes, resetting the curve for reuse.
+  -- Reset a reusable curve when transitioning between levels.
+  -- After clear(), the curve has zero keyframes and eval() returns 0.
   local curve = lurek.animation.newCurve()
-  curve:addKeyframe(0.0, 0.5)
-  curve:addKeyframe(1.0, 1.0)
-
-  -- Rebuild the curve with new control points (e.g., difficulty changed).
+  curve:addKeyframe(0.0, 1.0)
+  curve:addKeyframe(1.0, 5.0)
   curve:clear()
-  curve:addKeyframe(0.0, 0.0)
-  curve:addKeyframe(2.0, 1.0)  -- slower ramp for easier difficulty
+  lurek.log.info("curve cleared, ready for new keyframes", "anim")
 end
 ```
 
@@ -1461,9 +1449,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local curve = lurek.animation.newCurve()
-  local t = curve:type()
-  lurek.log.info("LAnimCurve:type = " .. t, "animation")  -- "LAnimCurve"
+  local obj = lurek.animation.newCurve()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LAnimCurve"
 end
 ```
 
@@ -1483,10 +1470,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local curve = lurek.animation.newCurve()
-  lurek.log.info("is LAnimCurve: " .. tostring(curve:typeOf("LAnimCurve")), "animation")
-  lurek.log.info("is Object: " .. tostring(curve:typeOf("Object")), "animation")
-  lurek.log.info("is wrong: " .. tostring(curve:typeOf("Unknown")), "animation")
+  local obj = lurek.animation.newCurve()
+  lurek.log.debug("typeOf LAnimCurve: " .. tostring(obj:typeOf("LAnimCurve")), "example") -- true
 end
 ```
 
@@ -1724,9 +1709,9 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local fsm = lurek.animation.newStateMachine(lurek.animation.new(), "idle")
-  local t = fsm:type()
-  lurek.log.info("LAnimStateMachine:type = " .. t, "animation")  -- "LAnimStateMachine"
+  local anim = lurek.animation.new()
+  local obj = lurek.animation.newStateMachine(anim, 'idle')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LAnimStateMachine"
 end
 ```
 
@@ -1746,10 +1731,9 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local fsm = lurek.animation.newStateMachine(lurek.animation.new(), "idle")
-  lurek.log.info("is LAnimStateMachine: " .. tostring(fsm:typeOf("LAnimStateMachine")), "animation")
-  lurek.log.info("is Object: " .. tostring(fsm:typeOf("Object")), "animation")
-  lurek.log.info("is wrong: " .. tostring(fsm:typeOf("Unknown")), "animation")
+  local anim = lurek.animation.new()
+  local obj = lurek.animation.newStateMachine(anim, 'idle')
+  lurek.log.debug("typeOf LAnimStateMachine: " .. tostring(obj:typeOf("LAnimStateMachine")), "example") -- true
 end
 ```
 
@@ -2164,9 +2148,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local bls = lurek.animation.newBlendLayerSet()
-  local t = bls:type()
-  lurek.log.info("LBlendLayerSet:type = " .. t, "animation")  -- "LBlendLayerSet"
+  local obj = lurek.animation.newBlendLayerSet()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LBlendLayerSet"
 end
 ```
 
@@ -2186,10 +2169,8 @@ Exact example from [animation.lua](../blob/main/content/examples/animation.lua):
 
 ```lua
 do
-  local bls = lurek.animation.newBlendLayerSet()
-  lurek.log.info("is LBlendLayerSet: " .. tostring(bls:typeOf("LBlendLayerSet")), "animation")
-  lurek.log.info("is Object: " .. tostring(bls:typeOf("Object")), "animation")
-  lurek.log.info("is wrong: " .. tostring(bls:typeOf("Unknown")), "animation")
+  local obj = lurek.animation.newBlendLayerSet()
+  lurek.log.debug("typeOf LBlendLayerSet: " .. tostring(obj:typeOf("LBlendLayerSet")), "example") -- true
 end
 ```
 

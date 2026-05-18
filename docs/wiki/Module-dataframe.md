@@ -53,11 +53,11 @@
   - [LDataFrame:dropNil(col: string) -> LDataFrame](#ldataframedropnilcol-string-ldataframe)
   - [LDataFrame:entropy(col: string) -> number](#ldataframeentropycol-string-number)
   - [LDataFrame:fillNil(col: string, val: any)](#ldataframefillnilcol-string-val-any)
-  - [LDataFrame:filter(col: string, op: string, val: any) -> LDataFrame](#ldataframefiltercol-string-op-string-val-any-ldataframe)
-  - [LDataFrame:getColumn(col: string) -> number[]](#ldataframegetcolumncol-string-number)
+  - [LDataFrame:filter(col: any, op: string, val: any) -> LDataFrame](#ldataframefiltercol-any-op-string-val-any-ldataframe)
+  - [LDataFrame:getColumn(col: any) -> number[]](#ldataframegetcolumncol-any-number)
   - [LDataFrame:getColumnAsF64(col: string) -> number[]](#ldataframegetcolumnasf64col-string-number)
   - [LDataFrame:getRow(row: integer) -> table](#ldataframegetrowrow-integer-table)
-  - [LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil](#ldataframegetvaluerow-integer-col-string-numberstringbooleannil)
+  - [LDataFrame:getValue(row: integer, col: any) -> number|string|boolean|nil](#ldataframegetvaluerow-integer-col-any-numberstringbooleannil)
   - [LDataFrame:groupAgg(group_col: string, agg_col: string, fn_name: string) -> LDataFrame](#ldataframegroupagggroupcol-string-aggcol-string-fnname-string-ldataframe)
   - [LDataFrame:groupBy(col: string) -> table](#ldataframegroupbycol-string-table)
   - [LDataFrame:groupByObj(col: string) -> LGroupedFrame](#ldataframegroupbyobjcol-string-lgroupedframe)
@@ -78,18 +78,18 @@
   - [LDataFrame:pivotTable(row_key: string, col_key: string, value_key: string, [agg]: string) -> LDataFrame](#ldataframepivottablerowkey-string-colkey-string-valuekey-string-agg-string-ldataframe)
   - [LDataFrame:query(sql_str: string) -> LDataFrame](#ldataframequerysqlstr-string-ldataframe)
   - [LDataFrame:rank(col: string, [order]: string, [result_col]: string) -> LDataFrame](#ldataframerankcol-string-order-string-resultcol-string-ldataframe)
-  - [LDataFrame:removeColumn(col: string)](#ldataframeremovecolumncol-string)
+  - [LDataFrame:removeColumn(col: any)](#ldataframeremovecolumncol-any)
   - [LDataFrame:removeRow(row: integer)](#ldataframeremoverowrow-integer)
-  - [LDataFrame:rename(col: string, new_name: string)](#ldataframerenamecol-string-newname-string)
+  - [LDataFrame:rename(col: any, new_name: string)](#ldataframerenamecol-any-newname-string)
   - [LDataFrame:rollingMean(col: string, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingmeancol-string-window-integer-resultcol-string-ldataframe)
   - [LDataFrame:rollingSum(col: string, window: integer, [result_col]: string) -> LDataFrame](#ldataframerollingsumcol-string-window-integer-resultcol-string-ldataframe)
   - [LDataFrame:rows() -> function](#ldataframerows-function)
   - [LDataFrame:sample(n: integer, [seed]: integer) -> LDataFrame](#ldataframesamplen-integer-seed-integer-ldataframe)
-  - [LDataFrame:select(...: string) -> LDataFrame](#ldataframeselect-string-ldataframe)
+  - [LDataFrame:select(...: any) -> LDataFrame](#ldataframeselect-any-ldataframe)
   - [LDataFrame:setColumnFromF64(col: string, values: table)](#ldataframesetcolumnfromf64col-string-values-table)
-  - [LDataFrame:setValue(row: integer, col: string, val: any)](#ldataframesetvaluerow-integer-col-string-val-any)
+  - [LDataFrame:setValue(row: integer, col: any, val: any)](#ldataframesetvaluerow-integer-col-any-val-any)
   - [LDataFrame:slice(start: integer, end: integer) -> LDataFrame](#ldataframeslicestart-integer-end-integer-ldataframe)
-  - [LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame](#ldataframesortcol-string-ascending-boolean-ldataframe)
+  - [LDataFrame:sort(col: any, [ascending]: boolean) -> LDataFrame](#ldataframesortcol-any-ascending-boolean-ldataframe)
   - [LDataFrame:stddev(col: string) -> number](#ldataframestddevcol-string-number)
   - [LDataFrame:sum(col: string) -> number](#ldataframesumcol-string-number)
   - [LDataFrame:tail([n]: integer) -> LDataFrame](#ldataframetailn-integer-ldataframe)
@@ -100,7 +100,7 @@
   - [LDataFrame:toTable() -> table](#ldataframetotable-table)
   - [LDataFrame:type() -> string](#ldataframetype-string)
   - [LDataFrame:typeOf(name: string) -> boolean](#ldataframetypeofname-string-boolean)
-  - [LDataFrame:unique(col: string) -> number[]](#ldataframeuniquecol-string-number)
+  - [LDataFrame:unique(col: any) -> number[]](#ldataframeuniquecol-any-number)
   - [LDataFrame:variance(col: string) -> number](#ldataframevariancecol-string-number)
   - [LDataFrame:withCumsum(col: string, name: string)](#ldataframewithcumsumcol-string-name-string)
   - [LDataFrame:withEval(col_name: string, expr: string) -> LDataFrame](#ldataframewithevalcolname-string-expr-string-ldataframe)
@@ -850,10 +850,9 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
+  -- Identify handle type in a debug inspector.
   local db = lurek.dataframe.newDatabase()
-  if db:type() == "Database" then
-    lurek.log.info("confirmed: this is a Database handle")
-  end
+  lurek.log.debug("db type: " .. db:type())
 end
 ```
 
@@ -873,11 +872,9 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- typeOf checks against "LDatabase", "Database", or "Object".
+  -- Type-guard before running database-specific operations.
   local db = lurek.dataframe.newDatabase()
-  if db:typeOf("Object") then
-    lurek.log.info("Database is an Object")
-  end
+  if db:typeOf("LDatabase") then lurek.log.debug("confirmed LDatabase") end
 end
 ```
 
@@ -1063,15 +1060,12 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- columns() gives you the schema as a string array.
-  -- Useful for rendering table headers or validating imported data.
-  local df = lurek.dataframe.fromTable({{hp = 100, mp = 50, stamina = 80}})
-  local headers = df:columns()
-
-  -- headers = {"hp", "mp", "stamina"} (order matches creation)
-  for _, name in ipairs(headers) do
-    lurek.log.info("stat: " .. name)
-  end
+  -- List columns for a debug table header in the inventory UI.
+  local df = lurek.dataframe.fromTable({
+    { id = 1, name = "Potion", qty = 5 },
+  })
+  local cols = df:columns()
+  lurek.log.debug("columns: " .. table.concat(cols, ", "))
 end
 ```
 
@@ -1218,17 +1212,14 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- dropNil filters out incomplete records.
-  -- Common when optional fields are missing for some entries.
-  local survey = lurek.dataframe.fromTable({
-    {player = "Alice", rating = 5},
-    {player = "Bob", rating = nil},   -- Bob didn't answer
-    {player = "Cara", rating = 4},
+  -- Remove loot entries with no rarity assigned before display.
+  local df = lurek.dataframe.fromTable({
+    { item = "Gem", rarity = "rare" },
+    { item = "Rock", rarity = nil },
+    { item = "Ring", rarity = "epic" },
   })
-
-  -- Only process rows where rating is present
-  local valid = survey:dropNil("rating")
-  lurek.log.info("valid responses: " .. valid:nrows())
+  local clean = df:dropNil("rarity")
+  lurek.log.debug("valid loot rows: " .. clean:nrows())
 end
 ```
 
@@ -1290,13 +1281,13 @@ do
 end
 ```
 
-### `LDataFrame:filter(col: string, op: string, val: any) -> LDataFrame`
+### `LDataFrame:filter(col: any, op: string, val: any) -> LDataFrame`
 
 Returns rows whose column value matches a comparison.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 - `op` (`string`, required) - Comparison operator string.
 - `val` (`any`, required) - Cell value used as the comparison target.
 
@@ -1308,26 +1299,24 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- filter() creates a subset based on a comparison.
-  -- Supported ops: "==", "!=", ">", ">=", "<", "<=".
-  local players = lurek.dataframe.newDataFrame()
-  players:addRow({name = "Alice", level = 20})
-  players:addRow({name = "Bob", level = 5})
-  players:addRow({name = "Cara", level = 35})
-
-  -- Find high-level players for the raid
-  local raiders = players:filter("level", ">=", 15)
-  lurek.log.info("raid-eligible: " .. raiders:nrows() .. " players")
+  -- Filter enemies whose HP is above a threshold for boss-wave selection.
+  local df = lurek.dataframe.fromTable({
+    { enemy = "Goblin", hp = 30 },
+    { enemy = "Orc", hp = 80 },
+    { enemy = "Dragon", hp = 500 },
+  })
+  local strong = df:filter("hp", ">", 50)
+  lurek.log.info("strong enemies: " .. strong:nrows())
 end
 ```
 
-### `LDataFrame:getColumn(col: string) -> number[]`
+### `LDataFrame:getColumn(col: any) -> number[]`
 
 Returns a column as an array table. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 
 **Returns**: `number[]` - Array table of column values.
 
@@ -1406,14 +1395,14 @@ do
 end
 ```
 
-### `LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil`
+### `LDataFrame:getValue(row: integer, col: any) -> number|string|boolean|nil`
 
 Returns one cell value by one-based row and column reference.
 
 **Parameters**
 
 - `row` (`integer`, required) - One-based row index.
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 
 **Returns**: `number|string|boolean|nil` - Cell value at the requested row and column.
 
@@ -1551,12 +1540,15 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- head() is useful for previewing large datasets or showing "top N" results.
-  local scores = lurek.dataframe.random({{"rank", "id"}, {"score", "int"}}, 100, 1)
-
-  -- Preview the first 3 entries
-  local top3 = scores:head(3)
-  lurek.log.info("top 3 preview:\n" .. top3:toString())
+  -- Preview the first 3 inventory items for a quick tooltip.
+  local df = lurek.dataframe.fromTable({
+    { item = "Sword", qty = 1 },
+    { item = "Shield", qty = 1 },
+    { item = "Potion", qty = 5 },
+    { item = "Arrow", qty = 20 },
+  })
+  local preview = df:head(3)
+  lurek.log.debug("preview rows: " .. preview:nrows())
 end
 ```
 
@@ -1720,14 +1712,15 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- merge() concatenates two frames vertically.
-  -- Use it to combine data from multiple sources (e.g., round results).
-  local round1 = lurek.dataframe.fromTable({{player = "Alice", score = 500}})
-  local round2 = lurek.dataframe.fromTable({{player = "Alice", score = 700}})
-
-  -- Combine both rounds into a single history
-  round1:merge(round2)
-  lurek.log.info("total records after merge: " .. round1:nrows())
+  -- Merge wave-1 and wave-2 enemy lists into a combined spawn table.
+  local wave1 = lurek.dataframe.fromTable({
+    { enemy = "Goblin", hp = 30 },
+  })
+  local wave2 = lurek.dataframe.fromTable({
+    { enemy = "Orc", hp = 80 },
+  })
+  wave1:merge(wave2)
+  lurek.log.info("combined spawn count: " .. wave1:nrows())
 end
 ```
 
@@ -1802,14 +1795,11 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- ncols tells you how wide the schema is.
-  -- Useful for dynamic rendering (e.g., how many columns to draw in a HUD table).
-  local df = lurek.dataframe.fromTable({{x = 1, y = 2, z = 3, w = 4}})
-
-  -- Iterate columns by index to build dynamic headers
-  for i = 1, df:ncols() do
-    lurek.log.info("column " .. i .. " = " .. df:columns()[i])
-  end
+  -- Verify column count matches the expected schema.
+  local df = lurek.dataframe.fromTable({
+    { name = "Sword", damage = 12, weight = 3 },
+  })
+  lurek.log.debug("item schema cols: " .. df:ncols())
 end
 ```
 
@@ -1855,13 +1845,13 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- Use nrows to check if a dataframe has data before processing
-  local df = lurek.dataframe.fromTable({{name = "Alice"}, {name = "Bob"}, {name = "Cara"}})
-
-  -- Common pattern: guard against empty frames before accessing values
-  if df:nrows() > 0 then
-    lurek.log.info("first player: " .. df:getValue(1, "name"))
-  end
+  -- Check row count after loading player stats for a leaderboard.
+  local df = lurek.dataframe.fromTable({
+    { name = "Alice", score = 950 },
+    { name = "Bob", score = 870 },
+    { name = "Carol", score = 1020 },
+  })
+  lurek.log.info("leaderboard rows: " .. df:nrows())
 end
 ```
 
@@ -1974,17 +1964,14 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- query() lets you use SQL syntax for complex filtering and projection.
-  -- The dataframe is exposed as table "t" in the SQL context.
-  local players = lurek.dataframe.fromTable({
-    {name = "Alice", hp = 80, level = 12},
-    {name = "Bob", hp = 20, level = 5},
-    {name = "Cara", hp = 45, level = 8},
+  -- Query items worth more than 100 gold using SQL syntax.
+  local df = lurek.dataframe.fromTable({
+    { item = "Sword", gold = 150 },
+    { item = "Stick", gold = 5 },
+    { item = "Shield", gold = 120 },
   })
-
-  -- Find players with low HP who might need healing
-  local wounded = players:query("SELECT name, hp FROM t WHERE hp < 50")
-  lurek.log.info("wounded players: " .. wounded:nrows())
+  local expensive = df:query("SELECT * WHERE gold > 100")
+  lurek.log.info("expensive items: " .. expensive:nrows())
 end
 ```
 
@@ -2019,13 +2006,13 @@ do
 end
 ```
 
-### `LDataFrame:removeColumn(col: string)`
+### `LDataFrame:removeColumn(col: any)`
 
 Removes a column by name or one-based index.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 
 #### Example
 
@@ -2074,13 +2061,13 @@ do
 end
 ```
 
-### `LDataFrame:rename(col: string, new_name: string)`
+### `LDataFrame:rename(col: any, new_name: string)`
 
 Renames a column by name or one-based index.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 - `new_name` (`string`, required) - New column name.
 
 #### Example
@@ -2215,13 +2202,13 @@ do
 end
 ```
 
-### `LDataFrame:select(...: string) -> LDataFrame`
+### `LDataFrame:select(...: any) -> LDataFrame`
 
 Returns a dataframe with selected columns.
 
 **Parameters**
 
-- `...` (`string`, required) - Column name strings or one-based column indices to keep.
+- `...` (`any`, required) - Column name strings or one-based column indices to keep.
 
 **Returns**: `LDataFrame` - New dataframe containing selected columns.
 
@@ -2231,15 +2218,13 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- select() projects specific columns, discarding the rest.
-  -- Useful for creating a "view" that only shows relevant fields.
-  local full_data = lurek.dataframe.fromTable({
-    {name = "Alice", hp = 80, mp = 30, x = 12.5, y = -3.2, internal_state = 7},
+  -- Extract only name and score for the leaderboard display.
+  local df = lurek.dataframe.fromTable({
+    { name = "Alice", score = 950, guild = "Knights" },
+    { name = "Bob", score = 870, guild = "Mages" },
   })
-
-  -- HUD only needs name, hp, mp -- hide position and internal data
-  local hud_view = full_data:select("name", "hp", "mp")
-  lurek.log.info(hud_view:toString())
+  local view = df:select("name", "score")
+  lurek.log.debug("selected cols: " .. view:ncols())
 end
 ```
 
@@ -2268,14 +2253,14 @@ do
 end
 ```
 
-### `LDataFrame:setValue(row: integer, col: string, val: any)`
+### `LDataFrame:setValue(row: integer, col: any, val: any)`
 
 Sets one cell value by one-based row and column reference.
 
 **Parameters**
 
 - `row` (`integer`, required) - One-based row index.
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 - `val` (`any`, required) - Cell value to store.
 
 #### Example
@@ -2311,23 +2296,23 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- slice(start, end) extracts a range of rows. Both indices are inclusive.
-  -- Great for pagination in a UI list.
-  local all_items = lurek.dataframe.random({{"id", "id"}, {"name", "name"}, {"price", "int"}}, 100, 2)
-
-  -- Page 2 of a 10-items-per-page list: rows 11 through 20
-  local page2 = all_items:slice(11, 20)
-  lurek.log.info("page 2 has " .. page2:nrows() .. " items")
+  -- Paginate crafting recipes: show page 2 (rows 4-6).
+  local df = lurek.dataframe.fromTable({
+    { recipe = "Sword" }, { recipe = "Shield" }, { recipe = "Bow" },
+    { recipe = "Staff" }, { recipe = "Helm" }, { recipe = "Boots" },
+  })
+  local page2 = df:slice(4, 6)
+  lurek.log.debug("page 2 recipes: " .. page2:nrows())
 end
 ```
 
-### `LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame`
+### `LDataFrame:sort(col: any, [ascending]: boolean) -> LDataFrame`
 
 Returns rows sorted by a column. This method is available to Lua scripts.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 - `ascending` (`boolean`, optional) - True for ascending order; defaults to true.
 
 **Returns**: `LDataFrame` - New sorted dataframe.
@@ -2338,15 +2323,14 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- sort() orders rows by a column. Use for leaderboards, priority queues, etc.
-  local df = lurek.dataframe.newDataFrame()
-  df:addRow({name = "Cara", score = 80})
-  df:addRow({name = "Alice", score = 95})
-  df:addRow({name = "Bob", score = 60})
-
-  -- Sort descending for a high-score list
-  local leaderboard = df:sort("score", false)
-  lurek.log.info("1st place: " .. leaderboard:getValue(1, "name"))
+  -- Sort highscores descending for display.
+  local df = lurek.dataframe.fromTable({
+    { name = "Alice", score = 950 },
+    { name = "Bob", score = 1200 },
+    { name = "Carol", score = 870 },
+  })
+  local sorted = df:sort("score", false)
+  lurek.log.info("top scorer row count: " .. sorted:nrows())
 end
 ```
 
@@ -2419,12 +2403,15 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- tail() shows the most recent entries. Ideal for event logs or chat history.
-  local events = lurek.dataframe.random({{"timestamp", "int"}, {"event", "name"}}, 50, 7)
-
-  -- Show the 5 most recent events
-  local recent = events:tail(5)
-  lurek.log.info("recent events:\n" .. recent:toString())
+  -- Show the most recent combat log entries.
+  local df = lurek.dataframe.fromTable({
+    { turn = 1, action = "attack" },
+    { turn = 2, action = "defend" },
+    { turn = 3, action = "heal" },
+    { turn = 4, action = "flee" },
+  })
+  local recent = df:tail(2)
+  lurek.log.debug("recent log rows: " .. recent:nrows())
 end
 ```
 
@@ -2491,15 +2478,13 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- toJSON produces a JSON string for web API output or inter-process communication.
-  local save_data = lurek.dataframe.fromTable({
-    {slot = 1, name = "World 1", playtime = 3600},
-    {slot = 2, name = "World 2", playtime = 1200},
+  -- Export save-game stats to a JSON string for cloud sync.
+  local df = lurek.dataframe.fromTable({
+    { stat = "playtime", value = 3600 },
+    { stat = "deaths", value = 7 },
   })
-
-  local json = save_data:toJSON()
-  if lurek.fs then lurek.fs.write("save/slots.json", json) end
-  lurek.log.info("exported JSON: " .. #json .. " bytes")
+  local json = df:toJSON()
+  lurek.log.debug("json length: " .. #json)
 end
 ```
 
@@ -2565,11 +2550,9 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- type() and typeOf() let you do runtime type checking on dataframe handles.
-  local df = lurek.dataframe.newDataFrame()
-  if df:type() == "DataFrame" then
-    lurek.log.info("confirmed: this is a DataFrame handle")
-  end
+  -- Identify handle type in a debug inspector.
+  local df = lurek.dataframe.fromTable({ { x = 1 } })
+  lurek.log.debug("df type: " .. df:type())
 end
 ```
 
@@ -2589,22 +2572,19 @@ Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- typeOf checks against "LDataFrame", "DataFrame", or "Object".
-  -- Useful for generic functions that accept multiple handle types.
-  local df = lurek.dataframe.newDataFrame()
-  if df:typeOf("Object") then
-    lurek.log.info("DataFrame is an Object (all handles are)")
-  end
+  -- Type-guard before calling dataframe-specific methods.
+  local df = lurek.dataframe.fromTable({ { x = 1 } })
+  if df:typeOf("LDataFrame") then lurek.log.debug("confirmed LDataFrame") end
 end
 ```
 
-### `LDataFrame:unique(col: string) -> number[]`
+### `LDataFrame:unique(col: any) -> number[]`
 
 Returns unique values from a column.
 
 **Parameters**
 
-- `col` (`string`, required) - Column name string or one-based column index.
+- `col` (`any`, required) - Column name string or one-based column index.
 
 **Returns**: `number[]` - Array table of unique values.
 
@@ -2977,57 +2957,18 @@ Returns the Lua-visible type name for this grouped frame handle.
 
 #### Example
 
-Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
--- content/examples/dataframe.lua
--- lurek.dataframe API examples: tabular data for analytics, leaderboards, item databases, and stat tracking.
--- Run: cargo run -- content/examples/dataframe.lua
-
---@api-stub: lurek.dataframe.newDataFrame
--- Creates an empty dataframe with no columns or rows
 do
-  -- Use newDataFrame when you need to build a table incrementally at runtime,
-  -- such as tracking player session stats as events come in.
-  local stats = lurek.dataframe.newDataFrame()
-
-  -- Define the schema: each addColumn call creates a named column with a default value.
-  -- The default is used when a row is added without specifying that column.
-  stats:addColumn("name", "")
-  stats:addColumn("score", 0)
-  stats:addColumn("deaths", 0)
-
-  -- Add rows as the session progresses
-  stats:addRow({name = "Alice", score = 1200, deaths = 3})
-  stats:addRow({name = "Bob", score = 980, deaths = 5})
-
-  -- The dataframe now has 2 rows and 3 columns
-  lurek.log.info("session stats: " .. stats:nrows() .. " players tracked")
+  -- Identify handle type in a debug inspector.
+  local df = lurek.dataframe.fromTable({
+    { team = "red", score = 10 },
+    { team = "blue", score = 20 },
+  })
+  local grouped = df:groupByObj("team")
+  lurek.log.debug("grouped type: " .. grouped:type())
 end
-
---@api-stub: lurek.dataframe.newDatabase
--- Creates an empty dataframe database for managing multiple named tables
-do
-  -- A Database groups related dataframes under string keys.
-  -- Use it to organize game data: one table for players, one for items, one for quests, etc.
-  local db = lurek.dataframe.newDatabase()
-
-  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice", level = 12}})
-  local items = lurek.dataframe.fromTable({{id = 1, name = "Iron Sword", dmg = 15}})
-
-  -- Register tables by name for later retrieval or SQL-style cross-table queries
-  db:addTable("players", players)
-  db:addTable("items", items)
-
-  lurek.log.info("database has " .. db:tableCount() .. " tables")
-end
-
---@api-stub: lurek.dataframe.fromTable
--- Creates a dataframe from an array of row tables (most common constructor)
-do
-  -- fromTable is the fastest way to create a dataframe from existing Lua data.
-  -- Each element is a table mapping column names to values.
-  -- All rows should share the same keys; missing keys become nil.
 ```
 
 ### `LGroupedFrame:typeOf(name: string) -> boolean`
@@ -3042,57 +2983,18 @@ Returns whether this grouped frame handle matches a supported type name.
 
 #### Example
 
-Module-level example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
--- content/examples/dataframe.lua
--- lurek.dataframe API examples: tabular data for analytics, leaderboards, item databases, and stat tracking.
--- Run: cargo run -- content/examples/dataframe.lua
-
---@api-stub: lurek.dataframe.newDataFrame
--- Creates an empty dataframe with no columns or rows
 do
-  -- Use newDataFrame when you need to build a table incrementally at runtime,
-  -- such as tracking player session stats as events come in.
-  local stats = lurek.dataframe.newDataFrame()
-
-  -- Define the schema: each addColumn call creates a named column with a default value.
-  -- The default is used when a row is added without specifying that column.
-  stats:addColumn("name", "")
-  stats:addColumn("score", 0)
-  stats:addColumn("deaths", 0)
-
-  -- Add rows as the session progresses
-  stats:addRow({name = "Alice", score = 1200, deaths = 3})
-  stats:addRow({name = "Bob", score = 980, deaths = 5})
-
-  -- The dataframe now has 2 rows and 3 columns
-  lurek.log.info("session stats: " .. stats:nrows() .. " players tracked")
+  -- Type-guard before calling grouped-frame aggregation methods.
+  local df = lurek.dataframe.fromTable({
+    { team = "red", score = 10 },
+    { team = "blue", score = 20 },
+  })
+  local grouped = df:groupByObj("team")
+  if grouped:typeOf("LGroupedFrame") then lurek.log.debug("confirmed LGroupedFrame") end
 end
-
---@api-stub: lurek.dataframe.newDatabase
--- Creates an empty dataframe database for managing multiple named tables
-do
-  -- A Database groups related dataframes under string keys.
-  -- Use it to organize game data: one table for players, one for items, one for quests, etc.
-  local db = lurek.dataframe.newDatabase()
-
-  local players = lurek.dataframe.fromTable({{id = 1, name = "Alice", level = 12}})
-  local items = lurek.dataframe.fromTable({{id = 1, name = "Iron Sword", dmg = 15}})
-
-  -- Register tables by name for later retrieval or SQL-style cross-table queries
-  db:addTable("players", players)
-  db:addTable("items", items)
-
-  lurek.log.info("database has " .. db:tableCount() .. " tables")
-end
-
---@api-stub: lurek.dataframe.fromTable
--- Creates a dataframe from an array of row tables (most common constructor)
-do
-  -- fromTable is the fastest way to create a dataframe from existing Lua data.
-  -- Each element is a table mapping column names to values.
-  -- All rows should share the same keys; missing keys become nil.
 ```
 
 ### `LLazyQuery`
@@ -3158,17 +3060,17 @@ Executes the lazy query and returns a dataframe.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- LLazyQuery is not directly constructable; lazy evaluation is achieved
-  -- via RingBuffer:toTable() or Lua table iteration.
-  -- toTable() materializes all stored values into a plain Lua array table.
-  local rb = lurek.data.newRingBuffer(8)
-  rb:push(10); rb:push(20); rb:push(30)
-  local result = rb:toTable()
-  lurek.log.info("collected " .. #result .. " items", "data")
+  -- Materialize a lazy query into a concrete dataframe for rendering.
+  local df = lurek.dataframe.fromTable({
+    { item = "Sword", gold = 150 },
+    { item = "Stick", gold = 5 },
+  })
+  local result = df:lazy():limit(10):collect()
+  lurek.log.info("collected rows: " .. result:nrows())
 end
 ```
 
@@ -3184,17 +3086,21 @@ Adds a step that drops rows with nil values in a column.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- Equivalent: filter a table to remove nil-equivalent sentinels (using 0 as sentinel).
-  local items = {1, 0, 3, 0, 5}
-  local non_zero = {}
-  for _, v in ipairs(items) do
-    if v ~= 0 then non_zero[#non_zero + 1] = v end
-  end
-  lurek.log.info("non-zero count=" .. #non_zero, "data")
+  -- dropNil filters out incomplete records.
+  -- Common when optional fields are missing for some entries.
+  local survey = lurek.dataframe.fromTable({
+    {player = "Alice", rating = 5},
+    {player = "Bob", rating = nil},   -- Bob didn't answer
+    {player = "Cara", rating = 4},
+  })
+
+  -- Only process rows where rating is present
+  local valid = survey:dropNil("rating")
+  lurek.log.info("valid responses: " .. valid:nrows())
 end
 ```
 
@@ -3212,17 +3118,20 @@ Adds a filter step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- filter keeps only values where the predicate returns true
-  local entities = {10, 25, 5, 40, 15}
-  local above20 = {}
-  for _, hp in ipairs(entities) do
-    if hp > 20 then above20[#above20 + 1] = hp end
-  end
-  lurek.log.info("above 20 hp: " .. #above20 .. " entities", "data")
+  -- filter() creates a subset based on a comparison.
+  -- Supported ops: "==", "!=", ">", ">=", "<", "<=".
+  local players = lurek.dataframe.newDataFrame()
+  players:addRow({name = "Alice", level = 20})
+  players:addRow({name = "Bob", level = 5})
+  players:addRow({name = "Cara", level = 35})
+
+  -- Find high-level players for the raid
+  local raiders = players:filter("level", ">=", 15)
+  lurek.log.info("raid-eligible: " .. raiders:nrows() .. " players")
 end
 ```
 
@@ -3238,16 +3147,16 @@ Adds a head limit step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- head(n) takes only the first N items — like LIMIT in SQL
-  local rb = lurek.data.newRingBuffer(8)
-  rb:push(10); rb:push(20); rb:push(30); rb:push(40); rb:push(50)
-  local all = rb:toTable()
-  local r = { all[1], all[2] }
-  lurek.log.info("top 2: " .. r[1] .. ", " .. r[2], "data")
+  -- head() is useful for previewing large datasets or showing "top N" results.
+  local scores = lurek.dataframe.random({{"rank", "id"}, {"score", "int"}}, 100, 1)
+
+  -- Preview the first 3 entries
+  local top3 = scores:head(3)
+  lurek.log.info("top 3 preview:\n" .. top3:toString())
 end
 ```
 
@@ -3263,16 +3172,18 @@ Adds a row limit step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- limit(n) caps output count — equivalent to reading at most n items
-  local all = {1, 2, 3, 4, 5}
-  local n = 3
-  local limited = {}
-  for i = 1, math.min(n, #all) do limited[#limited + 1] = all[i] end
-  lurek.log.info("limited to " .. #limited .. " items", "data")
+  -- Limit results to top-5 scorers before materializing the query.
+  local df = lurek.dataframe.fromTable({
+    { name = "A", score = 10 }, { name = "B", score = 20 },
+    { name = "C", score = 30 }, { name = "D", score = 40 },
+    { name = "E", score = 50 }, { name = "F", score = 60 },
+  })
+  local lazy = df:lazy():limit(5)
+  lurek.log.debug("lazy query built with limit 5")
 end
 ```
 
@@ -3288,15 +3199,19 @@ Adds a column selection step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- select maps/transforms each value — equivalent to table.map
-  local all = {1, 2, 3}
-  local r = {}
-  for i, v in ipairs(all) do r[i] = v * 10 end
-  lurek.log.info("scaled: " .. r[1] .. ", " .. r[2] .. ", " .. r[3], "data")
+  -- select() projects specific columns, discarding the rest.
+  -- Useful for creating a "view" that only shows relevant fields.
+  local full_data = lurek.dataframe.fromTable({
+    {name = "Alice", hp = 80, mp = 30, x = 12.5, y = -3.2, internal_state = 7},
+  })
+
+  -- HUD only needs name, hp, mp -- hide position and internal data
+  local hud_view = full_data:select("name", "hp", "mp")
+  lurek.log.info(hud_view:toString())
 end
 ```
 
@@ -3313,15 +3228,17 @@ Adds a one-based row slice step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- slice(start, stop) returns items in a range (1-based, inclusive)
-  local all = {10, 20, 30, 40, 50}
-  local r = {}
-  for i = 2, 4 do r[#r + 1] = all[i] end
-  lurek.log.info("slice [2..4]: " .. #r .. " items", "data")
+  -- slice(start, end) extracts a range of rows. Both indices are inclusive.
+  -- Great for pagination in a UI list.
+  local all_items = lurek.dataframe.random({{"id", "id"}, {"name", "name"}, {"price", "int"}}, 100, 2)
+
+  -- Page 2 of a 10-items-per-page list: rows 11 through 20
+  local page2 = all_items:slice(11, 20)
+  lurek.log.info("page 2 has " .. page2:nrows() .. " items")
 end
 ```
 
@@ -3338,14 +3255,19 @@ Adds a sort step to the lazy query. This method is available to Lua scripts.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- sort with a comparator: function(a, b) returning true if a < b
-  local arr = {30, 10, 20}
-  table.sort(arr, function(a, b) return a < b end)
-  lurek.log.info("sorted: " .. arr[1] .. ", " .. arr[2] .. ", " .. arr[3], "data")
+  -- sort() orders rows by a column. Use for leaderboards, priority queues, etc.
+  local df = lurek.dataframe.newDataFrame()
+  df:addRow({name = "Cara", score = 80})
+  df:addRow({name = "Alice", score = 95})
+  df:addRow({name = "Bob", score = 60})
+
+  -- Sort descending for a high-score list
+  local leaderboard = df:sort("score", false)
+  lurek.log.info("1st place: " .. leaderboard:getValue(1, "name"))
 end
 ```
 
@@ -3361,16 +3283,16 @@ Adds a tail limit step to the lazy query.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- tail(n) skips the first N items — equivalent to OFFSET in SQL
-  local all = {10, 20, 30, 40}
-  local skip = 2
-  local r = {}
-  for i = skip + 1, #all do r[#r + 1] = all[i] end
-  lurek.log.info("after skipping 2: " .. r[1] .. ", " .. r[2], "data")
+  -- tail() shows the most recent entries. Ideal for event logs or chat history.
+  local events = lurek.dataframe.random({{"timestamp", "int"}, {"event", "name"}}, 50, 7)
+
+  -- Show the 5 most recent events
+  local recent = events:tail(5)
+  lurek.log.info("recent events:\n" .. recent:toString())
 end
 ```
 
@@ -3382,13 +3304,14 @@ Returns the Lua-visible type name for this lazy query handle.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- LLazyQuery:type() would return "LLazyQuery". Show type of a real handle:
-  local rb = lurek.data.newRingBuffer(4)
-  lurek.log.info("ring buffer type = " .. rb:type(), "data")
+  -- Identify handle type in a debug inspector.
+  local df = lurek.dataframe.fromTable({ { x = 1 } })
+  local lq = df:lazy()
+  lurek.log.debug("lazy query type: " .. lq:type())
 end
 ```
 
@@ -3404,13 +3327,14 @@ Returns whether this lazy query handle matches a supported type name.
 
 #### Example
 
-Exact example from [data.lua](../blob/main/content/examples/data.lua):
+Exact example from [dataframe.lua](../blob/main/content/examples/dataframe.lua):
 
 ```lua
 do
-  -- LLazyQuery:typeOf() would check handle type. Show typeOf on a real handle:
-  local rb = lurek.data.newRingBuffer(4)
-  lurek.log.info("is LRingBuffer: " .. tostring(rb:typeOf("LRingBuffer")), "data")
+  -- Type-guard before chaining lazy operations.
+  local df = lurek.dataframe.fromTable({ { x = 1 } })
+  local lq = df:lazy()
+  if lq:typeOf("LLazyQuery") then lurek.log.debug("confirmed LLazyQuery") end
 end
 ```
 

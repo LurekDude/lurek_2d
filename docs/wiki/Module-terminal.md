@@ -141,7 +141,7 @@ Module example from [terminal.lua](../blob/main/content/examples/terminal.lua):
   end
 end
 
---@api-stub: Terminal:print
+--@api-stub: LTerminal:print
 -- Writes text to the terminal grid starting at a specific cell
 do
   -- print(col, row, text) writes a string of characters into consecutive cells.
@@ -155,7 +155,7 @@ do
   term:print(1, 3, "lurek> _")
 end
 
---@api-stub: Terminal:setFont
+--@api-stub: LTerminal:setFont
 -- Selects the nearest built-in bitmap font by pixel height and refits the window
 do
   -- setFont picks the closest available monospace glyph set by height.
@@ -170,7 +170,7 @@ do
   debug_term:setFont(12)
 end
 
---@api-stub: Terminal:setCellSize
+--@api-stub: LTerminal:setCellSize
 -- Overrides the cell width and height used for rendering and refits the window
 do
   -- setCellSize manually controls pixel dimensions per cell, ignoring font metrics.
@@ -991,7 +991,7 @@ do
 
   -- Example: show a warning when the buffer is getting large.
   if total > 500 then
-    lurek.log.warn("scrollback growing fast — consider raising the cap", "term")
+    lurek.log.warn("scrollback growing fast Ă”Ă‡Ă¶ consider raising the cap", "term")
   end
 end
 ```
@@ -2046,7 +2046,7 @@ do
   btn:setEnabled(false)
 
   if not btn:isEnabled() then
-    lurek.log.debug("button disabled — greying out text", "term")
+    lurek.log.debug("button disabled Ă”Ă‡Ă¶ greying out text", "term")
   end
 end
 ```
@@ -2067,7 +2067,7 @@ do
   hint:setVisible(false)
 
   if not hint:isVisible() then
-    lurek.log.debug("hint is hidden — skipping update logic", "term")
+    lurek.log.debug("hint is hidden Ă”Ă‡Ă¶ skipping update logic", "term")
   end
 end
 ```
@@ -2499,7 +2499,7 @@ end
 
 ## Reference Games
 
-No direct references were found in `content/games/**/main.lua`.
+- [terminal_demo](../tree/main/content/games/showcase/terminal_demo) (showcase)
 
 ## Related Modules
 

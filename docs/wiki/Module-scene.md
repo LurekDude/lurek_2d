@@ -125,7 +125,7 @@ do
   lurek.scene.switchTo(next_level, "wipe", 0.5, "ease_out", { score = 1240, level = 2 })
 end
 
---@api-stub: lurek.scene.clear
+--@api-stub: LDepthSorter:clear
 -- Remove ALL scenes from the stack (each receives leave() in order)
 do
   -- clear() empties the entire stack. Use on shutdown or when returning to title screen.
@@ -191,11 +191,8 @@ Exact example from [scene.lua](../blob/main/content/examples/scene.lua):
 
 ```lua
 do
-  -- clear() empties the entire stack. Use on shutdown or when returning to title screen.
-  function lurek.quit()
-    lurek.scene.clear()
-    lurek.log.info("scene stack cleared on shutdown", "scene")
-  end
+  lurek.scene.clear()
+  lurek.log.debug("scene cleared", "example")
 end
 ```
 
@@ -1276,7 +1273,7 @@ Store an arbitrary Lua value in the scene module's shared data map, keyed by a s
 **Parameters**
 
 - `key` (`string`, required) - The key to store data under (e.g. `"selectedLevel"`, `"playerName"`).
-- `value` (`any`, required) - Value to store.
+- `value` (`any`, required) - Value to store under the scene data key.
 
 #### Example
 

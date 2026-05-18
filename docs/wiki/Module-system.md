@@ -537,10 +537,9 @@ Exact example from [system.lua](../blob/main/content/examples/system.lua):
 
 ```lua
 do
-  local engine_version = lurek.runtime.getVersion()
-  -- Embed the engine version in save file headers to detect incompatibility
-  local save_header = "lurek2d/" .. engine_version
-  lurek.log.info("save header tag: " .. save_header, "save")
+  local version = lurek.engine.getVersion()
+  -- Use engine.getVersion for the Cargo.toml version (vs runtime.getVersion for semver)
+  lurek.log.info("engine crate version: " .. version, "boot")
 end
 ```
 
@@ -707,7 +706,7 @@ Executes a table of named task functions sequentially, collecting pass/fail resu
 - `tasks` (`table`, required) - Table mapping task names (string) to task functions (function).
 - `opts` (`table`, optional) - Options table. Set `stopOnError = true` to skip remaining tasks after the first failure.
 
-**Returns**: `table` - Table mapping each task name to a result table with `status` (`"passed"`, `"failed"`, or `"skipped"`), `time` (number), and optionally `error` (string).
+**Returns**: `table` - Table mapping each task name to a result table.
 
 #### Example
 
@@ -721,8 +720,8 @@ do
   }
   -- stopOnError skips remaining tasks after the first failure
   local results = lurek.runtime.runBatch(tasks, { stopOnError = true })
-  ---@diagnostic disable-next-line: undefined-field
-  lurek.log.info("batch completed: warmup=" .. results.warmup_cache.status, "boot")
+  local warmup_result = results["warmup_cache"]
+  lurek.log.info("batch completed: warmup=" .. warmup_result.status, "boot")
 end
 ```
 

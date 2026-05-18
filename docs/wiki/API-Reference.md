@@ -1318,7 +1318,7 @@ lurek.compute.zeros(shape: table, [dtype]: string) -> LArray -- Creates a zero-f
 
 ```lua
 LArray:abs() -> LArray -- Returns element-wise absolute values.
-LArray:add(value: LArray) -> LArray -- Returns element-wise addition with an array or scalar.
+LArray:add(value: any) -> LArray -- Returns element-wise addition with an array or scalar.
 LArray:addInplace(other: LArray) -- Adds another array into this array in place.
 LArray:all() -> boolean -- Returns whether all elements are non-zero.
 LArray:any() -> boolean -- Returns whether any element is non-zero.
@@ -1341,11 +1341,11 @@ LArray:cross2d(other: LArray) -> number -- Returns two-dimensional cross product
 LArray:cumsum() -> LArray -- Returns cumulative sum over the flattened array.
 LArray:diff([order]: integer) -> LArray -- Returns finite differences over the flattened array.
 LArray:dilate(radius: integer) -> LArray -- Returns morphological dilation with a radius.
-LArray:div(value: LArray) -> LArray -- Returns element-wise division with an array or scalar.
+LArray:div(value: any) -> LArray -- Returns element-wise division with an array or scalar.
 LArray:divInplace(other: LArray) -- Divides this array by another array in place.
 LArray:dot(other: LArray) -> number -- Returns dot product with another array.
 LArray:eigenPower([max_iter]: integer, [tol]: number) -> table -- Estimates dominant eigenvalue and eigenvector using power iteration.
-LArray:eq(value: LArray) -> LArray -- Returns element-wise equality comparison with an array or scalar.
+LArray:eq(value: any) -> LArray -- Returns element-wise equality comparison with an array or scalar.
 LArray:erode(radius: integer) -> LArray -- Returns morphological erosion with a radius.
 LArray:eval(expr: string) -> LArray -- Maps each element through a Lua expression compiled as `function(x) return expression end`.
 LArray:fill(val: number) -- Fills this array in place with one value.
@@ -1356,23 +1356,23 @@ LArray:getDimensions() -> integer -- Returns the number of array dimensions.
 LArray:getRegion(row: integer, col: integer, rows: integer, cols: integer) -> LArray -- Returns a rectangular region from this array.
 LArray:getShape() -> integer[] -- Returns the array shape as one-based dimension table.
 LArray:getSize() -> integer -- Returns the total number of array elements.
-LArray:gt(value: LArray) -> LArray -- Returns element-wise greater-than comparison with an array or scalar.
-LArray:gte(value: LArray) -> LArray -- Returns element-wise greater-or-equal comparison with an array or scalar.
+LArray:gt(value: any) -> LArray -- Returns element-wise greater-than comparison with an array or scalar.
+LArray:gte(value: any) -> LArray -- Returns element-wise greater-or-equal comparison with an array or scalar.
 LArray:histogram(bins: integer, [lo]: number, [hi]: number) -> table -- Returns histogram bins for the array values.
 LArray:isOnGPU() -> boolean -- Returns whether this array is currently stored on the GPU.
 LArray:linsolve(b: LArray) -> LArray -- Solves a linear system using this matrix and a right-hand side array.
-LArray:lt(value: LArray) -> LArray -- Returns element-wise less-than comparison with an array or scalar.
-LArray:lte(value: LArray) -> LArray -- Returns element-wise less-or-equal comparison with an array or scalar.
+LArray:lt(value: any) -> LArray -- Returns element-wise less-than comparison with an array or scalar.
+LArray:lte(value: any) -> LArray -- Returns element-wise less-or-equal comparison with an array or scalar.
 LArray:luDecompose() -> table -- Decomposes this matrix into LU data and permutation metadata.
 LArray:map(func: function) -> LArray -- Maps each element through a Lua function and returns a new array.
 LArray:matmul(other: LArray) -> LArray -- Returns matrix multiplication of this array and another array.
-LArray:max([axis]: integer) -> number|LArray -- Returns total maximum or a maximum array along a one-based axis.
-LArray:mean([axis]: integer) -> number|LArray -- Returns total mean or a mean array along a one-based axis.
-LArray:min([axis]: integer) -> number|LArray -- Returns total minimum or a minimum array along a one-based axis.
-LArray:mul(value: LArray) -> LArray -- Returns element-wise multiplication with an array or scalar.
+LArray:max([axis]: integer) -> number -- Returns total maximum or a maximum array along a one-based axis.
+LArray:mean([axis]: integer) -> number -- Returns total mean or a mean array along a one-based axis.
+LArray:min([axis]: integer) -> number -- Returns total minimum or a minimum array along a one-based axis.
+LArray:mul(value: any) -> LArray -- Returns element-wise multiplication with an array or scalar.
 LArray:mulInplace(other: LArray) -- Multiplies this array by another array in place.
 LArray:neg() -> LArray -- Returns element-wise negated values.
-LArray:neq(value: LArray) -> LArray -- Returns element-wise inequality comparison with an array or scalar.
+LArray:neq(value: any) -> LArray -- Returns element-wise inequality comparison with an array or scalar.
 LArray:normalizeRange(lo: number, hi: number) -> LArray -- Returns array values normalized into a target range.
 LArray:normalizeVec() -> LArray -- Returns this vector normalized to unit length.
 LArray:outer(other: LArray) -> LArray -- Returns outer product with another vector array.
@@ -1386,9 +1386,9 @@ LArray:set(...: number) -- Writes an array element using one-based indices follo
 LArray:setRegion(row: integer, col: integer, source: LArray) -- Writes a source array into this array at a one-based row and column.
 LArray:sobel() -> table -- Computes Sobel gradients for this array.
 LArray:sqrt() -> LArray -- Returns element-wise square roots.
-LArray:sub(value: LArray) -> LArray -- Returns element-wise subtraction with an array or scalar.
+LArray:sub(value: any) -> LArray -- Returns element-wise subtraction with an array or scalar.
 LArray:subInplace(other: LArray) -- Subtracts another array from this array in place.
-LArray:sum([axis]: integer) -> number|LArray -- Returns total sum or a summed array along a one-based axis.
+LArray:sum([axis]: integer) -> number -- Returns total sum or a summed array along a one-based axis.
 LArray:threshold(val: number) -> LArray -- Returns a mask array where values above a threshold are selected.
 LArray:toTable() -> number[] -- Returns array values flattened into a Lua table.
 LArray:transformPoints(pts: LArray) -> LArray -- Transforms a point array by this transform matrix.
@@ -1549,11 +1549,11 @@ LDataFrame:describe() -> LDataFrame -- Returns summary statistics for numeric co
 LDataFrame:dropNil(col: string) -> LDataFrame -- Returns rows where the chosen column is not nil.
 LDataFrame:entropy(col: string) -> number -- Returns entropy for a column. This method is available to Lua scripts.
 LDataFrame:fillNil(col: string, val: any) -- Replaces nil cells in a column with a value.
-LDataFrame:filter(col: string, op: string, val: any) -> LDataFrame -- Returns rows whose column value matches a comparison.
-LDataFrame:getColumn(col: string) -> number[] -- Returns a column as an array table. This method is available to Lua scripts.
+LDataFrame:filter(col: any, op: string, val: any) -> LDataFrame -- Returns rows whose column value matches a comparison.
+LDataFrame:getColumn(col: any) -> number[] -- Returns a column as an array table. This method is available to Lua scripts.
 LDataFrame:getColumnAsF64(col: string) -> number[] -- Returns a numeric column as an array of numbers.
 LDataFrame:getRow(row: integer) -> table -- Returns a row as a table keyed by column name.
-LDataFrame:getValue(row: integer, col: string) -> number|string|boolean|nil -- Returns one cell value by one-based row and column reference.
+LDataFrame:getValue(row: integer, col: any) -> number|string|boolean|nil -- Returns one cell value by one-based row and column reference.
 LDataFrame:groupAgg(group_col: string, agg_col: string, fn_name: string) -> LDataFrame -- Groups by one column and aggregates another column.
 LDataFrame:groupBy(col: string) -> table -- Groups rows by a column and returns a table from group key to dataframe.
 LDataFrame:groupByObj(col: string) -> LGroupedFrame -- Groups rows by a column and returns a grouped-frame object.
@@ -1574,18 +1574,18 @@ LDataFrame:pivot(row_col: string, col_col: string, val_col: string) -> LDataFram
 LDataFrame:pivotTable(row_key: string, col_key: string, value_key: string, [agg]: string) -> LDataFrame -- Builds a pivot table using row key, column key, value column, and aggregate function.
 LDataFrame:query(sql_str: string) -> LDataFrame -- Runs a SQL-style query against this dataframe.
 LDataFrame:rank(col: string, [order]: string, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rank column.
-LDataFrame:removeColumn(col: string) -- Removes a column by name or one-based index.
+LDataFrame:removeColumn(col: any) -- Removes a column by name or one-based index.
 LDataFrame:removeRow(row: integer) -- Removes a row by one-based index. This method is available to Lua scripts.
-LDataFrame:rename(col: string, new_name: string) -- Renames a column by name or one-based index.
+LDataFrame:rename(col: any, new_name: string) -- Renames a column by name or one-based index.
 LDataFrame:rollingMean(col: string, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling mean column.
 LDataFrame:rollingSum(col: string, window: integer, [result_col]: string) -> LDataFrame -- Returns a dataframe with a rolling sum column.
 LDataFrame:rows() -> function -- Returns an iterator function over one-based row index and row table pairs.
 LDataFrame:sample(n: integer, [seed]: integer) -> LDataFrame -- Returns a sampled dataframe. This method is available to Lua scripts.
-LDataFrame:select(...: string) -> LDataFrame -- Returns a dataframe with selected columns.
+LDataFrame:select(...: any) -> LDataFrame -- Returns a dataframe with selected columns.
 LDataFrame:setColumnFromF64(col: string, values: table) -- Replaces a numeric column from an array table of numbers.
-LDataFrame:setValue(row: integer, col: string, val: any) -- Sets one cell value by one-based row and column reference.
+LDataFrame:setValue(row: integer, col: any, val: any) -- Sets one cell value by one-based row and column reference.
 LDataFrame:slice(start: integer, end: integer) -> LDataFrame -- Returns a one-based inclusive row slice.
-LDataFrame:sort(col: string, [ascending]: boolean) -> LDataFrame -- Returns rows sorted by a column. This method is available to Lua scripts.
+LDataFrame:sort(col: any, [ascending]: boolean) -> LDataFrame -- Returns rows sorted by a column. This method is available to Lua scripts.
 LDataFrame:stddev(col: string) -> number -- Returns the numeric standard deviation of a column.
 LDataFrame:sum(col: string) -> number -- Returns the numeric sum of a column.
 LDataFrame:tail([n]: integer) -> LDataFrame -- Returns the last rows of this dataframe.
@@ -1596,7 +1596,7 @@ LDataFrame:toString() -> string -- Formats this dataframe as a human-readable te
 LDataFrame:toTable() -> table -- Converts this dataframe to an array table of row tables.
 LDataFrame:type() -> string -- Returns the Lua-visible type name for this dataframe handle.
 LDataFrame:typeOf(name: string) -> boolean -- Returns whether this dataframe handle matches a supported type name.
-LDataFrame:unique(col: string) -> number[] -- Returns unique values from a column.
+LDataFrame:unique(col: any) -> number[] -- Returns unique values from a column.
 LDataFrame:variance(col: string) -> number -- Returns the numeric variance of a column.
 LDataFrame:withCumsum(col: string, name: string) -- Adds a cumulative-sum column in place.
 LDataFrame:withEval(col_name: string, expr: string) -> LDataFrame -- Returns a dataframe with a column computed from an expression.
@@ -1697,7 +1697,7 @@ lurek.devtools.error(message: string) -- Adds an error-level diagnostic message 
 lurek.devtools.eval(code: string) -> LuaValue -- Evaluates Lua code in the current state and returns success plus values or failure plus an error message.
 lurek.devtools.exposeWatch(name: string, getter: function, [category]: string) -> integer -- Registers a watch expression callback for snapshots and watch panels.
 lurek.devtools.fatal(message: string) -- Adds a fatal-level diagnostic message to the devtools log.
-lurek.devtools.getCallStack([max_depth]: integer) -> string[] -- Returns Lua call stack frames using the Lua debug library.
+lurek.devtools.getCallStack([max_depth]: integer) -> any[] -- Returns Lua call stack frames using the Lua debug library.
 lurek.devtools.getFrameHistory() -> number[] -- Returns retained CPU frame duration samples in insertion order.
 lurek.devtools.getFrameHistorySize() -> integer -- Returns the current CPU frame history capacity.
 lurek.devtools.getFrameStats() -> table -- Returns aggregate CPU frame timing statistics from recorded samples.
@@ -1905,7 +1905,7 @@ LUniverse:defineBlueprint(name: string, components: table) -- Defines a named en
 LUniverse:defineTag(name: string) -> integer -- Defines a bitmap tag name and assigns it a bit slot.
 LUniverse:deserialize(snapshot: table) -- Replaces this universe state from a serialized Lua snapshot.
 LUniverse:each(name: string, callback: function) -- Iterates entities with one component and calls a Lua callback for each match.
-LUniverse:emit(event: string, ...: any) -- Calls matching event-named functions on registered systems.
+LUniverse:emit(event: string, ...: table) -- Calls matching event-named functions on registered systems.
 LUniverse:extendBlueprint(name: string, parent: string, overrides: table) -- Defines a blueprint that inherits from a parent blueprint and applies overrides.
 LUniverse:flushObservers() -- Delivers queued component add and remove events to registered observer callbacks.
 LUniverse:get(id: integer, name: string) -> table|number|string|boolean|nil -- Returns a component value from an entity.
@@ -1949,7 +1949,7 @@ LUniverse:removeSystem(system: table) -- Removes a previously registered Lua sys
 LUniverse:removeTag(id: integer, tag: string) -- Removes a string tag from an entity.
 LUniverse:render() -- Runs registered render-phase systems using their render or draw callbacks.
 LUniverse:serialize() -> table -- Serializes this universe into a Lua table snapshot.
-LUniverse:set(id: integer, name: string, value: any) -- Stores or replaces a component value on an entity.
+LUniverse:set(id: integer, name: string, value: table) -- Stores or replaces a component value on an entity.
 LUniverse:setLayer(id: integer, layer: integer) -- Assigns a numeric layer to an entity.
 LUniverse:setParent(child_id: integer, [parent_id]: integer) -- Sets or clears the parent entity for a child entity.
 LUniverse:snapshot() -> table -- Serializes this universe into a Lua table snapshot.
@@ -4108,22 +4108,22 @@ LFunnel:update(dt: number) -> boolean -- Advance the funnel's time window. Flush
 ### LList
 
 ```lua
-LList:add(value: string) -- Append a value to the end of the list.
+LList:add(value: any) -- Append a value to the end of the list.
 LList:clear() -- Remove all items from the list. This method is available to Lua scripts.
 LList:contains(value: string) -> boolean -- Check whether the list contains a specific value.
 LList:get(index: integer) -> string -- Get the value at a 1-based index. Returns nil if out of range.
 LList:indexOf(value: string) -> integer -- Find the 1-based index of the first occurrence of a value. Returns nil if not found.
-LList:insert(index: integer, value: string) -- Insert a value at a 1-based index, shifting subsequent items right.
+LList:insert(index: integer, value: any) -- Insert a value at a 1-based index, shifting subsequent items right.
 LList:isEmpty() -> boolean -- Check whether the list is empty. This method is available to Lua scripts.
 LList:len() -> number -- Return the number of items in the list.
 LList:pop() -> string -- Remove and return the last value. Returns nil if empty.
-LList:push(value: string) -- Append a value to the end of the list (alias for add).
+LList:push(value: any) -- Append a value to the end of the list (alias for add).
 LList:remove(index: integer) -> string -- Remove and return the value at a 1-based index. Returns nil if out of range.
 LList:reverse() -- Reverse the order of all items in the list in-place.
-LList:set(index: integer, value: string) -- Replace the value at a 1-based index. Errors if index is 0 or out of range.
+LList:set(index: integer, value: any) -- Replace the value at a 1-based index. Errors if index is 0 or out of range.
 LList:shift() -> string -- Remove and return the first value. Returns nil if empty.
 LList:toArray() -> number[] -- Return all items as an array table. This method is available to Lua scripts.
-LList:unshift(value: string) -- Insert a value at the beginning of the list.
+LList:unshift(value: any) -- Insert a value at the beginning of the list.
 ```
 
 ### LMap
@@ -4138,7 +4138,7 @@ LMap:keys() -> string[] -- Return an array of all keys in the map.
 LMap:len() -> number -- Return the number of key-value pairs.
 LMap:merge(other: LMap) -- Copy all entries from another LMap into this map. Existing keys are overwritten.
 LMap:remove(key: string) -> boolean -- Remove a key from the map. Returns true if it was present.
-LMap:set(key: string, value: string) -- Set a key-value pair in the map. Replaces any existing value for the same key.
+LMap:set(key: string, value: any) -- Set a key-value pair in the map. Replaces any existing value for the same key.
 LMap:values() -> number[] -- Return an array of all values in the map.
 ```
 
@@ -4181,7 +4181,7 @@ LObserver:unsubscribe(id: integer) -- Remove a subscription by its ID. The callb
 
 ```lua
 LPatternGraph:addEdge(from: integer, to: integer, [weight]: number, [label]: string) -> number -- Add a directed (or undirected) edge between two nodes with optional weight and label.
-LPatternGraph:addNode([label]: string, [value]: any) -> number -- Add a node to the graph with an optional label and payload value.
+LPatternGraph:addNode([label]: string, [value]: table) -> number -- Add a node to the graph with an optional label and payload value.
 LPatternGraph:bfs(start: integer) -> integer[] -- Perform a breadth-first search from a node. Returns visited node IDs in BFS order.
 LPatternGraph:clearAll() -- Remove all nodes, edges, and payloads from the graph.
 LPatternGraph:dfs(start: integer) -> integer[] -- Perform a depth-first search from a node. Returns visited node IDs in DFS order.
@@ -4213,10 +4213,10 @@ LQueue:back() -> string -- Return the back value without removing it. Returns ni
 LQueue:clear() -- Remove all items from the queue. This method is available to Lua scripts.
 LQueue:dequeue() -> string -- Remove and return the front value. Returns nil if empty.
 LQueue:dequeueBack() -> string -- Remove and return the back value. Returns nil if empty.
-LQueue:enqueue(value: string) -> boolean -- Add a value to the back of the queue. Returns false if at capacity.
-LQueue:enqueueFront(value: string) -> boolean -- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
+LQueue:enqueue(value: any) -> boolean -- Add a value to the back of the queue. Returns false if at capacity.
+LQueue:enqueueFront(value: any) -> boolean -- Add a value to the front of the queue (priority insertion). Returns false if at capacity.
 LQueue:front() -> string -- Return the front value without removing it. Returns nil if empty.
-LQueue:insertAt(index: integer, value: string) -> boolean -- Insert a value at a 1-based index in the queue. Returns false if at capacity.
+LQueue:insertAt(index: integer, value: any) -> boolean -- Insert a value at a 1-based index in the queue. Returns false if at capacity.
 LQueue:isEmpty() -> boolean -- Check whether the queue is empty. This method is available to Lua scripts.
 LQueue:isFull() -> boolean -- Check whether the queue has reached its capacity limit.
 LQueue:len() -> number -- Return the current number of items in the queue.
@@ -4294,7 +4294,7 @@ LSimpleState:update(dt: number) -- Call the current state's update callback with
 
 ```lua
 LStack:clear() -- Remove all items from the stack. This method is available to Lua scripts.
-LStack:insertAt(index: integer, value: string) -> boolean -- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
+LStack:insertAt(index: integer, value: any) -> boolean -- Insert a value at a 1-based index in the stack, shifting items above it. Returns false if at capacity.
 LStack:isEmpty() -> boolean -- Check whether the stack is empty. This method is available to Lua scripts.
 LStack:isFull() -> boolean -- Check whether the stack has reached its capacity limit (if one was set).
 LStack:len() -> number -- Return the current number of items in the stack.
@@ -4305,8 +4305,8 @@ LStack:peekBottom() -> string -- Return the bottom value without removing it. Re
 LStack:pop() -> string -- Remove and return the top value. Returns nil if the stack is empty.
 LStack:popBottom() -> string -- Remove and return the bottom value. Returns nil if empty.
 LStack:popMany(count: integer) -> integer[] -- Pop up to `count` values from the top and return them as an array table.
-LStack:push(value: string) -> boolean -- Push a value onto the top of the stack. Returns false if the stack is at capacity.
-LStack:pushBottom(value: string) -> boolean -- Push a value onto the bottom of the stack. Returns false if at capacity.
+LStack:push(value: any) -> boolean -- Push a value onto the top of the stack. Returns false if the stack is at capacity.
+LStack:pushBottom(value: any) -> boolean -- Push a value onto the bottom of the stack. Returns false if at capacity.
 LStack:removeAt(index: integer) -> string -- Remove and return the value at a 1-based index. Returns nil if out of range.
 LStack:toArray() -> number[] -- Return all stack items as an array table (bottom to top).
 ```
@@ -4338,7 +4338,7 @@ LThrottle:update(dt: number) -> boolean -- Advance the throttle timer. If the in
 ### LWeightedRandom
 
 ```lua
-LWeightedRandom:add(weight: number, value: string, [label]: string) -> number -- Add an item with a relative weight. Higher weight = higher selection probability.
+LWeightedRandom:add(weight: number, value: any, [label]: string) -> number -- Add an item with a relative weight. Higher weight = higher selection probability.
 LWeightedRandom:clearAll() -- Remove all entries from the pool. This method is available to Lua scripts.
 LWeightedRandom:getRevision() -> number -- Return the revision counter. Increments on any add/remove/weight change.
 LWeightedRandom:isEmpty() -> boolean -- Check whether the pool has no entries.
@@ -4958,6 +4958,7 @@ lurek.render.push() -- Pushes the current transformation matrix onto the transfo
 lurek.render.pushLayer(id: integer, [alpha]: number, [blendMode]: string) -- Begins a compositing layer with the given alpha and blend mode. Must be paired with popLayer.
 lurek.render.pushSortKey(depth: number) -- Sets the depth sort key for subsequent draw calls within the current sort group.
 lurek.render.rectangle(mode: string, x: number, y: number, w: number, h: number, [rx]: number, [ry]: number) -- Draws a rectangle. If rx is provided, draws a rounded rectangle.
+lurek.render.resetCanvas(canvas: LCanvas) -- Marks a canvas as needing a full clear before its next render pass. Use before re-rendering to avoid conten...
 lurek.render.rotate(angle: number) -- Applies a rotation to the current transformation matrix.
 lurek.render.saveScreenshot(path: string) -- Saves a screenshot of the current frame to a file under the save/ directory.
 lurek.render.scale(sx: number, [sy]: number) -- Applies scaling to the current transformation matrix.

@@ -129,7 +129,7 @@ do
   end
 end
 
---@api-stub: DoorManager:getDoor
+--@api-stub: LDoorManager:getDoor
 -- Returns a table describing the door at the given index
 do
   local doors = lurek.raycaster.newDoorManager()
@@ -143,7 +143,7 @@ do
   end
 end
 
---@api-stub: DoorManager:count
+--@api-stub: LDoorManager:count
 -- Returns the total number of registered doors
 do
   local doors = lurek.raycaster.newDoorManager()
@@ -154,7 +154,7 @@ do
   lurek.log.info("level has " .. doors:count() .. " doors", "doors")
 end
 
---@api-stub: DoorManager:type
+--@api-stub: LSpriteManager:type
 -- Returns the Lua-visible type name string for this door manager handle
 do
   local doors = lurek.raycaster.newDoorManager()
@@ -164,7 +164,7 @@ do
   end
 end
 
---@api-stub: DoorManager:typeOf
+--@api-stub: LSpriteManager:typeOf
 -- Returns true if this door manager handle matches the given type name string
 ```
 
@@ -589,11 +589,9 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
+  -- type() returns the engine type string for this door manager handle.
   local doors = lurek.raycaster.newDoorManager()
-  -- Returns "LDoorManager" — useful for runtime type checks in generic code
-  if doors:type() == "LDoorManager" then
-    lurek.log.debug("door manager OK", "raycaster")
-  end
+  lurek.log.info("door mgr type: " .. doors:type(), "raycaster")
 end
 ```
 
@@ -613,11 +611,10 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
+  -- typeOf checks handle identity for polymorphic dispatch.
   local doors = lurek.raycaster.newDoorManager()
-  -- typeOf accepts "LDoorManager", "DoorManager", or "Object"
-  if doors:typeOf("DoorManager") then
-    lurek.log.debug("dispatched as DoorManager", "raycaster")
-  end
+  local is_door = doors:typeOf("LDoorManager")
+  lurek.log.info("is LDoorManager=" .. tostring(is_door), "raycaster")
 end
 ```
 
@@ -784,9 +781,9 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local hm = lurek.raycaster.newHeightMap(8, 8)
-  -- Always returns "LHeightMap"
-  lurek.log.debug("heightmap type: " .. hm:type(), "raycaster")
+  -- type() returns the engine type string for this height map handle.
+  local hm = lurek.raycaster.newHeightMap(16, 12)
+  lurek.log.info("heightmap type: " .. hm:type(), "raycaster")
 end
 ```
 
@@ -806,9 +803,10 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local hm = lurek.raycaster.newHeightMap(8, 8)
-  -- Accepts "LHeightMap", "HeightMap", or "Object"
-  if hm:typeOf("HeightMap") then lurek.log.debug("is HeightMap", "raycaster") end
+  -- typeOf checks handle identity for polymorphic dispatch.
+  local hm = lurek.raycaster.newHeightMap(16, 12)
+  local is_hm = hm:typeOf("LHeightMap")
+  lurek.log.info("is LHeightMap=" .. tostring(is_hm), "raycaster")
 end
 ```
 
@@ -947,9 +945,9 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local light = lurek.raycaster.newPointLight(0, 0, 1, 1, 1, 1, 1)
-  -- Always returns "LPointLight"
-  lurek.log.info("PointLight:type = " .. light:type(), "raycaster")
+  -- type() returns the engine type string for this point light handle.
+  local torch = lurek.raycaster.newPointLight(5.5, 3.5, 1.0, 0.8, 0.4, 6.0, 1.0)
+  lurek.log.info("light type: " .. torch:type(), "raycaster")
 end
 ```
 
@@ -969,9 +967,10 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local light = lurek.raycaster.newPointLight(1, 1, 0.5, 0.5, 1, 2, 1)
-  -- Accepts "LPointLight", "PointLight", or "Object"
-  if light:typeOf("LPointLight") then lurek.log.debug("light kind ok", "raycaster") end
+  -- typeOf checks handle identity for polymorphic dispatch.
+  local torch = lurek.raycaster.newPointLight(5.5, 3.5, 1.0, 0.8, 0.4, 6.0, 1.0)
+  local is_light = torch:typeOf("LPointLight")
+  lurek.log.info("is LPointLight=" .. tostring(is_light), "raycaster")
 end
 ```
 
@@ -2089,10 +2088,8 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local rc = lurek.raycaster.new(8, 8)
-  -- Always returns "LRaycaster"
-  local t = rc:type()
-  lurek.log.info("LRaycaster:type = " .. t, "raycaster")
+  local obj = lurek.raycaster.new(800, 600)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LRaycaster"
 end
 ```
 
@@ -2112,10 +2109,8 @@ Exact example from [raycaster.lua](../blob/main/content/examples/raycaster.lua):
 
 ```lua
 do
-  local rc = lurek.raycaster.new(8, 8)
-  -- Accepts "LRaycaster", "Raycaster", or "Object"
-  lurek.log.info("is LRaycaster: " .. tostring(rc:typeOf("LRaycaster")), "raycaster")
-  lurek.log.info("is unknown: " .. tostring(rc:typeOf("Unknown")), "raycaster")
+  local obj = lurek.raycaster.new(800, 600)
+  lurek.log.debug("typeOf LRaycaster: " .. tostring(obj:typeOf("LRaycaster")), "example") -- true
 end
 ```
 

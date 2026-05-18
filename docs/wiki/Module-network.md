@@ -296,8 +296,8 @@ do
   local room = lurek.network.createRoom("casual", "hostB", 3)
   local joined = lurek.network.joinRoom(room.id)
   if joined then
-    ---@diagnostic disable-next-line: undefined-field
-    lurek.log.debug("joined room=" .. joined.id .. " count=" .. joined.player_count, "match")
+    local joined_room = joined --[[@as {id: string, player_count: integer}]]
+    lurek.log.debug("joined room=" .. joined_room.id .. " count=" .. joined_room.player_count, "match")
   end
 end
 ```
@@ -323,8 +323,10 @@ do
   local room = lurek.network.createRoom("coop", "hostC", 3)
   local _ = lurek.network.joinRoom(room.id)
   local left = lurek.network.leaveRoom(room.id)
-  ---@diagnostic disable-next-line: undefined-field
-  if left then lurek.log.debug("left room=" .. left.id, "match") end
+  if left then
+    local left_room = left --[[@as {id: string}]]
+    lurek.log.debug("left room=" .. left_room.id, "match")
+  end
 end
 ```
 
@@ -1346,7 +1348,7 @@ do
   end
 end
 
---@api-stub: NetworkHost:flush
+--@api-stub: LNetworkHost:flush
 -- Sends all queued outgoing packets on this host immediately without waiting for service.
 do
   -- Normally packets are flushed at each service() call. Use flush() when you
@@ -1357,7 +1359,7 @@ do
   host:flush()
 end
 
---@api-stub: NetworkHost:resetPeer
+--@api-stub: LNetworkHost:resetPeer
 -- Forcibly resets a peer connection by id without sending a graceful disconnect message.
 do
   -- resetPeer immediately drops a peer with no farewell packet. The remote
@@ -1429,10 +1431,8 @@ Exact example from [network.lua](../blob/main/content/examples/network.lua):
 
 ```lua
 do
-  -- type() returns "LNetworkHost" — useful for type-checking in generic code.
-  local host = lurek.network.newServer{ port = 5573, maxPeers = 4 }
-  lurek.log.info("LNetworkHost:type = " .. host:type(), "net")
-  host:destroy()
+  local obj = lurek.network.newHost({addr = '127.0.0.1:7777', maxPeers = 8})
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LNetworkHost"
 end
 ```
 
@@ -1452,12 +1452,8 @@ Exact example from [network.lua](../blob/main/content/examples/network.lua):
 
 ```lua
 do
-  -- typeOf checks against "LNetworkHost" and "Object".
-  -- Use for duck-typing checks when receiving userdata from other modules.
-  local host = lurek.network.newServer{ port = 5574, maxPeers = 4 }
-  lurek.log.info("is LNetworkHost: " .. tostring(host:typeOf("LNetworkHost")), "net")
-  lurek.log.info("is Object: " .. tostring(host:typeOf("Object")), "net")
-  host:destroy()
+  local obj = lurek.network.newHost({addr = '0.0.0.0:0', maxPeers = 8})
+  lurek.log.debug("typeOf LNetworkHost: " .. tostring(obj:typeOf("LNetworkHost")), "example") -- true
 end
 ```
 
@@ -1607,7 +1603,7 @@ do
   end
 end
 
---@api-stub: NetworkRuntime:shutdown
+--@api-stub: LNetworkRuntime:shutdown
 -- Shuts down the network runtime and cancels all pending async network operations.
 do
   -- shutdown() stops the background thread and drops all open connections.
@@ -1618,7 +1614,7 @@ do
   end
 end
 
---@api-stub: NetworkHost:broadcast
+--@api-stub: LNetworkHost:broadcast
 -- Sends a packet to all currently connected peers on a channel with optional reliability.
 do
   -- broadcast sends the same data to every connected peer at once.
@@ -1630,7 +1626,7 @@ do
   lurek.log.info("broadcast sent to all peers", "network")
 end
 
---@api-stub: NetworkHost:connect
+--@api-stub: LNetworkHost:connect
 -- Initiates a connection from this client host to a remote server address string.
 do
   -- connect() can be called on any host (not just clients) to initiate a

@@ -19,27 +19,23 @@ pub(crate) const MAX_COLS: usize = 512;
 pub(crate) const MAX_ROWS: usize = 256;
 
 /// Foreground color for unfocused buttons.
-const BUTTON_FG: [f32; 4] = [0.9, 0.9, 0.9, 1.0];
+const BUTTON_FG: [f32; 4] = [0.90, 0.96, 0.90, 1.0];
 /// Background color for inactive terminal buttons.
-const BUTTON_BG: [f32; 4] = [0.16, 0.19, 0.26, 1.0];
+const BUTTON_BG: [f32; 4] = [0.05, 0.08, 0.05, 1.0];
 /// Background color for focused terminal buttons.
-const BUTTON_FOCUS_BG: [f32; 4] = [0.23, 0.28, 0.40, 1.0];
-/// Bright top-left edge color for shaded terminal widgets.
-const WIDGET_LIGHT_FG: [f32; 4] = [0.82, 0.88, 1.0, 1.0];
-/// Dark bottom-right edge color for shaded terminal widgets.
-const WIDGET_SHADOW_FG: [f32; 4] = [0.06, 0.07, 0.10, 1.0];
+const BUTTON_FOCUS_BG: [f32; 4] = [0.11, 0.14, 0.07, 1.0];
 /// Background color for text entry widgets.
-const TEXTBOX_BG: [f32; 4] = [0.07, 0.08, 0.11, 1.0];
+const TEXTBOX_BG: [f32; 4] = [0.03, 0.05, 0.03, 1.0];
 /// Background color for terminal list widgets.
-const LIST_BG: [f32; 4] = [0.09, 0.10, 0.14, 1.0];
+const LIST_BG: [f32; 4] = [0.03, 0.05, 0.03, 1.0];
 /// Background color for the selected row inside a terminal list.
-const LIST_SELECTED_BG: [f32; 4] = [0.18, 0.30, 0.44, 1.0];
+const LIST_SELECTED_BG: [f32; 4] = [0.16, 0.18, 0.09, 1.0];
 /// Background color for terminal panels and bordered regions.
-const PANEL_BG: [f32; 4] = [0.10, 0.11, 0.15, 0.94];
+const PANEL_BG: [f32; 4] = [0.02, 0.03, 0.02, 0.98];
 /// Foreground color applied to the focused widget.
-const FOCUS_FG: [f32; 4] = [1.0, 0.95, 0.5, 1.0];
+const FOCUS_FG: [f32; 4] = [1.0, 0.93, 0.55, 1.0];
 /// Foreground color for the selected list item.
-const LIST_SELECTED_FG: [f32; 4] = [0.7, 0.95, 1.0, 1.0];
+const LIST_SELECTED_FG: [f32; 4] = [0.96, 0.98, 0.86, 1.0];
 /// Character drawn at the text-box cursor position.
 const CURSOR_CHAR: char = '_';
 
@@ -149,23 +145,23 @@ fn draw_compact_button(
     }
     clear_render_rect(cells, cols, rows, x, y, width, 1, fg, bg);
     if width >= 2 {
-        set_render_cell_with_bg(cells, (cols, rows), (x, y), '[', WIDGET_LIGHT_FG, bg);
+        set_render_cell_with_bg(cells, (cols, rows), (x, y), '[', fg, bg);
         set_render_cell_with_bg(
             cells,
             (cols, rows),
             (x + width - 1, y),
             ']',
-            WIDGET_SHADOW_FG,
+            fg,
             bg,
         );
     }
     let content_width = width.saturating_sub(2).max(1);
     let text_width = char_count(text).min(content_width);
-    let start_col = x + (width.saturating_sub(text_width) / 2);
+    let start_col = x + 1 + content_width.saturating_sub(text_width) / 2;
     write_render_text(cells, cols, rows, start_col, y, text, fg, text_width);
 }
 
-/// Draw a light-top/dark-bottom frame around a rectangular terminal widget.
+/// Draw a flat single-line frame around a terminal widget.
 #[allow(clippy::too_many_arguments)]
 fn draw_shaded_frame(
     cells: &mut [TCell],
@@ -204,7 +200,7 @@ fn draw_shaded_frame(
             (cols, rows),
             (x + offset, y),
             top_ch,
-            WIDGET_LIGHT_FG,
+            DEFAULT_FG,
             bg,
         );
         set_render_cell_with_bg(
@@ -212,7 +208,7 @@ fn draw_shaded_frame(
             (cols, rows),
             (x + offset, y + height - 1),
             bottom_ch,
-            WIDGET_SHADOW_FG,
+            DEFAULT_FG,
             bg,
         );
     }
@@ -223,7 +219,7 @@ fn draw_shaded_frame(
                 (cols, rows),
                 (x, y + offset),
                 '│',
-                WIDGET_LIGHT_FG,
+                DEFAULT_FG,
                 bg,
             );
             set_render_cell_with_bg(
@@ -231,7 +227,7 @@ fn draw_shaded_frame(
                 (cols, rows),
                 (x + width - 1, y + offset),
                 '│',
-                WIDGET_SHADOW_FG,
+                DEFAULT_FG,
                 bg,
             );
         }

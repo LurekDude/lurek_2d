@@ -157,7 +157,7 @@ Module example from [particle.lua](../blob/main/content/examples/particle.lua):
   end
 end
 
---@api-stub: ParticleSystem:emit
+--@api-stub: LParticleSystem:emit
 -- Performs the emit operation on this particle system.
 do
   -- emit(count) spawns exactly `count` particles in one burst.
@@ -177,7 +177,7 @@ do
   hit:emit(24)                -- burst 24 sparks instantly
 end
 
---@api-stub: ParticleSystem:start
+--@api-stub: LParticleSystem:start
 -- Starts the operation managed by this particle system.
 do
   -- start() begins continuous particle emission at the configured emissionRate.
@@ -643,17 +643,15 @@ Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
 do
-  -- drawToImage(w, h) renders particles into an image (LImageData).
-  -- Useful for baking particle effects into textures or thumbnails.
-  -- The image is w x h pixels.
-
-  local sys = lurek.particle.newSystem({ maxParticles = 32 })
-  sys:setPosition(64, 64)
-  sys:setColors({1, 0.5, 0, 1}, {1, 0, 0, 0})
-  sys:emit(20)
-  sys:update(0.1)  -- simulate briefly so particles spread
-  local img = sys:drawToImage(128, 128)
-  lurek.log.debug("baked thumbnail " .. img:getWidth() .. "x" .. img:getHeight(), "fx")
+  -- drawToImage renders the current particle state into a CPU-side image buffer.
+  -- Useful for baking particle effects into textures or generating sprite sheets.
+  local ps = lurek.particle.newSystem({ maxParticles = 32 })
+  ps:setEmissionRate(20)
+  ps:setParticleLifetime(0.5, 1.0)
+  ps:start()
+  ps:update(0.1)
+  local img = ps:drawToImage(64.0, 64.0)
+  lurek.log.info("rendered particles to image", "particle")
 end
 ```
 
@@ -2538,12 +2536,9 @@ Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
 do
-  -- type() always returns "LParticleSystem" for particle system handles.
-  -- Use typeOf() for duck-typing checks (e.g., "Drawable", "Object").
-
-  local sys = lurek.particle.newSystem({})
-  local t = sys:type()  -- "LParticleSystem"
-  lurek.log.debug("handle type: " .. t, "fx")
+  -- type() returns the engine type string for handle identification.
+  local ps = lurek.particle.newSystem({ maxParticles = 64 })
+  lurek.log.info("particle type: " .. ps:type(), "particle")
 end
 ```
 
@@ -2563,15 +2558,11 @@ Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
 do
-  -- typeOf(name) checks if this handle is compatible with a given type.
-  -- Recognized names: "LParticleSystem", "ParticleSystem", "Drawable", "Object"
-  -- Use this for polymorphic drawable lists.
-
-  local sys = lurek.particle.newSystem({})
-  if sys:typeOf("Drawable") then
-    -- Can safely pass to any function expecting a Drawable
-    lurek.log.info("particle system is drawable", "fx")
-  end
+  -- typeOf checks handle identity for polymorphic dispatch.
+  local ps = lurek.particle.newSystem({ maxParticles = 64 })
+  local is_ps = ps:typeOf("LParticleSystem")
+  local is_img = ps:typeOf("LImage")
+  lurek.log.info("is LParticleSystem=" .. tostring(is_ps) .. " is LImage=" .. tostring(is_img), "particle")
 end
 ```
 
@@ -2589,16 +2580,12 @@ Exact example from [particle.lua](../blob/main/content/examples/particle.lua):
 
 ```lua
 do
-  -- update(dt) must be called every frame to advance particle simulation.
-  -- It moves particles, applies gravity/acceleration, ages them, and removes dead ones.
-  -- Also triggers physics collision and callbacks if configured.
-
-  local sys = lurek.particle.newSystem({ maxParticles = 128, emissionRate = 30 })
-  sys:start()
-  function lurek.process(dt)
-    -- Pass the frame delta time; particles simulate in real-time
-    sys:update(dt)
-  end
+  -- Call update every frame to advance particle positions, lifetimes, and effects.
+  local ps = lurek.particle.newSystem({ maxParticles = 256 })
+  ps:setEmissionRate(30)
+  ps:setParticleLifetime(1.0, 2.0)
+  ps:start()
+  function lurek.process(dt) ps:update(dt) end
 end
 ```
 

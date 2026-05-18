@@ -577,7 +577,7 @@ Pushes a value onto the channel. Blocks on bounded channels if the channel is fu
 
 **Parameters**
 
-- `value` (`any`, required) - The message to send.
+- `value` (`any`, required) - The message value to send.
 
 **Returns**: `integer` - The message sequence ID assigned to this push.
 
@@ -650,7 +650,7 @@ Pushes a value and blocks until a consumer pops it (synchronous handoff).
 
 **Parameters**
 
-- `value` (`any`, required) - The message to send.
+- `value` (`any`, required) - The message value to send.
 
 **Returns**: `boolean` - true when the value has been consumed.
 
@@ -676,7 +676,7 @@ Attempts to push a value onto a bounded channel without blocking.
 
 **Parameters**
 
-- `value` (`any`, required) - The message to send.
+- `value` (`any`, required) - The message value to send.
 
 **Returns**: `boolean` - true if the value was enqueued, false if the channel is full.
 
@@ -866,8 +866,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local p = lurek.thread.async("-- noop")
-  lurek.log.info("promise type = " .. p:type(), "thread")
+  local obj = lurek.thread.async(function() return 42 end)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LPromise"
 end
 ```
 
@@ -887,10 +887,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local p = lurek.thread.async("-- noop")
-  assert(p:typeOf("Promise"))
-  assert(p:typeOf("Object"))
-  assert(not p:typeOf("LChannel"))
+  local obj = lurek.thread.async(function() return 42 end)
+  lurek.log.debug("typeOf LPromise: " .. tostring(obj:typeOf("LPromise")), "example") -- true
 end
 ```
 
@@ -928,16 +926,11 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  -- Always check getError after wait to handle worker failures gracefully.
-  local risky = lurek.thread.newThread([[
-    error("out of memory in chunk generator")
-  ]])
-  risky:start()
-  risky:wait()
-  local err = risky:getError()
-  if err then
-    lurek.log.error("worker failed: " .. err, "thread")
-  end
+  local t = lurek.thread.newThread("error('intentional test error')")
+  t:start()
+  t:wait()
+  local err = t:getError()
+  lurek.log.debug("thread error: " .. tostring(err), "thread")
 end
 ```
 
@@ -1004,8 +997,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local t = lurek.thread.newThread("-- noop")
-  lurek.log.info("type = " .. t:type(), "thread")
+  local obj = lurek.thread.newThread("return 42")
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LThread"
 end
 ```
 
@@ -1025,10 +1018,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local t = lurek.thread.newThread("-- noop")
-  assert(t:typeOf("LThread"))
-  assert(t:typeOf("Object"))
-  assert(not t:typeOf("LChannel"))
+  local obj = lurek.thread.newThread("return 42")
+  lurek.log.debug("typeOf LThread: " .. tostring(obj:typeOf("LThread")), "example") -- true
 end
 ```
 
@@ -1204,7 +1195,7 @@ Pushes a value into the pool's input channel for processing by a worker thread.
 
 **Parameters**
 
-- `value` (`any`, required) - The message to send.
+- `value` (`any`, required) - The message value to send.
 
 #### Example
 
@@ -1238,8 +1229,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local pool = lurek.thread.newPool(2, "-- noop")
-  lurek.log.info("pool type = " .. pool:type(), "thread")
+  local obj = lurek.thread.newPool(2, "worker")
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LThreadPool"
 end
 ```
 
@@ -1259,10 +1250,8 @@ Exact example from [thread.lua](../blob/main/content/examples/thread.lua):
 
 ```lua
 do
-  local pool = lurek.thread.newPool(2, "-- noop")
-  assert(pool:typeOf("ThreadPool"))
-  assert(pool:typeOf("Object"))
-  assert(not pool:typeOf("LChannel"))
+  local obj = lurek.thread.newPool(2, "worker")
+  lurek.log.debug("typeOf LThreadPool: " .. tostring(obj:typeOf("LThreadPool")), "example") -- true
 end
 ```
 

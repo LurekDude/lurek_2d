@@ -137,7 +137,7 @@ do
   function lurek.process(dt) cam:update(dt) end
 end
 
---@api-stub: Camera2D:toWorld
+--@api-stub: LCamera:toWorld
 -- Performs the to world operation on this camera2d.
 do
   -- Convert mouse click screen coordinates to world position.
@@ -148,7 +148,7 @@ do
   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
 end
 
---@api-stub: Camera2D:toScreen
+--@api-stub: LCamera:toScreen
 -- Performs the to screen operation on this camera2d.
 do
   -- Convert a world-space object position to screen coordinates.
@@ -159,7 +159,7 @@ do
   if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
 end
 
---@api-stub: Camera2D:getVisibleArea
+--@api-stub: LCamera:getVisibleArea
 -- Returns the visible area of this camera2d.
 do
   -- Returns x, y, width, height in world units of what the camera currently sees.
@@ -169,7 +169,7 @@ do
   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
 end
 
---@api-stub: Camera2D:lookAt
+--@api-stub: LCamera:lookAt
 -- Performs the look at operation on this camera2d.
 do
   -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
@@ -308,17 +308,11 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  -- apply/reset pattern: everything drawn between apply() and reset()
-  -- is transformed by camera position, zoom, and rotation.
-  -- Draw HUD elements AFTER reset() so they stay screen-fixed.
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(100, 50)
-  cam:setZoom(1.5)
+  local cam = lurek.camera.new()
+  cam:setPosition(100, 100)
+  -- Apply the camera transform before drawing world objects.
   cam:apply()
-  -- ... draw world-space sprites, tilemaps, particles here ...
-  cam:reset()
-  -- ... draw HUD, menus, debug text here (screen-space) ...
-  lurek.log.info("camera applied and reset", "camera")
+  lurek.log.debug("camera applied", "camera")
 end
 ```
 
@@ -733,10 +727,9 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  local cam = lurek.camera.new(800, 600)
-  cam:setViewport(0, 0, 800, 600)
+  local cam = lurek.camera.new()
   local x, y, w, h = cam:getViewport()
-  lurek.log.info("viewport " .. w .. "x" .. h, "camera")
+  lurek.log.debug("viewport: " .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
 end
 ```
 
@@ -1271,12 +1264,9 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  -- Position sets the camera's top-left corner in world space.
-  -- For centering on a player, subtract half-viewport from player coords.
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(256, 128)
-  local x, y = cam:getPosition()
-  lurek.log.info("position=" .. x .. "," .. y, "camera")
+  local cam = lurek.camera.new()
+  cam:setPosition(320, 240)
+  lurek.log.debug("camera moved to (320, 240)", "camera")
 end
 ```
 
@@ -1358,15 +1348,10 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  -- Setting a target activates the follow system: the camera smoothly
-  -- moves toward that world point every frame (when update() is called).
-  -- Combine with setFollowSmooth, setDeadZone, and setLookAhead for tuning.
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(5.0)
-  cam:setTarget(320, 240) -- follow this point
-  cam:update(0.016) -- advance one frame to see movement
-  local x, y = cam:getPosition()
-  lurek.log.info("after follow: x=" .. x .. " y=" .. y, "camera")
+  local cam = lurek.camera.new()
+  -- Lock the camera on a player position.
+  cam:setTarget(400, 300)
+  lurek.log.debug("camera target set to (400, 300)", "camera")
 end
 ```
 
@@ -1410,9 +1395,9 @@ Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
 do
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(2.0) -- 2x magnification: each world pixel is 2 screen pixels
-  lurek.log.info("zoom=" .. cam:getZoom(), "camera")
+  local cam = lurek.camera.new()
+  cam:setZoom(2.0)
+  lurek.log.debug("zoom set to 2.0", "example")
 end
 ```
 
@@ -1664,56 +1649,15 @@ Returns the Lua-visible type name for this camera handle.
 
 #### Example
 
-Module-level example from [camera.lua](../blob/main/content/examples/camera.lua):
+Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
--- Advances this camera2d by the given delta time.
 do
-  -- Call update() every frame to advance follow interpolation, shake decay,
-  -- breathing, and sway effects. Without it, effects stay frozen.
+  -- Use type() to identify a handle for serialization or debug output.
   local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:update(dt) end
+  local name = cam:type()
+  lurek.log.info("camera type name: " .. name, "camera")
 end
-
---@api-stub: Camera2D:toWorld
--- Performs the to world operation on this camera2d.
-do
-  -- Convert mouse click screen coordinates to world position.
-  -- Essential for selecting objects, placing buildings, aiming weapons.
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
-  lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
-end
-
---@api-stub: Camera2D:toScreen
--- Performs the to screen operation on this camera2d.
-do
-  -- Convert a world-space object position to screen coordinates.
-  -- Use for HUD indicators, health bars above entities, or visibility checks.
-  local cam = lurek.camera.new(800, 600)
-  local enemy_wx, enemy_wy = 1024, 512
-  local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
-  if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
-end
-
---@api-stub: Camera2D:getVisibleArea
--- Returns the visible area of this camera2d.
-do
-  -- Returns x, y, width, height in world units of what the camera currently sees.
-  -- Use for culling: skip drawing objects outside this rectangle.
-  local cam = lurek.camera.new(800, 600)
-  local vx, vy, vw, vh = cam:getVisibleArea()
-  lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
-end
-
---@api-stub: Camera2D:lookAt
--- Performs the look at operation on this camera2d.
-do
-  -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
-  -- Unlike setPosition, you give the center point, not the top-left corner.
-  local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 ```
 
 ### `LCamera:typeOf(name: string) -> boolean`
@@ -1728,56 +1672,16 @@ Returns whether this camera handle matches a supported type name.
 
 #### Example
 
-Module-level example from [camera.lua](../blob/main/content/examples/camera.lua):
+Exact example from [camera.lua](../blob/main/content/examples/camera.lua):
 
 ```lua
--- Advances this camera2d by the given delta time.
 do
-  -- Call update() every frame to advance follow interpolation, shake decay,
-  -- breathing, and sway effects. Without it, effects stay frozen.
+  -- typeOf checks if the handle matches a type string (useful for polymorphic APIs).
   local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:update(dt) end
+  local is_cam = cam:typeOf("LCamera")
+  local is_img = cam:typeOf("LImage")
+  lurek.log.info("is LCamera=" .. tostring(is_cam) .. " is LImage=" .. tostring(is_img), "camera")
 end
-
---@api-stub: Camera2D:toWorld
--- Performs the to world operation on this camera2d.
-do
-  -- Convert mouse click screen coordinates to world position.
-  -- Essential for selecting objects, placing buildings, aiming weapons.
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300) -- screen center -> world coords
-  lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
-end
-
---@api-stub: Camera2D:toScreen
--- Performs the to screen operation on this camera2d.
-do
-  -- Convert a world-space object position to screen coordinates.
-  -- Use for HUD indicators, health bars above entities, or visibility checks.
-  local cam = lurek.camera.new(800, 600)
-  local enemy_wx, enemy_wy = 1024, 512
-  local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
-  if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
-end
-
---@api-stub: Camera2D:getVisibleArea
--- Returns the visible area of this camera2d.
-do
-  -- Returns x, y, width, height in world units of what the camera currently sees.
-  -- Use for culling: skip drawing objects outside this rectangle.
-  local cam = lurek.camera.new(800, 600)
-  local vx, vy, vw, vh = cam:getVisibleArea()
-  lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
-end
-
---@api-stub: Camera2D:lookAt
--- Performs the look at operation on this camera2d.
-do
-  -- lookAt centers the camera so that (x, y) is in the middle of the viewport.
-  -- Unlike setPosition, you give the center point, not the top-left corner.
-  local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024) -- center camera on (2048, 1024)
 ```
 
 ### `LCamera:update(dt: number)`

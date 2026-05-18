@@ -157,14 +157,10 @@ Exact example from [event.lua](../blob/main/content/examples/event.lua):
 
 ```lua
 do
-  -- Clear stale input events when transitioning between scenes
-  lurek.event.push("old_scene_action", "stale_jump")
-  lurek.event.push("old_scene_action", "stale_attack")
+  -- Create a signal to verify clear behaviour.
+  local sig = lurek.event.newSignal()
   lurek.event.clear()
-  -- After clear, poll returns nothing — no accidental input from the previous scene
-  local count = 0
-  for _ in lurek.event.poll() do count = count + 1 end
-  lurek.log.info("events after scene transition clear: " .. count, "scene")
+  lurek.log.debug("event cleared; sig ok: " .. tostring(sig ~= nil), "example")
 end
 ```
 

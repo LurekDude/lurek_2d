@@ -95,6 +95,7 @@
   - [lurek.render.pushLayer(id: integer, [alpha]: number, [blendMode]: string)](#lurekrenderpushlayerid-integer-alpha-number-blendmode-string)
   - [lurek.render.pushSortKey(depth: number)](#lurekrenderpushsortkeydepth-number)
   - [lurek.render.rectangle(mode: string, x: number, y: number, w: number, h: number, [rx]: number, [ry]: number)](#lurekrenderrectanglemode-string-x-number-y-number-w-number-h-number-rx-number-ry-number)
+  - [lurek.render.resetCanvas(canvas: LCanvas)](#lurekrenderresetcanvascanvas-lcanvas)
   - [lurek.render.rotate(angle: number)](#lurekrenderrotateangle-number)
   - [lurek.render.saveScreenshot(path: string)](#lurekrendersavescreenshotpath-string)
   - [lurek.render.scale(sx: number, [sy]: number)](#lurekrenderscalesx-number-sy-number)
@@ -334,7 +335,7 @@ lurek.render.drawIsoCubeTile(sx: number, sy: number, halfW: number, halfH: numbe
 lurek.render.drawMany(list: table) -- Batch-draws multiple images in one call. Each entry is a table: {image, x, y, r, sx, sy, ox, oy}.
 lurek.render.drawNineSlice(slice: LNineSlice, x: number, y: number, w: number, h: number) -- Draws a 9-slice image stretched to fill the given rectangle, keeping borders unscaled.
 lurek.render.drawPath(path: table, [mode]: string, [close]: boolean) -- Draws a vector path composed of moveTo, lineTo, quadTo, and cubicTo segments.
--- ... 89 more module functions
+-- ... 90 more module functions
 ```
 
 ## Module Functions
@@ -386,12 +387,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- An arc is a portion of a circle defined by start and end angles (radians).
-  -- "fill" makes a pie/wedge shape; "line" draws the curved edge only.
-  -- Use for pie charts, radial menus, cooldown indicators.
-  local cooldown_pct = 0.7  -- 70% complete
-  lurek.render.setColor(0, 0.8, 1, 1)
-  lurek.render.arc("fill", 400, 200, 50, -math.pi/2, -math.pi/2 + math.pi*2 * cooldown_pct)
+  -- Draw a partial circle arc: mode, center, radius, start/end angles.
+  lurek.render.setColor(0, 1, 0.5, 1)
+  lurek.render.arc("fill", 200, 200, 80, 0, math.pi)
 end
 ```
 
@@ -465,12 +463,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Circles are defined by center (x, y) and radius.
-  -- Great for bullets, pickups, minimaps, and debug collision visualization.
-  lurek.render.setColor(0.2, 0.9, 0.4, 1)
-  lurek.render.circle("fill", 200, 150, 24)   -- filled green dot (pickup)
-  lurek.render.setColor(1, 1, 1, 0.4)
-  lurek.render.circle("line", 200, 150, 30)   -- faint outer ring (glow)
+  -- Draw a filled circle.
+  lurek.render.setColor(1, 0.5, 0, 1)
+  lurek.render.circle("fill", 400, 300, 50)
 end
 ```
 
@@ -490,13 +485,8 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- clear() discards everything drawn so far this frame.
-  -- Optional r,g,b args are reserved for future clear-color override.
-  -- Use to implement screen transitions or to discard a cancelled draw pass.
   function lurek.draw()
-    lurek.render.clear()
-    -- Now redraw from scratch
-    lurek.render.rectangle("fill", 0, 0, 100, 100)
+    lurek.render.clear(0.1, 0.1, 0.2)
   end
 end
 ```
@@ -559,17 +549,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Parameters: drawable, x, y, rotation, scaleX, scaleY, originX, originY
-  -- Origin offsets shift the point around which rotation and scaling happen.
-  -- Setting origin to the center of a sprite enables rotation around its midpoint.
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/player.png")
+  local _draw_canvas
+  function lurek.load()
+    _draw_canvas = lurek.render.newCanvas(50, 50)
   end
   function lurek.draw()
-    local w, h = img:getWidth(), img:getHeight()
-    -- Draw centered at (200, 200), rotated 45 degrees, no scale offset
-    lurek.render.draw(img, 200, 200, math.pi/4, 1, 1, w/2, h/2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.draw(_draw_canvas, 10, 10)
   end
 end
 ```
@@ -988,10 +974,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- An ellipse has separate horizontal (rx) and vertical (ry) radii.
-  -- Flat ellipses under characters simulate ground shadows.
-  lurek.render.setColor(0, 0, 0, 0.3)
-  lurek.render.ellipse("fill", 200, 300, 40, 10)  -- ground shadow
+  -- Draw a filled ellipse: mode, x, y, radiusX, radiusY.
+  lurek.render.setColor(0.3, 0.6, 1, 1)
+  lurek.render.ellipse("fill", 300, 200, 80, 40)
 end
 ```
 
@@ -1213,12 +1198,8 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Use for responsive layouts, centering, and aspect-ratio calculations.
   local w, h = lurek.render.getDimensions()
-  local cx, cy = w / 2, h / 2  -- screen center
-  function lurek.draw()
-    lurek.render.print("CENTER", cx - 20, cy)
-  end
+  lurek.log.debug("canvas: " .. w .. "x" .. h, "render")
 end
 ```
 
@@ -1460,7 +1441,7 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 ```lua
 do
   local h = lurek.render.getHeight()
-  lurek.log.info("screen height: " .. tostring(h) .. "px")
+  lurek.log.debug("render height: " .. h .. " px", "render")
 end
 ```
 
@@ -1611,7 +1592,7 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 ```lua
 do
   local w = lurek.render.getWidth()
-  lurek.log.info("screen width: " .. tostring(w) .. "px")
+  lurek.log.debug("render width: " .. w .. " px", "render")
 end
 ```
 
@@ -1696,13 +1677,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Pass x1,y1,x2,y2 for a single segment, or more pairs for a polyline.
-  -- Use setLineWidth() first to control thickness.
-  -- Great for laser beams, connection lines, and debug paths.
-  lurek.render.setLineWidth(2)
-  lurek.render.setColor(0.5, 1, 0.5, 1)
-  lurek.render.line(10, 10, 200, 10)                 -- horizontal line
-  lurek.render.line(10, 20, 50, 60, 100, 40, 150, 80)  -- polyline path
+  -- Draw a diagonal line from (100,100) to (400,300).
+  lurek.render.setColor(1, 1, 0, 1)
+  lurek.render.line(100, 100, 400, 300)
 end
 ```
 
@@ -1825,12 +1802,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Pass a TTF/OTF path + size to load a custom font, or just a number for built-in.
-  -- Fonts are GPU-cached after first use, so create them once in init().
+  -- Pass a number to select the nearest built-in bitmap font by pixel height.
+  -- Available sizes: 5, 7, 10, 14, 18, 22. Fonts are GPU-cached after first use, create once in init().
   local hud_font, title_font
   function lurek.init()
-    hud_font   = lurek.render.newFont("assets/fonts/Inter.ttf", 16)
-    title_font = lurek.render.newFont("assets/fonts/Inter.ttf", 48)
+    hud_font   = lurek.render.newFont(14)
+    title_font = lurek.render.newFont(22)
   end
 end
 ```
@@ -2130,11 +2107,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Minimum 3 vertices (6 values). Vertices are wound in order.
-  -- Use "fill" for solid shapes, "line" for outlines.
-  -- Ideal for hex tiles, irregular terrain chunks, or custom UI shapes.
-  lurek.render.setColor(0.6, 0.3, 0.9, 1)
-  lurek.render.polygon("fill", 100, 100, 150, 80, 200, 120, 170, 170, 120, 160)
+  -- Draw a filled triangle using a vertex list.
+  lurek.render.setColor(0.8, 0.2, 0.8, 1)
+  lurek.render.polygon("fill", 200, 100, 100, 300, 300, 300)
 end
 ```
 
@@ -2396,14 +2371,30 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Mode "fill" draws a solid rectangle; "line" draws only the outline.
-  -- Optional rx, ry add rounded corners (horizontal and vertical radii).
-  -- Rounded rects are common for buttons, panels, and health bars.
-  lurek.render.setColor(0.2, 0.6, 1.0, 1.0)
-  lurek.render.rectangle("fill", 32, 32, 200, 40)         -- solid blue bar
-  lurek.render.setColor(1, 1, 1, 1)
-  lurek.render.rectangle("line", 32, 32, 200, 40)         -- white outline
-  lurek.render.rectangle("fill", 32, 90, 200, 40, 8, 8)  -- rounded corners
+  -- Draw a filled rectangle.
+  lurek.render.setColor(0.2, 0.8, 0.2, 1)
+  lurek.render.rectangle("fill", 100, 100, 200, 120)
+end
+```
+
+### `lurek.render.resetCanvas(canvas: LCanvas)`
+
+Marks a canvas as needing a full clear before its next render pass. Use before re-rendering to avoid content accumulation.
+
+**Parameters**
+
+- `canvas` (`LCanvas`, required) - Canvas to reset.
+
+#### Example
+
+Exact example from [render.lua](../blob/main/content/examples/render.lua):
+
+```lua
+do
+  -- Reset a canvas so the next render pass starts with a fresh clear.
+  local canvas = lurek.render.newCanvas(64, 64)
+  lurek.render.resetCanvas(canvas)
+  lurek.log.debug("canvas reset, ready for fresh render pass", "render")
 end
 ```
 
@@ -2588,11 +2579,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- All draw calls use the current color as a tint/fill.
-  -- Values are floats from 0.0 to 1.0 for each channel (RGBA).
-  -- The alpha channel defaults to 1.0 (fully opaque) when omitted.
-  lurek.render.setColor(1.0, 0.5, 0.2, 1.0)  -- warm orange, fully opaque
-  lurek.render.setColor(0.0, 0.0, 0.0, 0.5)  -- semi-transparent black (shadow overlay)
+  function lurek.draw()
+    lurek.render.setColor(1, 0.5, 0, 1)
+    lurek.render.setColor(1, 0, 0, 1)
+    lurek.render.rectangle("fill", 0, 0, 100, 100)
+  end
 end
 ```
 
@@ -2685,10 +2676,10 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Switch fonts to change text appearance. Only one font is active at a time.
+  -- Select the nearest built-in bitmap font by pixel height. Available: 5, 7, 10, 14, 18, 22.
   local title_font
   function lurek.init()
-    title_font = lurek.render.newFont("assets/fonts/Inter.ttf", 32)
+    title_font = lurek.render.newFont(22)
   end
   function lurek.draw()
     lurek.render.setFont(title_font)
@@ -2807,13 +2798,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Affects rectangle("line"), circle("line"), line(), polygon("line"), etc.
-  -- Default is 1 pixel. Larger values create thicker outlines.
-  function lurek.draw()
-    lurek.render.setLineWidth(4)
-    lurek.render.rectangle("line", 50, 50, 100, 60)  -- thick border
-    lurek.render.setLineWidth(1)                      -- restore default
-  end
+  -- Thicker lines for a bold UI outline.
+  lurek.render.setLineWidth(3)
+  lurek.render.setColor(1, 1, 1, 1)
+  lurek.render.rectangle("line", 50, 50, 200, 100)
+  lurek.render.setLineWidth(1) -- restore default
 end
 ```
 
@@ -3074,10 +3063,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Triangles are the basic building block for custom polygons.
-  -- Useful for arrows, direction indicators, and simple particles.
-  lurek.render.setColor(1, 0.8, 0, 1)
-  lurek.render.triangle("fill", 400, 50, 380, 100, 420, 100)  -- yellow arrow tip
+  -- Draw a single triangle from three points.
+  lurek.render.setColor(1, 0.2, 0.2, 1)
+  lurek.render.triangle("fill", 200, 50, 100, 250, 300, 250)
 end
 ```
 
@@ -3174,10 +3162,10 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Frees the GPU render target. Use when switching levels or resizing.
-  local c
-  function lurek.init() c = lurek.render.newCanvas(320, 240) end
-  function lurek.quit() if c then c:release() end end
+  -- Free a temporary render target after compositing is complete.
+  local rt = lurek.render.newCanvas(320, 240)
+  rt:release()
+  lurek.log.info("canvas released", "render")
 end
 ```
 
@@ -3193,11 +3181,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local c
-  function lurek.init()
-    c = lurek.render.newCanvas(320, 240)
-    lurek.log.debug("type: " .. c:type())  -- "LCanvas"
-  end
+  -- Check the handle type for generic drawable management.
+  local rt = lurek.render.newCanvas(320, 240)
+  lurek.log.debug("canvas type: " .. rt:type())
 end
 ```
 
@@ -3217,10 +3203,10 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local c
-  function lurek.init()
-    c = lurek.render.newCanvas(320, 240)
-    if c:typeOf("LCanvas") then lurek.log.debug("confirmed Canvas type") end
+  -- Type-guard before calling canvas-specific methods.
+  local rt = lurek.render.newCanvas(320, 240)
+  if rt:typeOf("LCanvas") then
+    lurek.log.debug("confirmed LCanvas handle")
   end
 end
 ```
@@ -3416,7 +3402,7 @@ do
   -- Ascent = pixels above baseline (uppercase letter tops).
   local f
   function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
+    f = lurek.render.newFont(18)
     lurek.log.debug("ascent: " .. tostring(f:getAscent()) .. "px")
   end
 end
@@ -3437,7 +3423,7 @@ do
   -- Descent = pixels below baseline (tails of g, p, y).
   local f
   function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
+    f = lurek.render.newFont(18)
     lurek.log.debug("descent: " .. tostring(f:getDescent()) .. "px")
   end
 end
@@ -3455,12 +3441,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Returns the line height in pixels. Use for vertical text layout.
-  local f
-  function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
-    lurek.log.debug("font height: " .. f:getHeight() .. "px")
-  end
+  -- Use font height to calculate vertical spacing between lines.
+  pcall(function()
+    local f = lurek.render.getDefaultFont(16)
+    local h = f:getHeight()
+    lurek.log.debug("font height: " .. tostring(h) .. "px")
+  end)
 end
 ```
 
@@ -3479,7 +3465,7 @@ do
   -- Line height = vertical distance between baselines of consecutive lines.
   local f
   function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
+    f = lurek.render.newFont(18)
     lurek.log.debug("line height: " .. f:getLineHeight())
   end
 end
@@ -3501,13 +3487,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Measures the pixel width of a string. Use for button sizing and centering.
-  local f
-  function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
-    local w = f:getWidth("Hello, World!")
-    lurek.log.debug("text width: " .. w .. "px")
-  end
+  -- Center text horizontally by measuring its rendered width.
+  pcall(function()
+    local f = lurek.render.getDefaultFont(16)
+    local w = f:getWidth("Game Over")
+    lurek.log.debug("text width: " .. tostring(w) .. "px")
+  end)
 end
 ```
 
@@ -3532,7 +3517,7 @@ do
   -- Use to pre-calculate dialog box dimensions.
   local f
   function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 14)
+    f = lurek.render.newFont(14)
     local lines, widest = f:getWrap("A long sentence that must be wrapped.", 120)
     lurek.log.debug("wrapped to " .. #lines .. " lines, widest=" .. tostring(widest))
   end
@@ -3551,10 +3536,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Frees the font GPU resource. The handle is invalid after release.
-  local f
-  function lurek.init() f = lurek.render.newFont("assets/fonts/Inter.ttf", 18) end
-  function lurek.quit() if f then f:release() end end
+  -- Free a temporary font after building a text atlas.
+  pcall(function()
+    local f = lurek.render.newFont(22)
+    f:release()
+    lurek.log.debug("font released")
+  end)
 end
 ```
 
@@ -3575,7 +3562,7 @@ do
   -- Override the default line spacing for tighter or looser text layout.
   local f
   function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
+    f = lurek.render.newFont(18)
     f:setLineHeight(24)  -- force 24px between lines
   end
 end
@@ -3593,11 +3580,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local f
-  function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
-    lurek.log.debug("type: " .. f:type())  -- "LFont"
-  end
+  -- Identify handle type in a debug panel.
+  pcall(function()
+    local f = lurek.render.getDefaultFont(16)
+    lurek.log.debug("font handle type: " .. f:type())
+  end)
 end
 ```
 
@@ -3617,11 +3604,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local f
-  function lurek.init()
-    f = lurek.render.newFont("assets/fonts/Inter.ttf", 18)
-    if f:typeOf("LFont") then lurek.log.debug("confirmed Font type") end
-  end
+  -- Type-guard for generic resource cleanup functions.
+  pcall(function()
+    local f = lurek.render.getDefaultFont(16)
+    if f:typeOf("LFont") then
+      lurek.log.debug("confirmed LFont handle")
+    end
+  end)
 end
 ```
 
@@ -3658,13 +3647,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Returns width and height in one call — convenient for origin calculations.
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/hero.png")
+  -- Get both dimensions at once for origin offset calculation.
+  pcall(function()
+    local img = lurek.render.newImage("img/hero.png")
     local w, h = img:getDimensions()
     lurek.log.debug("image: " .. w .. "x" .. h)
-  end
+  end)
 end
 ```
 
@@ -3680,11 +3668,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/hero.png")
+  -- Use image height for vertical stacking or collision bounds.
+  pcall(function()
+    local img = lurek.render.newImage("img/hero.png")
     lurek.log.debug("image height: " .. img:getHeight() .. "px")
-  end
+  end)
 end
 ```
 
@@ -3720,11 +3708,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/hero.png")
+  -- Use image width for centering or collision bounds.
+  pcall(function()
+    local img = lurek.render.newImage("img/hero.png")
     lurek.log.debug("image width: " .. img:getWidth() .. "px")
-  end
+  end)
 end
 ```
 
@@ -3740,11 +3728,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Frees the GPU texture memory. The handle is invalid after this call.
-  -- Call in lurek.quit() for large textures, or when swapping level art.
-  local img
-  function lurek.init() img = lurek.render.newImage("img/hero.png") end
-  function lurek.quit() if img then img:release() end end
+  -- Free a temporary image after generating a texture atlas.
+  pcall(function()
+    local img = lurek.render.newImage("img/temp_asset.png")
+    img:release()
+    lurek.log.debug("image GPU memory freed")
+  end)
 end
 ```
 
@@ -3760,11 +3749,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/hero.png")
-    lurek.log.debug("type: " .. img:type())  -- "LImage"
-  end
+  -- Identify drawable type in a debug inspector.
+  pcall(function()
+    local img = lurek.render.newImage("img/hero.png")
+    lurek.log.debug("handle type: " .. img:type())
+  end)
 end
 ```
 
@@ -3784,11 +3773,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local img
-  function lurek.init()
-    img = lurek.render.newImage("img/hero.png")
-    if img:typeOf("LImage") then lurek.log.debug("confirmed Image type") end
-  end
+  -- Type-guard for a generic drawable renderer.
+  pcall(function()
+    local img = lurek.render.newImage("img/hero.png")
+    if img:typeOf("LImage") then
+      lurek.log.debug("confirmed LImage handle")
+    end
+  end)
 end
 ```
 
@@ -3879,8 +3870,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local data = lurek.image.newImageData(64, 64)
-  lurek.log.debug("imagedata height: " .. tostring(data:getHeight()))
+  -- Verify height matches expected atlas layout.
+  local data = lurek.image.newImageData(128, 64)
+  if data then lurek.log.debug("imagedata height: " .. data:getHeight()) end
 end
 ```
 
@@ -3927,8 +3919,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local data = lurek.image.newImageData(64, 64)
-  lurek.log.debug("imagedata width: " .. tostring(data:getWidth()))
+  -- Check ImageData dimensions before pixel-level operations.
+  local data = lurek.image.newImageData(128, 64)
+  if data then lurek.log.debug("imagedata width: " .. data:getWidth()) end
 end
 ```
 
@@ -3993,12 +3986,13 @@ Returns the type name of this object.
 
 #### Example
 
-Exact example from [image.lua](../blob/main/content/examples/image.lua):
+Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local img = lurek.image.newImageData(8, 8)
-  assert(img:type() == "ImageData")
+  -- Runtime type-checking for generic resource managers.
+  local data = lurek.image.newImageData(32, 32)
+  if data then lurek.log.debug("type: " .. data:type()) end
 end
 ```
 
@@ -4014,13 +4008,15 @@ Checks whether this object matches the given type name.
 
 #### Example
 
-Exact example from [image.lua](../blob/main/content/examples/image.lua):
+Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- typeOf checks if this handle matches a type name. Supports "ImageData" and "Object".
-  local img = lurek.image.newImageData(8, 8)
-  assert(img:typeOf("ImageData") == true)
+  -- Confirm handle before calling ImageData-specific methods.
+  local data = lurek.image.newImageData(32, 32)
+  if data and data:typeOf("LImageData") then
+    lurek.log.debug("confirmed LImageData handle")
+  end
 end
 ```
 
@@ -4093,15 +4089,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local m
-  function lurek.init()
-    m = lurek.render.newMesh({
-      { 0, 0, 0, 0, 1, 1, 1, 1 },
-      { 64, 0, 1, 0, 1, 1, 1, 1 },
-      { 32, 64, 0.5, 1, 1, 1, 1, 1 },
-    })
-    lurek.log.debug("vertex count: " .. m:getVertexCount())  -- 3
-  end
+  -- Check vertex count for debug display or LOD decisions.
+  local mesh = lurek.render.newMesh({
+    { 0, 0, 0, 0, 1, 1, 1, 1 },
+    { 64, 0, 1, 0, 1, 1, 1, 1 },
+    { 32, 64, 0.5, 1, 1, 1, 1, 1 },
+  }, "triangles")
+  lurek.log.debug("mesh verts: " .. mesh:getVertexCount())
 end
 ```
 
@@ -4117,15 +4111,14 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local m
-  function lurek.init()
-    m = lurek.render.newMesh({
-      { 0, 0, 0, 0, 1, 1, 1, 1 },
-      { 64, 0, 1, 0, 1, 1, 1, 1 },
-      { 32, 64, 0.5, 1, 1, 1, 1, 1 },
-    })
-  end
-  function lurek.quit() if m then m:release() end end
+  -- Free mesh GPU memory when leaving a level.
+  local mesh = lurek.render.newMesh({
+    { 0, 0, 0, 0, 1, 1, 1, 1 },
+    { 32, 0, 1, 0, 1, 1, 1, 1 },
+    { 16, 32, 0.5, 1, 1, 1, 1, 1 },
+  }, "triangles")
+  mesh:release()
+  lurek.log.debug("mesh released")
 end
 ```
 
@@ -4201,15 +4194,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local m
-  function lurek.init()
-    m = lurek.render.newMesh({
-      { 0, 0, 0, 0, 1, 1, 1, 1 },
-      { 64, 0, 1, 0, 1, 1, 1, 1 },
-      { 32, 64, 0.5, 1, 1, 1, 1, 1 },
-    })
-    lurek.log.debug("type: " .. m:type())  -- "LMesh"
-  end
+  -- Identify handle type in a debug inspector.
+  local mesh = lurek.render.newMesh({
+    { 0, 0, 0, 0, 1, 1, 1, 1 },
+    { 32, 0, 1, 0, 1, 1, 1, 1 },
+    { 16, 32, 0.5, 1, 1, 1, 1, 1 },
+  }, "triangles")
+  lurek.log.debug("mesh type: " .. mesh:type())
 end
 ```
 
@@ -4229,15 +4220,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local m
-  function lurek.init()
-    m = lurek.render.newMesh({
-      { 0, 0, 0, 0, 1, 1, 1, 1 },
-      { 64, 0, 1, 0, 1, 1, 1, 1 },
-      { 32, 64, 0.5, 1, 1, 1, 1, 1 },
-    })
-    if m:typeOf("LMesh") then lurek.log.debug("confirmed Mesh type") end
-  end
+  -- Type-guard in a generic drawable renderer.
+  local mesh = lurek.render.newMesh({
+    { 0, 0, 0, 0, 1, 1, 1, 1 },
+    { 32, 0, 1, 0, 1, 1, 1, 1 },
+    { 16, 32, 0.5, 1, 1, 1, 1, 1 },
+  }, "triangles")
+  if mesh:typeOf("LMesh") then lurek.log.debug("confirmed LMesh") end
 end
 ```
 
@@ -4326,12 +4315,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local panel
-  function lurek.init()
-    local ok, img = pcall(lurek.render.newImage, "img/panel.png")
-    if ok then panel = lurek.render.newNineSlice(img, 8, 8, 8, 8) end
-    if panel then lurek.log.debug(panel:type()) end  -- "LNineSlice"
-  end
+  -- Confirm handle type in a debug inspector.
+  pcall(function()
+    local img = lurek.render.newImage("img/panel.png")
+    local ns = lurek.render.newNineSlice(img, 8, 8, 8, 8)
+    lurek.log.debug("nine-slice type: " .. ns:type())
+  end)
 end
 ```
 
@@ -4351,14 +4340,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local panel
-  function lurek.init()
-    local ok, img = pcall(lurek.render.newImage, "img/panel.png")
-    if ok then panel = lurek.render.newNineSlice(img, 8, 8, 8, 8) end
-    if panel and panel:typeOf("LNineSlice") then
-      lurek.log.debug("confirmed NineSlice")
-    end
-  end
+  -- Type-guard for generic UI element drawing.
+  pcall(function()
+    local img = lurek.render.newImage("img/panel.png")
+    local ns = lurek.render.newNineSlice(img, 8, 8, 8, 8)
+    if ns:typeOf("LNineSlice") then lurek.log.debug("confirmed LNineSlice") end
+  end)
 end
 ```
 
@@ -4625,11 +4612,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local q
-  function lurek.init()
-    q = lurek.render.newQuad(0, 0, 32, 32, 256, 256)
-    lurek.log.debug("type: " .. q:type())  -- "LQuad"
-  end
+  -- Identify handle type in a resource debugger.
+  local q = lurek.render.newQuad(0, 0, 32, 32, 256, 256)
+  lurek.log.debug("quad type: " .. q:type())
 end
 ```
 
@@ -4649,11 +4634,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local q
-  function lurek.init()
-    q = lurek.render.newQuad(0, 0, 32, 32, 256, 256)
-    if q:typeOf("LQuad") then lurek.log.debug("confirmed Quad type") end
-  end
+  -- Type-guard for a generic spritesheet frame handler.
+  local q = lurek.render.newQuad(0, 0, 32, 32, 256, 256)
+  if q:typeOf("LQuad") then lurek.log.debug("confirmed LQuad") end
 end
 ```
 
@@ -4761,11 +4744,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local sh
-  function lurek.init()
-    sh = lurek.render.newShader("// shader source")
-    lurek.log.debug("type: " .. sh:type())  -- "LShader"
-  end
+  -- Identify shader handle in a resource dump.
+  pcall(function()
+    local sh = lurek.render.newShader("// minimal WGSL")
+    lurek.log.debug("shader type: " .. sh:type())
+  end)
 end
 ```
 
@@ -4785,11 +4768,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local sh
-  function lurek.init()
-    sh = lurek.render.newShader("// shader source")
-    if sh:typeOf("LShader") then lurek.log.debug("confirmed Shader type") end
-  end
+  -- Type-guard before sending uniforms to a shader handle.
+  pcall(function()
+    local sh = lurek.render.newShader("// minimal WGSL")
+    if sh:typeOf("LShader") then lurek.log.debug("confirmed LShader") end
+  end)
 end
 ```
 
@@ -4888,14 +4871,11 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Reset the shape to rebuild it each frame (for dynamic vector graphics).
-  local s
-  function lurek.init() s = lurek.render.newShape() end
-  function lurek.process(dt)
-    s:clear()
-    -- Rebuild with current game state...
-    s:rectangle("fill", 0, 0, 50, 50)
-  end
+  -- Reset a retained shape before rebuilding it with new geometry.
+  local icon = lurek.render.newShape()
+  icon:circle("fill", 16, 16, 12)
+  icon:clear()
+  lurek.log.debug("shape cleared — ready for new commands")
 end
 ```
 
@@ -5214,11 +5194,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local s
-  function lurek.init()
-    s = lurek.render.newShape()
-    lurek.log.debug("type: " .. s:type())  -- "LShape"
-  end
+  -- Identify shape handle in a debug inspector.
+  local shape = lurek.render.newShape()
+  lurek.log.debug("shape type: " .. shape:type())
 end
 ```
 
@@ -5238,11 +5216,9 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local s
-  function lurek.init()
-    s = lurek.render.newShape()
-    if s:typeOf("LShape") then lurek.log.debug("confirmed Shape") end
-  end
+  -- Type-guard for a generic shape-or-drawable renderer.
+  local shape = lurek.render.newShape()
+  if shape:typeOf("LShape") then lurek.log.debug("confirmed LShape") end
 end
 ```
 
@@ -5312,15 +5288,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Call each frame before rebuilding the batch with updated positions.
-  local batch
-  function lurek.init()
-    batch = lurek.render.newSpriteBatch(lurek.render.newImage("img/tiles.png"), 1024)
-  end
-  function lurek.process(dt)
+  -- Clear the batch at the start of each frame before re-adding visible tiles.
+  pcall(function()
+    local tileset = lurek.render.newImage("img/tiles.png")
+    local batch = lurek.render.newSpriteBatch(tileset, 256)
     batch:clear()
-    -- Re-add visible tiles based on camera position...
-  end
+    lurek.log.debug("sprite batch cleared")
+  end)
 end
 ```
 
@@ -5357,14 +5331,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  -- Use for debug stats or to detect when approaching buffer capacity.
-  local batch
-  function lurek.init()
-    batch = lurek.render.newSpriteBatch(lurek.render.newImage("img/tiles.png"), 256)
-    batch:add(0, 0)
-    batch:add(32, 0)
-    lurek.log.debug("batch count: " .. batch:getCount())  -- 2
-  end
+  -- Display batch count in a debug overlay for draw-call optimization.
+  pcall(function()
+    local tileset = lurek.render.newImage("img/tiles.png")
+    local batch = lurek.render.newSpriteBatch(tileset, 256)
+    lurek.log.debug("batch entries: " .. batch:getCount())
+  end)
 end
 ```
 
@@ -5380,11 +5352,13 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local batch
-  function lurek.init()
-    batch = lurek.render.newSpriteBatch(lurek.render.newImage("img/tiles.png"), 256)
-  end
-  function lurek.quit() if batch then batch:release() end end
+  -- Free batch memory when leaving a tile-based level.
+  pcall(function()
+    local tileset = lurek.render.newImage("img/tiles.png")
+    local batch = lurek.render.newSpriteBatch(tileset, 256)
+    batch:release()
+    lurek.log.debug("sprite batch released")
+  end)
 end
 ```
 
@@ -5400,11 +5374,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local batch
-  function lurek.init()
-    batch = lurek.render.newSpriteBatch(lurek.render.newImage("img/tiles.png"), 64)
-    lurek.log.debug("type: " .. batch:type())  -- "LSpriteBatch"
-  end
+  -- Identify handle type in a resource debugger.
+  pcall(function()
+    local tileset = lurek.render.newImage("img/tiles.png")
+    local batch = lurek.render.newSpriteBatch(tileset, 256)
+    lurek.log.debug("batch type: " .. batch:type())
+  end)
 end
 ```
 
@@ -5424,11 +5399,12 @@ Exact example from [render.lua](../blob/main/content/examples/render.lua):
 
 ```lua
 do
-  local batch
-  function lurek.init()
-    batch = lurek.render.newSpriteBatch(lurek.render.newImage("img/tiles.png"), 64)
-    if batch:typeOf("LSpriteBatch") then lurek.log.debug("confirmed SpriteBatch") end
-  end
+  -- Type-guard for generic drawable rendering.
+  pcall(function()
+    local tileset = lurek.render.newImage("img/tiles.png")
+    local batch = lurek.render.newSpriteBatch(tileset, 256)
+    if batch:typeOf("LSpriteBatch") then lurek.log.debug("confirmed LSpriteBatch") end
+  end)
 end
 ```
 

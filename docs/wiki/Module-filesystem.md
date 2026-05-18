@@ -127,7 +127,7 @@ do
   end
 end
 
---@api-stub: lurek.filesystem.read
+--@api-stub: LFileHandle:read
 -- Reads a UTF-8 text file from GameFS
 do
   -- read() loads the entire file as a UTF-8 string. Use it for config files,
@@ -140,7 +140,7 @@ do
   end
 end
 
---@api-stub: lurek.filesystem.write
+--@api-stub: LFileHandle:write
 -- Writes a UTF-8 text file through GameFS
 do
   -- write() creates or overwrites a file with text content. GameFS resolves the
@@ -936,13 +936,11 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- read() loads the entire file as a UTF-8 string. Use it for config files,
-  -- level data, dialogue CSVs, or any text-based game data.
-  -- Wrapping in pcall handles missing files gracefully.
-  local ok, toml = pcall(lurek.filesystem.read, "config/options.toml")
-  if ok then
-    lurek.log.info("loaded options.toml (" .. #toml .. " bytes)", "config")
-    -- Parse the TOML string here to extract game settings
+  local text, err = lurek.filesystem.read("save/score.txt")
+  if text then
+    lurek.log.debug("read " .. #text .. " bytes", "example")
+  else
+    lurek.log.debug("read error: " .. tostring(err), "example")
   end
 end
 ```
@@ -1257,12 +1255,8 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- write() creates or overwrites a file with text content. GameFS resolves the
-  -- path relative to the save directory, so writes are sandboxed and safe.
-  -- Use this for simple save data, high scores, or small config persistence.
-  local score = 12450
-  lurek.filesystem.write("save/highscore.txt", tostring(score))
-  -- The file now exists at <save_dir>/highscore.txt and will persist across runs.
+  local ok, err = lurek.filesystem.write("save/_fs_tests/write_test.txt", "hello")
+  lurek.log.debug("write ok: " .. tostring(ok), "example")
 end
 ```
 
@@ -1397,13 +1391,9 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- LFileData:getSize() tells you how many bytes the loaded file occupies.
-  -- Use it for progress bars, memory budgets, or deciding whether to cache.
-  pcall(function()
-    local fd = lurek.filesystem.newFileData("assets/sfx/jump.ogg")
-    local kb = fd:getSize() / 1024
-    lurek.log.info(string.format("jump.ogg = %.1f KiB", kb), "audio")
-  end)
+  local fd = lurek.filesystem.newFileData("content/examples/filesystem.lua")
+  local sz = fd:getSize()
+  lurek.log.debug("FileData size: " .. sz .. " bytes", "fs") -- 11
 end
 ```
 
@@ -1442,15 +1432,8 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- type() always returns "LFileData". Use it for runtime type checks when
-  -- you have a generic handle and need to confirm what kind of object it is.
-  local ok_fd, file_data_obj = pcall(lurek.filesystem.newFileData, "save/highscore.txt")
-  if ok_fd and file_data_obj then
-    local t = file_data_obj:type()
-    lurek.log.info("LFileData:type = " .. t, "filesystem")
-  else
-    lurek.log.info("LFileData:type = skipped", "filesystem")
-  end
+  local obj = lurek.filesystem.newFileData('content/examples/filesystem.lua')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LFileData"
 end
 ```
 
@@ -1470,16 +1453,8 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- typeOf() checks if this handle matches a given type name. Accepts "LFileData"
-  -- and "Object" (the base type). Use it for polymorphic code that handles
-  -- multiple handle types.
-  local ok_fd2, file_data_obj2 = pcall(lurek.filesystem.newFileData, "save/highscore.txt")
-  if ok_fd2 and file_data_obj2 then
-    lurek.log.info("is LFileData: " .. tostring(file_data_obj2:typeOf("LFileData")), "filesystem")
-    lurek.log.info("is wrong: " .. tostring(file_data_obj2:typeOf("Unknown")), "filesystem")
-  else
-    lurek.log.info("LFileData:typeOf = skipped", "filesystem")
-  end
+  local obj = lurek.filesystem.newFileData('content/examples/filesystem.lua')
+  lurek.log.debug("typeOf LFileData: " .. tostring(obj:typeOf("LFileData")), "example") -- true
 end
 ```
 
@@ -1718,13 +1693,8 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- type() always returns "LFileHandle" for file handle objects.
-  local ok_fh ---@type boolean
-  local file_handle_obj ---@type LFileHandle?
-  ok_fh, file_handle_obj = pcall(lurek.filesystem.openFile, "save/highscore.txt", nil)
-  if not ok_fh then file_handle_obj = nil end
-  local t = file_handle_obj and file_handle_obj:type() or "LFileHandle"
-  lurek.log.info("LFileHandle:type = " .. t, "filesystem")
+  local obj = lurek.filesystem.openFile('save/score.txt', 'r')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LFileHandle"
 end
 ```
 
@@ -1744,13 +1714,8 @@ Exact example from [filesystem.lua](../blob/main/content/examples/filesystem.lua
 
 ```lua
 do
-  -- typeOf() checks "LFileHandle" and "Object". Same pattern as LFileData:typeOf.
-  local ok_fh ---@type boolean
-  local file_handle_obj ---@type LFileHandle?
-  ok_fh, file_handle_obj = pcall(lurek.filesystem.openFile, "save/highscore.txt", nil)
-  if not ok_fh then file_handle_obj = nil end
-  lurek.log.info("is LFileHandle: " .. tostring(file_handle_obj and file_handle_obj:typeOf("LFileHandle") or false), "filesystem")
-  lurek.log.info("is wrong: " .. tostring(file_handle_obj and file_handle_obj:typeOf("Unknown") or false), "filesystem")
+  local obj = lurek.filesystem.openFile('save/score.txt', 'r')
+  lurek.log.debug("typeOf LFileHandle: " .. tostring(obj:typeOf("LFileHandle")), "example") -- true
 end
 ```
 

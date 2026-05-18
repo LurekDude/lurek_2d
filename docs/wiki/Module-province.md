@@ -1229,7 +1229,7 @@ end
 
 ## Reference Games
 
-No direct references were found in `content/games/**/main.lua`.
+- [eu2](../tree/main/content/games/strategy/eu2) (strategy)
 
 ## Related Modules
 

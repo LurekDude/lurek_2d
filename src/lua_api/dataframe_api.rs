@@ -533,7 +533,7 @@ impl LuaUserData for LuaDataFrame {
         // -- fillNil --
         /// Replaces nil cells in a column with a value.
         /// @param | col | string | Column name string or one-based column index.
-        /// @param | val | string | Replacement cell value.
+        /// @param | val | any | Replacement cell value.
         methods.add_method("fillNil", |_, this, (col, val): (LuaValue, LuaValue)| {
             let cr = lua_to_col_ref(col)?;
             let cv = lua_to_cell(val);
@@ -1051,7 +1051,7 @@ impl LuaUserData for LuaLazyQuery {
         /// Adds a filter step to the lazy query.
         /// @param | col | string | Column name to filter.
         /// @param | op | string | Comparison operator string.
-        /// @param | val | string | Filter comparison value.
+        /// @param | val | any | Filter comparison value.
         /// @return | LLazyQuery | New lazy query handle with the filter step.
         methods.add_method_mut(
             "filter",

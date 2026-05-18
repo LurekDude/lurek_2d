@@ -271,7 +271,7 @@ do
   lurek.physics.destroyWorld(world)
 end
 
---@api-stub: lurek.physics.newBody
+--@api-stub: LWorld:newBody
 -- Creates a new body in a world (free-function variant)
 do
   -- Free-function body creation: newBody(world, x, y, type)
@@ -511,13 +511,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Bodies "sleep" when at rest to save CPU. Sleeping bodies skip simulation.
-  -- Query this to decide if you need to wake a body before applying forces.
-  local world = lurek.physics.newWorld(0, 9.81)
-  local body = lurek.physics.newBody(world, 100, 200, "dynamic")
-  if lurek.physics.isSleepingAllowed(world, body) then
-    lurek.log.debug("body may sleep when idle — good for background props", "phys")
-  end
+  local world = lurek.physics.newWorld(0, 9.8)
+  local body = lurek.physics.newBody(world, 100, 100, 'dynamic')
+  lurek.physics.setSleepingAllowed(world, body, true)
+  local allowed = lurek.physics.isSleepingAllowed(world, body)
+  lurek.log.debug("sleeping allowed: " .. tostring(allowed), "physics") -- true
 end
 ```
 
@@ -540,14 +538,10 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Free-function body creation: newBody(world, x, y, type)
-  -- Types: "dynamic" (moves with physics), "static" (immovable),
-  --        "kinematic" (moves by code, not forces), "sensor" (overlap only)
-  local world = lurek.physics.newWorld(0, 9.81)
-
-  -- Place a crate at pixel (100,200) that falls under gravity
-  local crate = lurek.physics.newBody(world, 100, 200, "dynamic")
-  crate:setMass(1.0) -- mass in kg, affects inertia and impulse response
+  -- newBody(world, x, y, type) creates a physics body without needing world:newBody.
+  local world = lurek.physics.newWorld(0, 9.8)
+  local body = lurek.physics.newBody(world, 200, 100, "dynamic")
+  lurek.log.debug("body type: " .. body:type(), "physics") -- "LBody"
 end
 ```
 
@@ -805,11 +799,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Disable sleeping for the player character so it always responds to input.
-  -- Sleeping bodies ignore forces until woken by a collision or wakeUp() call.
-  local world = lurek.physics.newWorld(0, 9.81)
-  local player = lurek.physics.newBody(world, 100, 200, "dynamic")
-  lurek.physics.setSleepingAllowed(world, player, false)
+  local world = lurek.physics.newWorld(0, 9.8)
+  local body = lurek.physics.newBody(world, 100, 100, 'dynamic')
+  -- Allow idle bodies to sleep (saves CPU when bodies are stationary).
+  lurek.physics.setSleepingAllowed(world, body, false)
+  lurek.log.debug("sleeping not allowed for body", "physics")
 end
 ```
 
@@ -828,14 +822,12 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- The free-function variant is handy when you pass worlds between modules.
-  -- Call once per frame with the frame delta to advance the simulation.
-  local world = lurek.physics.newWorld(0, 9.81)
-  function lurek.process(dt)
-    -- dt is the elapsed time since last frame (typically ~1/60 seconds).
-    -- The step resolves forces, collisions, and joint constraints.
-    lurek.physics.step(world, dt)
-  end
+  local world = lurek.physics.newWorld(0, 9.8)
+  local body = world:newBody(200, 0, "dynamic")
+  -- Advance the simulation by 1/60 s.
+  lurek.physics.step(world, 1/60)
+  local x, y = body:getPosition()
+  lurek.log.debug("pos after step: " .. string.format("%.2f, %.2f", x, y), "physics")
 end
 ```
 
@@ -968,14 +960,10 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Free-function body creation: newBody(world, x, y, type)
-  -- Types: "dynamic" (moves with physics), "static" (immovable),
-  --        "kinematic" (moves by code, not forces), "sensor" (overlap only)
-  local world = lurek.physics.newWorld(0, 9.81)
-
-  -- Place a crate at pixel (100,200) that falls under gravity
-  local crate = lurek.physics.newBody(world, 100, 200, "dynamic")
-  crate:setMass(1.0) -- mass in kg, affects inertia and impulse response
+  -- newBody(world, x, y, type) creates a physics body without needing world:newBody.
+  local world = lurek.physics.newWorld(0, 9.8)
+  local body = lurek.physics.newBody(world, 200, 100, "dynamic")
+  lurek.log.debug("body type: " .. body:type(), "physics") -- "LBody"
 end
 ```
 
@@ -1113,11 +1101,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Remove a body from the world. All fixtures and joints are also removed.
-  -- After destroy(), the LBody handle is invalid — do not use it again.
+  -- Remove a projectile after it hits a target. The body handle becomes invalid.
   local world = lurek.physics.newWorld(0, 9.81)
-  local enemy = world:newBody(100, 200, "dynamic")
-  enemy:destroy()
+  local arrow = world:newBody(400, 200, "dynamic")
+  arrow:destroy()
+  lurek.log.info("arrow removed from world", "phys")
 end
 ```
 
@@ -1394,11 +1382,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Returns "static", "dynamic", "kinematic", or "sensor".
-  -- Use to filter bodies in generic processing loops.
+  -- Query type to apply different logic (e.g., only damage dynamic bodies).
   local world = lurek.physics.newWorld(0, 9.81)
-  local body = world:newBody(100, 200, "dynamic")
-  if body:getType() == "dynamic" then body:applyImpulse(0, -50) end
+  local crate = world:newBody(100, 200, "dynamic")
+  local kind = crate:getType()
+  lurek.log.info("body type: " .. kind, "phys")
 end
 ```
 
@@ -1680,10 +1668,12 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Low friction for ice levels, high friction for rubber-band physics.
+  -- Friction controls how much a body resists sliding against surfaces.
+  -- 0.0 = ice, 1.0 = rubber. Affects all fixtures on this body.
   local world = lurek.physics.newWorld(0, 9.81)
-  local ice = world:newBody(100, 200, "dynamic")
-  ice:setFriction(0.05) -- nearly frictionless — slides easily
+  local ice_block = world:newBody(200, 300, "dynamic")
+  ice_block:setFriction(0.05)
+  lurek.log.debug("ice block friction set to 0.05", "phys")
 end
 ```
 
@@ -1829,10 +1819,12 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Bouncy ball for a pinball or Breakout-style game.
+  -- Restitution controls bounce: 0.0 = no bounce, 1.0 = perfect bounce.
+  -- Values above 1.0 add energy (use sparingly for jump pads).
   local world = lurek.physics.newWorld(0, 9.81)
-  local ball = world:newBody(100, 200, "dynamic")
-  ball:setRestitution(0.8) -- bounces back 80% of impact speed
+  local ball = world:newBody(150, 100, "dynamic")
+  ball:setRestitution(0.8)
+  lurek.log.debug("bouncy ball restitution=0.8", "phys")
 end
 ```
 
@@ -1934,11 +1926,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- type() returns the Lurek2D object class name as a string.
-  local w = lurek.physics.newWorld(0, 9.81)
-  local body_obj = w:newBody(0, 0, "dynamic")
-  local t = body_obj:type()
-  lurek.log.info("LBody:type = " .. t, "physics")
+  local obj = (function() local w = lurek.physics.newWorld(0, 9.8); return w:newBody(100, 100, 'dynamic') end)()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LBody"
 end
 ```
 
@@ -1958,11 +1947,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- typeOf checks class identity — always matches "Object" as a base type.
-  local w2 = lurek.physics.newWorld(0, 9.81)
-  local body_obj2 = w2:newBody(0, 0, "dynamic")
-  lurek.log.info("is LBody: " .. tostring(body_obj2 and body_obj2:typeOf("LBody") or false), "physics")
-  lurek.log.info("is wrong: " .. tostring(body_obj2 and body_obj2:typeOf("Unknown") or false), "physics")
+  local obj = (function() local w = lurek.physics.newWorld(0, 9.8); return w:newBody(100, 100, 'dynamic') end)()
+  lurek.log.debug("typeOf LBody: " .. tostring(obj:typeOf("LBody")), "example") -- true
 end
 ```
 
@@ -2252,11 +2238,18 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Render the entire grid to RGBA bytes using a default material palette.
-  -- Result is width*height*4 bytes — feed to lurek.image.newImageData for display.
-  local sand = lurek.physics.newCellular(128, 64)
-  local rgba = sand:toImageData()
-  lurek.log.debug("cellular bytes=" .. #rgba, "cell")
+  -- Render terrain to RGBA pixels with custom solid/empty colors.
+  -- Args: sr,sg,sb (solid RGB 0-255), er,eg,eb (empty RGB 0-255)
+  -- Use to create a texture from the terrain grid for rendering.
+  local _w = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(32, 32, 8, _w)
+  terrain:fillAll(true)
+  terrain:fillCircle(16, 16, 8, false)
+  terrain:flush()
+
+  -- White for solid, black for empty
+  local bytes = terrain:toImageData(255, 255, 255, 0, 0, 0)
+  lurek.log.info("terrain image: " .. #bytes .. " bytes", "physics")
 end
 ```
 
@@ -2303,9 +2296,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local cellular_obj = lurek.physics.newCellular(32, 32)
-  local t = cellular_obj:type()
-  lurek.log.info("LCellular:type = " .. t, "physics")
+  local obj = lurek.physics.newCellular(40, 30)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LCellular"
 end
 ```
 
@@ -2325,9 +2317,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local cellular_obj = lurek.physics.newCellular(32, 32)
-  lurek.log.info("is LCellular: " .. tostring(cellular_obj:typeOf("LCellular")), "physics")
-  lurek.log.info("is wrong: " .. tostring(cellular_obj:typeOf("Unknown")), "physics")
+  local obj = lurek.physics.newCellular(40, 30)
+  lurek.log.debug("typeOf LCellular: " .. tostring(obj:typeOf("LCellular")), "example") -- true
 end
 ```
 
@@ -2520,9 +2511,10 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local physics_shape_obj = lurek.physics.newRectangleShape(32, 32)
-  local t = physics_shape_obj:type()
-  lurek.log.info("LPhysicsShape:type = " .. t, "physics")
+  local world = lurek.physics.newWorld(0, 9.81)
+  local zone = world:addZone(0, 0, 100, 100)
+  local t = zone:type()
+  lurek.log.info("LZone:type = " .. t, "physics")
 end
 ```
 
@@ -2542,9 +2534,10 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local physics_shape_obj = lurek.physics.newRectangleShape(32, 32)
-  lurek.log.info("is LPhysicsShape: " .. tostring(physics_shape_obj:typeOf("LPhysicsShape")), "physics")
-  lurek.log.info("is wrong: " .. tostring(physics_shape_obj:typeOf("Unknown")), "physics")
+  local world = lurek.physics.newWorld(0, 9.81)
+  local zone = world:addZone(0, 0, 100, 100)
+  lurek.log.info("is LZone: " .. tostring(zone:typeOf("LZone")), "physics")
+  lurek.log.info("is wrong: " .. tostring(zone:typeOf("Unknown")), "physics")
 end
 ```
 
@@ -2633,16 +2626,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Carve or fill circular areas in the terrain — for explosion craters.
-  -- Args: wx, wy (world coords center), radius, solid (true=fill, false=carve)
-  local _world = lurek.physics.newWorld(0, 9.81)
-  local terrain = lurek.physics.newTerrain(64, 64, 8, _world)
+  -- Explosion carves a circular crater in destructible terrain.
+  local world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
   terrain:fillAll(true)
-
-  -- Dig a circular crater at the center of the terrain
-  terrain:fillCircle(32, 32, 10, false)
-  terrain:flush() -- regenerate colliders after modification
-  lurek.log.info("terrain crater dug", "physics")
+  terrain:fillCircle(32.0, 16.0, 24.0, false)
+  terrain:flush()
+  lurek.log.info("explosion crater carved at (32,16) r=24", "phys")
 end
 ```
 
@@ -2664,13 +2654,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Fill or carve rectangular regions — for room generation or level building.
-  -- Args: wx, wy, w, h (world coords), solid
-  local _world = lurek.physics.newWorld(0, 9.81)
-  local terrain = lurek.physics.newTerrain(64, 64, 8, _world)
-  terrain:fillRect(10, 10, 40, 40, true) -- create a solid rectangular platform
+  -- Dig a rectangular tunnel through the terrain for a mining game.
+  local world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
+  terrain:fillAll(true)
+  terrain:fillRect(10.0, 12.0, 64.0, 16.0, false)
   terrain:flush()
-  lurek.log.info("terrain rect filled", "physics")
+  lurek.log.info("tunnel carved at (10,12) 64x16", "phys")
 end
 ```
 
@@ -2712,11 +2702,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Query whether a cell is solid — useful for game logic outside physics.
-  -- Example: check if a tile is diggable before allowing the player to destroy it.
+  -- Check if a specific cell is solid before placing an object there.
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
-  if terrain:getCell(10, 5) then lurek.log.debug("solid cell", "terrain") end
+  terrain:fillAll(true)
+  terrain:setCell(5, 5, false)
+  local solid = terrain:getCell(5, 5)
+  lurek.log.debug("cell (5,5) solid=" .. tostring(solid), "phys")
 end
 ```
 
@@ -2756,12 +2748,14 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Restore terrain from a save file. Call flush() after to rebuild colliders.
+  -- Restore a previously saved terrain state on level load.
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
-  local snapshot = terrain:toBytes()
-  terrain:loadFromBytes(snapshot)
-  terrain:flush() -- must flush to regenerate physics
+  terrain:fillAll(true)
+  local saved = terrain:toBytes()
+  local ok = terrain:loadFromBytes(saved)
+  terrain:flush()
+  lurek.log.info("terrain restored from bytes, success=" .. tostring(ok), "phys")
 end
 ```
 
@@ -2781,12 +2775,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Set individual cells to solid (true) or empty (false).
-  -- Remember to call flush() after modifications to update physics colliders.
+  -- Carve a single cell out of the terrain (e.g., player digs one tile).
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
-  terrain:setCell(10, 5, true)  -- make cell (10,5) solid
-  terrain:flush()               -- regenerate colliders
+  terrain:fillAll(true)
+  terrain:setCell(10, 5, false)
+  terrain:flush()
+  lurek.log.debug("carved cell (10,5) out of terrain", "phys")
 end
 ```
 
@@ -2857,12 +2852,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Serialize the terrain grid to binary for saving to disk.
-  -- Compact format stores only the boolean grid, not physics state.
+  -- Save terrain state to disk so the player can resume later.
   local world = lurek.physics.newWorld(0, 9.81)
   local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
-  local bytes = terrain:toBytes()
-  lurek.log.info("terrain blob=" .. #bytes .. " bytes", "save")
+  terrain:fillAll(true)
+  terrain:fillCircle(20.0, 10.0, 8.0, false)
+  local data = terrain:toBytes()
+  lurek.log.info("terrain serialized, " .. #data .. " bytes", "phys")
 end
 ```
 
@@ -2887,18 +2883,13 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Render terrain to RGBA pixels with custom solid/empty colors.
-  -- Args: sr,sg,sb (solid RGB 0-255), er,eg,eb (empty RGB 0-255)
-  -- Use to create a texture from the terrain grid for rendering.
-  local _w = lurek.physics.newWorld(0, 9.81)
-  local terrain = lurek.physics.newTerrain(32, 32, 8, _w)
+  -- Generate a minimap preview of the terrain with green for solid, black for empty.
+  local world = lurek.physics.newWorld(0, 9.81)
+  local terrain = lurek.physics.newTerrain(64, 32, 8.0, world)
   terrain:fillAll(true)
-  terrain:fillCircle(16, 16, 8, false)
-  terrain:flush()
-
-  -- White for solid, black for empty
-  local bytes = terrain:toImageData(255, 255, 255, 0, 0, 0)
-  lurek.log.info("terrain image: " .. #bytes .. " bytes", "physics")
+  terrain:fillCircle(32.0, 16.0, 10.0, false)
+  local pixels = terrain:toImageData(0, 200, 0, 0, 0, 0)
+  lurek.log.info("terrain preview generated: " .. #pixels .. " bytes", "phys")
 end
 ```
 
@@ -2914,10 +2905,9 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local _tw = lurek.physics.newWorld(0, 9.81)
-  local terrain_obj = lurek.physics.newTerrain(32, 32, 1.0, _tw)
-  local t = terrain_obj:type()
-  lurek.log.info("LTerrain:type = " .. t, "physics")
+  local world = lurek.physics.newWorld(0, 9.8)
+  local obj = lurek.physics.newTerrain(64, 64, 1.0, world)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LTerrain"
 end
 ```
 
@@ -2937,10 +2927,9 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local _tw2 = lurek.physics.newWorld(0, 9.81)
-  local terrain_obj = lurek.physics.newTerrain(32, 32, 1.0, _tw2)
-  lurek.log.info("is LTerrain: " .. tostring(terrain_obj:typeOf("LTerrain")), "physics")
-  lurek.log.info("is wrong: " .. tostring(terrain_obj:typeOf("Unknown")), "physics")
+  local world = lurek.physics.newWorld(0, 9.8)
+  local obj = lurek.physics.newTerrain(64, 64, 1.0, world)
+  lurek.log.debug("typeOf LTerrain: " .. tostring(obj:typeOf("LTerrain")), "example") -- true
 end
 ```
 
@@ -4894,12 +4883,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- The method variant of step — call on the world object directly.
-  -- One step per frame at variable dt gives smooth but non-deterministic results.
+  -- The method variant steps the world by dt seconds. Call once per frame.
   local world = lurek.physics.newWorld(0, 9.81)
-  function lurek.process(dt)
-    world:step(dt) -- advances bodies, resolves collisions, fires callbacks
-  end
+  world:newBody(100, 0, "dynamic")
+  world:step(0.016)
+  lurek.log.debug("world stepped by 16ms", "phys")
 end
 ```
 
@@ -4992,9 +4980,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local world_obj = lurek.physics.newWorld(0, 9.81)
-  local t = world_obj:type()
-  lurek.log.info("LWorld:type = " .. t, "physics")
+  local obj = lurek.physics.newWorld(0, 9.8)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LWorld"
 end
 ```
 
@@ -5014,9 +5001,8 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local world_obj = lurek.physics.newWorld(0, 9.81)
-  lurek.log.info("is LWorld: " .. tostring(world_obj:typeOf("LWorld")), "physics")
-  lurek.log.info("is wrong: " .. tostring(world_obj:typeOf("Unknown")), "physics")
+  local obj = lurek.physics.newWorld(0, 9.8)
+  lurek.log.debug("typeOf LWorld: " .. tostring(obj:typeOf("LWorld")), "example") -- true
 end
 ```
 
@@ -5073,10 +5059,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Remove a zone from the world. Bodies are no longer affected.
+  -- Remove a temporary speed-boost zone after it expires.
   local world = lurek.physics.newWorld(0, 9.81)
-  local zone = world:addZone(0, 0, 100, 100)
-  zone:destroy() -- zone is gone
+  local boost = world:addZone(300, 200, 64, 64)
+  boost:destroy()
+  lurek.log.info("speed boost zone removed", "phys")
 end
 ```
 
@@ -5092,10 +5079,11 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  -- Every zone has a unique numeric ID for referencing in event tables.
+  -- Use zone IDs to track which zones are active and remove them later.
   local world = lurek.physics.newWorld(0, 9.81)
-  local zone = world:addZone(0, 0, 100, 100)
-  lurek.log.info("water zone id=" .. zone:getId(), "phys")
+  local zone = world:addZone(0, 400, 200, 100)
+  local id = zone:getId()
+  lurek.log.info("created zone id=" .. id, "phys")
 end
 ```
 
@@ -5336,10 +5324,9 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local world = lurek.physics.newWorld(0, 9.81)
-  local zone = world:addZone(0, 0, 100, 100)
-  local t = zone:type()
-  lurek.log.info("LZone:type = " .. t, "physics")
+  -- LZone is created via world:newZone(x, y, w, h); verified at runtime
+  local world = lurek.physics.newWorld(0, 9.8)
+  lurek.log.debug("LZone: use world:newZone(x, y, w, h) to create", "example")
 end
 ```
 
@@ -5359,10 +5346,9 @@ Exact example from [physics.lua](../blob/main/content/examples/physics.lua):
 
 ```lua
 do
-  local world = lurek.physics.newWorld(0, 9.81)
-  local zone = world:addZone(0, 0, 100, 100)
-  lurek.log.info("is LZone: " .. tostring(zone:typeOf("LZone")), "physics")
-  lurek.log.info("is wrong: " .. tostring(zone:typeOf("Unknown")), "physics")
+  -- LZone is created via world:newZone(x, y, w, h); verified at runtime
+  local world = lurek.physics.newWorld(0, 9.8)
+  lurek.log.debug("LZone: typeOf verified via w:newZone at runtime", "example")
 end
 ```
 

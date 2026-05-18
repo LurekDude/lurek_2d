@@ -701,3 +701,11 @@ do
 end
 
 print("content/examples/scene.lua")
+
+-- ---- Stub: lurek.scene.clear --------------------------------------------
+--@api-stub: lurek.scene.clear
+-- Removes all entities and components from the active scene.
+do
+  lurek.scene.clear()
+  lurek.log.debug("scene cleared", "example")
+end

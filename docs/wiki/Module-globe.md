@@ -133,7 +133,7 @@ Module example from [globe.lua](../blob/main/content/examples/globe.lua):
   end
 end
 
---@api-stub: Globe:zoom
+--@api-stub: LGlobe:zoom
 -- Multiplies the globe camera zoom by a factor.
 do
   -- Globe:zoom(factor) -> nil
@@ -152,7 +152,7 @@ do
   end
 end
 
---@api-stub: Globe:setCamera
+--@api-stub: LGlobe:setCamera
 -- Sets the camera latitude, longitude, and zoom directly.
 do
   -- Globe:setCamera(lat, lon, zoom) -> nil
@@ -240,17 +240,11 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
 
 ```lua
 do
-  -- lurek.globe.get(name) -> LGlobe | nil
-  -- Use this to retrieve a globe created elsewhere (e.g., in a different script module).
-  -- Returns nil if no globe with that name exists — always nil-check before use.
-  lurek.globe.new("campaign", {})
-  local g = lurek.globe.get("campaign")
-  if g then
-    -- Safe to use the globe handle now
-    lurek.log.info("found globe '" .. g:getName() .. "' in registry", "globe")
-  else
-    lurek.log.warn("globe 'campaign' not found — was it created?", "globe")
-  end
+  local g = lurek.globe.new(8)
+  -- get() returns an existing globe by ID (created with new()).
+  local name = g:getName()
+  local same = lurek.globe.get(name)
+  lurek.log.debug("got globe by id: " .. tostring(same ~= nil), "globe") -- true
 end
 ```
 
@@ -433,17 +427,9 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
 
 ```lua
 do
-  -- lurek.globe.new(name, spec_tbl?) -> LGlobe
-  -- The spec table can include: radius, axial_tilt_deg, and other globe parameters.
-  -- Each globe is stored in a shared registry and can be retrieved later by name.
-  -- Use this as the primary entry point for creating strategy maps, planet views, etc.
-  local g = lurek.globe.new("earth_demo", {
-    radius = 1.0,        -- unit sphere radius; scales all lat/lon projections
-    axial_tilt_deg = 23.5, -- Earth-like axial tilt for day/night terminator
-  })
-  -- After creation, configure rendering options like province borders
-  g:setBorders(true)
-  lurek.log.info("created globe '" .. g:getName() .. "' with borders enabled", "globe")
+  -- new(subdivisions) creates an icosphere globe for planetary/map rendering.
+  local planet = lurek.globe.new(6)
+  lurek.log.debug("globe type: " .. planet:type(), "globe") -- "LGlobe"
 end
 ```
 
@@ -970,7 +956,7 @@ do
   end
 end
 
---@api-stub: Globe:setRotation
+--@api-stub: LGlobe:setRotation
 -- Sets the globe rotation angle in degrees.
 do
   -- Globe:setRotation(deg) -> nil
@@ -999,7 +985,7 @@ end
 -- Picking and interaction
 -- ═══════════════════════════════════════════════════════════════════════════════
 
---@api-stub: Globe:pick
+--@api-stub: LGlobe:pick
 ```
 
 ### `LGlobe:getMarkerAttr(id: integer, key: string) -> string`
@@ -2306,11 +2292,8 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
 
 ```lua
 do
-  -- Globe:type() -> "LGlobe"
-  -- Always returns the string "LGlobe". Use for runtime type checking.
-  local g = lurek.globe.new("type_test", nil)
-  local t = g:type()
-  lurek.log.info("LGlobe:type() = " .. t, "globe")
+  local obj = lurek.globe.new(8)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LGlobe"
 end
 ```
 
@@ -2330,12 +2313,8 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
 
 ```lua
 do
-  -- Globe:typeOf(name) -> boolean
-  -- Matches against "LGlobe" and "Object". Returns false for other strings.
-  local g = lurek.globe.new("typeof_test", nil)
-  lurek.log.info("is LGlobe: " .. tostring(g:typeOf("LGlobe")), "globe")
-  lurek.log.info("is Object: " .. tostring(g:typeOf("Object")), "globe")
-  lurek.log.info("is wrong:  " .. tostring(g:typeOf("Unknown")), "globe")
+  local obj = lurek.globe.new(8)
+  lurek.log.debug("typeOf LGlobe: " .. tostring(obj:typeOf("LGlobe")), "example") -- true
 end
 ```
 
@@ -2421,7 +2400,7 @@ Module-level example from [globe.lua](../blob/main/content/examples/globe.lua):
   end
 end
 
---@api-stub: Globe:zoom
+--@api-stub: LGlobe:zoom
 -- Multiplies the globe camera zoom by a factor.
 do
   -- Globe:zoom(factor) -> nil
@@ -2440,7 +2419,7 @@ do
   end
 end
 
---@api-stub: Globe:setCamera
+--@api-stub: LGlobe:setCamera
 -- Sets the camera latitude, longitude, and zoom directly.
 do
   -- Globe:setCamera(lat, lon, zoom) -> nil

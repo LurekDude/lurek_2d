@@ -785,7 +785,7 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
   end
 end
 
---@api-stub: Globe:pickLatLon
+--@api-stub: LGlobe:pickLatLon
 -- Picks at screen coordinates and returns the hit province centroid in screen space.
 ```
 
@@ -1032,7 +1032,7 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
   end
 end
 
---@api-stub: Globe:setCamera
+--@api-stub: LGlobe:setCamera
 -- Sets the camera latitude, longitude, and zoom directly.
 do
 ```
@@ -1346,7 +1346,7 @@ Exact example from [globe.lua](../blob/main/content/examples/globe.lua):
   end
 end
 
---@api-stub: Globe:zoom
+--@api-stub: LGlobe:zoom
 -- Multiplies the globe camera zoom by a factor.
 do
   -- Globe:zoom(factor) -> nil
@@ -1640,11 +1640,23 @@ Loads gamepad mapping strings from a file.
 Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
+-- Load gamepad mappings from a file (SDL GameControllerDB format).
 do
-  -- Same as lurek.input.gamepad.loadGamepadMappings above; pcall for safety
-  local ok, count = pcall(lurek.input.gamepad.loadGamepadMappings, "assets/gamecontrollerdb.txt")
-  lurek.log.info("loadGamepadMappings ok=" .. tostring(ok), "input")
+  -- Wrap in pcall because the file may not exist in headless/test environments
+  local ok, n = pcall(lurek.input.gamepad.loadGamepadMappings, "save/gamecontrollerdb.txt")
+  if ok then
+    lurek.log.info("loaded controller mappings from file", "input")
+  else
+    lurek.log.debug("gamecontrollerdb.txt not found — using built-in mappings", "input")
+  end
 end
+
+--@api-stub: lurek.input.saveGamepadMappings
+-- Save all current gamepad mappings to a file for persistence.
+do
+  -- Save user's custom mappings so they persist across sessions
+  lurek.input.gamepad.saveGamepadMappings("save/user_mappings.txt")
+  lurek.log.info("user gamepad mappings saved to disk", "input")
 ```
 
 ### `lurek.input.loadRecording(json: string)`
@@ -2802,12 +2814,8 @@ Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
 do
-  local ok ---@type boolean
-  local combo_obj ---@type LCombo?
-  ok, combo_obj = pcall(lurek.input.newCombo, {"a","b"}, {})
-  if not ok then combo_obj = nil end
-  local t = combo_obj and combo_obj:type() or "LInputCombo"
-  lurek.log.info("LCombo:type = " .. t, "input")
+  local obj = lurek.input.newCombo({'ctrl', 's'})
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LCombo"
 end
 ```
 
@@ -2827,13 +2835,8 @@ Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
 do
-  local ok_c2 ---@type boolean
-  local combo_obj2 ---@type LCombo?
-  ok_c2, combo_obj2 = pcall(lurek.input.newCombo, {"a","b"}, {})
-  if not ok_c2 then combo_obj2 = nil end
-  -- typeOf checks against "LCombo" and "Object"
-  lurek.log.info("is LCombo: " .. tostring(combo_obj2 and combo_obj2:typeOf("LCombo") or false), "input")
-  lurek.log.info("is wrong: " .. tostring(combo_obj2 and combo_obj2:typeOf("Unknown") or false), "input")
+  local obj = lurek.input.newCombo({'ctrl', 's'})
+  lurek.log.debug("typeOf LCombo: " .. tostring(obj:typeOf("LCombo")), "example") -- true
 end
 ```
 
@@ -2913,13 +2916,8 @@ Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
 do
-  local ok_c, cursor_obj = pcall(lurek.input.mouse.newCursor)
-  if ok_c and cursor_obj then
-    local t = cursor_obj:type()
-    lurek.log.info("LCursor:type = " .. t, "input")
-  else
-    lurek.log.info("LCursor:type = skipped", "input")
-  end
+  local obj = lurek.input.mouse.getSystemCursor('crosshair')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LCursor"
 end
 ```
 
@@ -2939,13 +2937,8 @@ Exact example from [input.lua](../blob/main/content/examples/input.lua):
 
 ```lua
 do
-  local ok_c2, cursor_obj = pcall(lurek.input.mouse.newCursor)
-  if ok_c2 and cursor_obj then
-    lurek.log.info("is LCursor: " .. tostring(cursor_obj:typeOf("LCursor")), "input")
-    lurek.log.info("is wrong: " .. tostring(cursor_obj:typeOf("Unknown")), "input")
-  else
-    lurek.log.info("LCursor:typeOf = skipped", "input")
-  end
+  local obj = lurek.input.mouse.getSystemCursor('crosshair')
+  lurek.log.debug("typeOf LCursor: " .. tostring(obj:typeOf("LCursor")), "example") -- true
 end
 ```
 

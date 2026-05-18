@@ -1,25 +1,35 @@
-[2026-05-17T20:17:30.769Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
-[2026-05-17T20:17:30.770Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
-[2026-05-17T20:17:30.770Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo
-[2026-05-17T20:17:30.887Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
-[2026-05-17T20:17:30.888Z] WARN  GENERAL [Loader Message (0x0)]
+[2026-05-17T21:36:03.292Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
+[2026-05-17T21:36:03.293Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-05-17T21:36:03.293Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo
+[2026-05-17T21:36:03.439Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-05-17T21:36:03.441Z] WARN  GENERAL [Loader Message (0x0)]
 	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
-[2026-05-17T20:17:30.888Z] WARN  	objects: (type: INSTANCE, hndl: 0x193d076fcb0, name: ?)
-[2026-05-17T20:17:30.960Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
-[2026-05-17T20:17:30.960Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
-[2026-05-17T20:17:30.970Z] WARN  Unrecognized present mode 1000361000
-[2026-05-17T20:17:31.229Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
-[2026-05-17T20:17:31.265Z] WARN  Unrecognized present mode 1000361000
-[2026-05-17T20:17:31.265Z] INFO  [L034] GPU texture dimension limit: 32768
-[2026-05-17T20:17:31.266Z] WARN  Unrecognized present mode 1000361000
-[2026-05-17T20:17:31.572Z] INFO  [L035] GPU initialised: 786ms (format=Bgra8UnormSrgb, present=Fifo, 800x600)
-[2026-05-17T20:17:31.573Z] DEBUG Loaded 846 mappings.
-[2026-05-17T20:17:31.597Z] WARN  Unrecognized present mode 1000361000
-[2026-05-17T20:17:31.602Z] WARN  Unrecognized present mode 1000361000
-[2026-05-17T20:17:31.607Z] DEBUG [FS01] GameFS initialised
-[2026-05-17T20:17:31.986Z] DEBUG [AT01] Simulator created
-[2026-05-17T20:17:31.991Z] DEBUG [SC01] SC01
-[2026-05-17T20:17:31.992Z] DEBUG [GU01] GuiContext created
-[2026-05-17T20:17:31.992Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo\main.lua
-[2026-05-17T20:17:34.757Z] INFO  [L039] Window close requested
-[2026-05-17T20:17:34.758Z] INFO  [L002] Lurek2D Engine stopped
+[2026-05-17T21:36:03.441Z] WARN  	objects: (type: INSTANCE, hndl: 0x1a0ab1a8c60, name: ?)
+[2026-05-17T21:36:03.541Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-05-17T21:36:03.541Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-05-17T21:36:03.554Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:03.944Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-05-17T21:36:04.000Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:04.001Z] INFO  [L034] GPU texture dimension limit: 32768
+[2026-05-17T21:36:04.002Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:04.403Z] INFO  [L035] GPU initialised: 1s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-05-17T21:36:04.404Z] DEBUG Loaded 846 mappings.
+[2026-05-17T21:36:04.448Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:04.455Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:04.461Z] DEBUG [FS01] GameFS initialised
+[2026-05-17T21:36:04.924Z] DEBUG [AT01] Simulator created
+[2026-05-17T21:36:04.925Z] DEBUG [SC01] SC01
+[2026-05-17T21:36:04.926Z] DEBUG [GU01] GuiContext created
+[2026-05-17T21:36:04.927Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\showcase\terminal_demo\main.lua
+[2026-05-17T21:36:04.946Z] WARN  [G003] tex vertex buffer at 102% capacity (16800/16384) — consider reducing sprite draws or increasing MAX_TEX_VERTS
+[2026-05-17T21:36:04.947Z] WARN  [G003] grew tex vertex buffer capacity to 32768 vertices
+[2026-05-17T21:36:04.951Z] WARN  Unrecognized present mode 1000361000
+[2026-05-17T21:36:09.883Z] ERROR lurek.keypressed(): runtime error: Widget:setStyle: invalid border style
+stack traceback:
+	[C]: in function 'setStyle'
+	[string "main.lua"]:343: in function <[string "main.lua"]:334>
+	[string "main.lua"]:521: in function 'build_current_scene'
+	[string "main.lua"]:591: in function <[string "main.lua"]:586>
+
+[2026-05-17T21:36:16.827Z] INFO  [L039] Window close requested
+[2026-05-17T21:36:16.828Z] INFO  [L002] Lurek2D Engine stopped

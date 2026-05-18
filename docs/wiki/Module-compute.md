@@ -30,7 +30,7 @@
 - [Types and Methods](#types-and-methods)
   - [LArray](#larray)
   - [LArray:abs() -> LArray](#larrayabs-larray)
-  - [LArray:add(value: LArray) -> LArray](#larrayaddvalue-larray-larray)
+  - [LArray:add(value: any) -> LArray](#larrayaddvalue-any-larray)
   - [LArray:addInplace(other: LArray)](#larrayaddinplaceother-larray)
   - [LArray:all() -> boolean](#larrayall-boolean)
   - [LArray:any() -> boolean](#larrayany-boolean)
@@ -53,11 +53,11 @@
   - [LArray:cumsum() -> LArray](#larraycumsum-larray)
   - [LArray:diff([order]: integer) -> LArray](#larraydifforder-integer-larray)
   - [LArray:dilate(radius: integer) -> LArray](#larraydilateradius-integer-larray)
-  - [LArray:div(value: LArray) -> LArray](#larraydivvalue-larray-larray)
+  - [LArray:div(value: any) -> LArray](#larraydivvalue-any-larray)
   - [LArray:divInplace(other: LArray)](#larraydivinplaceother-larray)
   - [LArray:dot(other: LArray) -> number](#larraydotother-larray-number)
   - [LArray:eigenPower([max_iter]: integer, [tol]: number) -> table](#larrayeigenpowermaxiter-integer-tol-number-table)
-  - [LArray:eq(value: LArray) -> LArray](#larrayeqvalue-larray-larray)
+  - [LArray:eq(value: any) -> LArray](#larrayeqvalue-any-larray)
   - [LArray:erode(radius: integer) -> LArray](#larrayeroderadius-integer-larray)
   - [LArray:eval(expr: string) -> LArray](#larrayevalexpr-string-larray)
   - [LArray:fill(val: number)](#larrayfillval-number)
@@ -68,23 +68,23 @@
   - [LArray:getRegion(row: integer, col: integer, rows: integer, cols: integer) -> LArray](#larraygetregionrow-integer-col-integer-rows-integer-cols-integer-larray)
   - [LArray:getShape() -> integer[]](#larraygetshape-integer)
   - [LArray:getSize() -> integer](#larraygetsize-integer)
-  - [LArray:gt(value: LArray) -> LArray](#larraygtvalue-larray-larray)
-  - [LArray:gte(value: LArray) -> LArray](#larraygtevalue-larray-larray)
+  - [LArray:gt(value: any) -> LArray](#larraygtvalue-any-larray)
+  - [LArray:gte(value: any) -> LArray](#larraygtevalue-any-larray)
   - [LArray:histogram(bins: integer, [lo]: number, [hi]: number) -> table](#larrayhistogrambins-integer-lo-number-hi-number-table)
   - [LArray:isOnGPU() -> boolean](#larrayisongpu-boolean)
   - [LArray:linsolve(b: LArray) -> LArray](#larraylinsolveb-larray-larray)
-  - [LArray:lt(value: LArray) -> LArray](#larrayltvalue-larray-larray)
-  - [LArray:lte(value: LArray) -> LArray](#larrayltevalue-larray-larray)
+  - [LArray:lt(value: any) -> LArray](#larrayltvalue-any-larray)
+  - [LArray:lte(value: any) -> LArray](#larrayltevalue-any-larray)
   - [LArray:luDecompose() -> table](#larrayludecompose-table)
   - [LArray:map(func: function) -> LArray](#larraymapfunc-function-larray)
   - [LArray:matmul(other: LArray) -> LArray](#larraymatmulother-larray-larray)
-  - [LArray:max([axis]: integer) -> number|LArray](#larraymaxaxis-integer-numberlarray)
-  - [LArray:mean([axis]: integer) -> number|LArray](#larraymeanaxis-integer-numberlarray)
-  - [LArray:min([axis]: integer) -> number|LArray](#larrayminaxis-integer-numberlarray)
-  - [LArray:mul(value: LArray) -> LArray](#larraymulvalue-larray-larray)
+  - [LArray:max([axis]: integer) -> number](#larraymaxaxis-integer-number)
+  - [LArray:mean([axis]: integer) -> number](#larraymeanaxis-integer-number)
+  - [LArray:min([axis]: integer) -> number](#larrayminaxis-integer-number)
+  - [LArray:mul(value: any) -> LArray](#larraymulvalue-any-larray)
   - [LArray:mulInplace(other: LArray)](#larraymulinplaceother-larray)
   - [LArray:neg() -> LArray](#larrayneg-larray)
-  - [LArray:neq(value: LArray) -> LArray](#larrayneqvalue-larray-larray)
+  - [LArray:neq(value: any) -> LArray](#larrayneqvalue-any-larray)
   - [LArray:normalizeRange(lo: number, hi: number) -> LArray](#larraynormalizerangelo-number-hi-number-larray)
   - [LArray:normalizeVec() -> LArray](#larraynormalizevec-larray)
   - [LArray:outer(other: LArray) -> LArray](#larrayouterother-larray-larray)
@@ -98,9 +98,9 @@
   - [LArray:setRegion(row: integer, col: integer, source: LArray)](#larraysetregionrow-integer-col-integer-source-larray)
   - [LArray:sobel() -> table](#larraysobel-table)
   - [LArray:sqrt() -> LArray](#larraysqrt-larray)
-  - [LArray:sub(value: LArray) -> LArray](#larraysubvalue-larray-larray)
+  - [LArray:sub(value: any) -> LArray](#larraysubvalue-any-larray)
   - [LArray:subInplace(other: LArray)](#larraysubinplaceother-larray)
-  - [LArray:sum([axis]: integer) -> number|LArray](#larraysumaxis-integer-numberlarray)
+  - [LArray:sum([axis]: integer) -> number](#larraysumaxis-integer-number)
   - [LArray:threshold(val: number) -> LArray](#larraythresholdval-number-larray)
   - [LArray:toTable() -> number[]](#larraytotable-number)
   - [LArray:transformPoints(pts: LArray) -> LArray](#larraytransformpointspts-larray-larray)
@@ -127,6 +127,8 @@ Dense N-D numerical array library exposed as lurek.compute.*; CPU-only matrix / 
 Dense N-dimensional numerical array library for CPU-only matrix, signal, and spatial workloads. `NdArray` is a flat-storage typed array supporting `f32`, `f64`, `i32`, and `u8` element types with shape metadata for arbitrary dimensionality. Operations include element-wise arithmetic, broadcasting, reshape, transpose, slice, convolve2d, matrix multiply, and dot product.
 
 The module provides FFT/IFFT via Cooley-Tukey, LU decomposition for linear system solving, Gaussian kernels for image filtering, and spatial helpers for 2D rotation and affine transforms. Analytics functions compute mean, variance, standard deviation, min, max, sum, percentiles, and histograms over array data. Exposed as `lurek.compute.*`. Pure Foundations tier — no engine dependencies.
+
+Lua API doc contract: all Lua-visible params, returns, and fields for `lurek.compute` must be declared in and then generated into `docs/api/lurek.lua`. Do not add Lua-side cast workarounds in tests or examples to compensate for missing or wrong binding docs. For polymorphic compute methods that accept either an `LArray` or a scalar, document the source parameter type as `any`. For methods whose return type changes with arguments, keep the base `@return` precise and add a source `@overload` marker so the generated stub stays authoritative without Lua-side narrowing hacks.
 
 ## Minimal Module Example
 
@@ -636,30 +638,27 @@ do
 end
 ```
 
-### `LArray:add(value: LArray) -> LArray`
+### `LArray:add(value: any) -> LArray`
 
 Returns element-wise addition with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New array containing the addition result.
 
 #### Example
 
-Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- add(value) adds either a scalar or another array element-wise.
-  -- With an array argument, shapes must be compatible (broadcast supported for 1D->2D).
-  local base = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
-  local boost = lurek.compute.fromTable({10, 20}, {2})
-
-  -- Row broadcast: each row gets +10 and +20 added to its columns
-  local out = base:add(boost)
-  lurek.log.info("add row-broadcast [2,2] = " .. out:get(2, 2), "compute")
+  -- Element-wise add is useful for combining velocity vectors or stat bonuses.
+  local base_stats = lurek.compute.fromTable({10, 5, 3})
+  local bonus = lurek.compute.fromTable({2, 1, 0})
+  local total = base_stats:add(bonus)
+  lurek.log.info("stat[1] after buff: " .. total:get(1), "data")
 end
 ```
 
@@ -1208,28 +1207,27 @@ do
 end
 ```
 
-### `LArray:div(value: LArray) -> LArray`
+### `LArray:div(value: any) -> LArray`
 
 Returns element-wise division with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New array containing the division result.
 
 #### Example
 
-Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- div(value) divides by a scalar or array.
-  -- Use for unit conversion, normalizing by frame count, etc.
-  local ms = lurek.compute.fromTable({16, 20, 25, 33})
-  local sec = ms:div(1000) -- convert milliseconds to seconds
-
-  lurek.log.info("sec[1] = " .. sec:get(1), "compute")
+  -- Divide for normalization: convert raw scores to ratios or averages.
+  local totals = lurek.compute.fromTable({200, 150, 90})
+  local counts = lurek.compute.fromTable({4, 3, 2})
+  local averages = totals:div(counts)
+  lurek.log.info("avg score[1]: " .. averages:get(1), "data")
 end
 ```
 
@@ -1313,13 +1311,13 @@ do
 end
 ```
 
-### `LArray:eq(value: LArray) -> LArray`
+### `LArray:eq(value: any) -> LArray`
 
 Returns element-wise equality comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -1591,13 +1589,13 @@ do
 end
 ```
 
-### `LArray:gt(value: LArray) -> LArray`
+### `LArray:gt(value: any) -> LArray`
 
 Returns element-wise greater-than comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -1615,13 +1613,13 @@ do
 end
 ```
 
-### `LArray:gte(value: LArray) -> LArray`
+### `LArray:gte(value: any) -> LArray`
 
 Returns element-wise greater-or-equal comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -1717,13 +1715,13 @@ do
 end
 ```
 
-### `LArray:lt(value: LArray) -> LArray`
+### `LArray:lt(value: any) -> LArray`
 
 Returns element-wise less-than comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -1741,13 +1739,13 @@ do
 end
 ```
 
-### `LArray:lte(value: LArray) -> LArray`
+### `LArray:lte(value: any) -> LArray`
 
 Returns element-wise less-or-equal comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -1838,7 +1836,7 @@ do
 end
 ```
 
-### `LArray:max([axis]: integer) -> number|LArray`
+### `LArray:max([axis]: integer) -> number`
 
 Returns total maximum or a maximum array along a one-based axis.
 
@@ -1846,7 +1844,7 @@ Returns total maximum or a maximum array along a one-based axis.
 
 - `axis` (`integer`, optional) - Optional one-based axis to reduce.
 
-**Returns**: `number|LArray` - Scalar maximum when no axis given, or reduced array along the axis.
+**Returns**: `number` - Scalar maximum when no axis is given.
 
 #### Example
 
@@ -1862,7 +1860,7 @@ do
 end
 ```
 
-### `LArray:mean([axis]: integer) -> number|LArray`
+### `LArray:mean([axis]: integer) -> number`
 
 Returns total mean or a mean array along a one-based axis.
 
@@ -1870,7 +1868,7 @@ Returns total mean or a mean array along a one-based axis.
 
 - `axis` (`integer`, optional) - Optional one-based axis to reduce.
 
-**Returns**: `number|LArray` - Scalar mean when no axis given, or reduced array along the axis.
+**Returns**: `number` - Scalar mean when no axis is given.
 
 #### Example
 
@@ -1886,7 +1884,7 @@ do
 end
 ```
 
-### `LArray:min([axis]: integer) -> number|LArray`
+### `LArray:min([axis]: integer) -> number`
 
 Returns total minimum or a minimum array along a one-based axis.
 
@@ -1894,7 +1892,7 @@ Returns total minimum or a minimum array along a one-based axis.
 
 - `axis` (`integer`, optional) - Optional one-based axis to reduce.
 
-**Returns**: `number|LArray` - Scalar minimum when no axis given, or reduced array along the axis.
+**Returns**: `number` - Scalar minimum when no axis is given.
 
 #### Example
 
@@ -1910,28 +1908,27 @@ do
 end
 ```
 
-### `LArray:mul(value: LArray) -> LArray`
+### `LArray:mul(value: any) -> LArray`
 
 Returns element-wise multiplication with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New array containing the multiplication result.
 
 #### Example
 
-Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- mul(value) multiplies by a scalar or array.
-  -- Use for applying damage multipliers, scaling physics forces, etc.
-  local dmg = lurek.compute.fromTable({10, 12, 8})
-  local crit = dmg:mul(1.5) -- 150% critical hit multiplier
-
-  lurek.log.info("crit total = " .. crit:sum(), "compute")
+  -- Multiply for scaling: apply per-channel color multipliers or damage modifiers.
+  local base = lurek.compute.fromTable({100, 50, 25})
+  local scale = lurek.compute.fromTable({1.5, 2.0, 1.0})
+  local result = base:mul(scale)
+  lurek.log.info("scaled[1]: " .. result:get(1), "data")
 end
 ```
 
@@ -1980,13 +1977,13 @@ do
 end
 ```
 
-### `LArray:neq(value: LArray) -> LArray`
+### `LArray:neq(value: any) -> LArray`
 
 Returns element-wise inequality comparison with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New mask array containing comparison results.
 
@@ -2335,28 +2332,27 @@ do
 end
 ```
 
-### `LArray:sub(value: LArray) -> LArray`
+### `LArray:sub(value: any) -> LArray`
 
 Returns element-wise subtraction with an array or scalar.
 
 **Parameters**
 
-- `value` (`LArray`, required) - LArray or scalar number for element-wise operation.
+- `value` (`any`, required) - Array or scalar number for element-wise operation.
 
 **Returns**: `LArray` - New array containing the subtraction result.
 
 #### Example
 
-Exact example from [compute.lua](../blob/main/content/examples/compute.lua):
+Exact example from [data.lua](../blob/main/content/examples/data.lua):
 
 ```lua
 do
-  -- sub(value) subtracts a scalar or array.
-  -- Use for applying flat damage reduction to a party's HP array.
-  local hp = lurek.compute.fromTable({100, 80, 65})
-  local after = hp:sub(15) -- 15 damage to all party members
-
-  lurek.log.info("sub result first = " .. after:get(1), "compute")
+  -- Subtract to compute difference between two sample sets or damage vs armor.
+  local damage = lurek.compute.fromTable({20, 15, 8})
+  local armor = lurek.compute.fromTable({5, 3, 2})
+  local net = damage:sub(armor)
+  lurek.log.info("net damage[1]: " .. net:get(1), "data")
 end
 ```
 
@@ -2385,7 +2381,7 @@ do
 end
 ```
 
-### `LArray:sum([axis]: integer) -> number|LArray`
+### `LArray:sum([axis]: integer) -> number`
 
 Returns total sum or a summed array along a one-based axis.
 
@@ -2393,7 +2389,7 @@ Returns total sum or a summed array along a one-based axis.
 
 - `axis` (`integer`, optional) - Optional one-based axis to reduce.
 
-**Returns**: `number|LArray` - Scalar sum when no axis given, or reduced array along the axis.
+**Returns**: `number` - Scalar sum when no axis is given.
 
 #### Example
 

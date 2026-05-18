@@ -98,7 +98,8 @@ do
   function lurek.init()
     -- newLayer accepts a table with a required "texture" field and many optional fields.
     -- Use it to build each visual depth layer in a side-scroller or top-down scene.
-    local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
+    local ok_sky, sky_tex = pcall(lurek.render.newImage, "assets/parallax/sky.png")
+    if not ok_sky then return end
 
     -- Minimal layer: just a texture, everything else defaults (no scroll, z=0, full opacity)
     local sky = lurek.parallax.newLayer({ texture = sky_tex })
@@ -138,7 +139,6 @@ do
     local forest_backdrop = lurek.parallax.newSet("forest_backdrop")
 
     -- Sets start visible and empty. Add layers after creation.
-    forest_backdrop:setVisible(true)
 ```
 
 ## Key Types
@@ -177,7 +177,8 @@ do
   function lurek.init()
     -- newLayer accepts a table with a required "texture" field and many optional fields.
     -- Use it to build each visual depth layer in a side-scroller or top-down scene.
-    local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
+    local ok_sky, sky_tex = pcall(lurek.render.newImage, "assets/parallax/sky.png")
+    if not ok_sky then return end
 
     -- Minimal layer: just a texture, everything else defaults (no scroll, z=0, full opacity)
     local sky = lurek.parallax.newLayer({ texture = sky_tex })
@@ -294,7 +295,8 @@ do
   function lurek.init()
     -- newLayer accepts a table with a required "texture" field and many optional fields.
     -- Use it to build each visual depth layer in a side-scroller or top-down scene.
-    local sky_tex = lurek.render.newImage("assets/parallax/sky.png")
+    local ok_sky, sky_tex = pcall(lurek.render.newImage, "assets/parallax/sky.png")
+    if not ok_sky then return end
 
     -- Minimal layer: just a texture, everything else defaults (no scroll, z=0, full opacity)
     local sky = lurek.parallax.newLayer({ texture = sky_tex })
@@ -686,18 +688,11 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  local rain
-  function lurek.init()
-    rain = lurek.parallax.newLayer({
-      texture = lurek.render.newImage("assets/parallax/rain.png"),
-      autoscroll_y = 60,
-    })
-  end
-  function lurek.process(dt)
-    -- Only update autoscroll when visible — saves work during clear weather.
-    if rain:isVisible() then
-      rain:update(dt)
-    end
+  -- isVisible returns the current visibility state of the layer.
+  local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+  fog:setVisible(false)
+  if not fog:isVisible() then
+    lurek.log.info("fog layer is off", "parallax")
   end
 end
 ```
@@ -717,22 +712,13 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  local hills
-  function lurek.init()
-    -- Use render(cam_x, cam_y) when you control the camera position yourself
-    -- (e.g., a custom camera system or a fixed-scroll cutscene).
-    hills = lurek.parallax.newLayer({
-      texture = lurek.render.newImage("assets/parallax/hills.png"),
-      scroll_factor_x = 0.4,
-      repeat_x = true,
-    })
-  end
-  function lurek.draw()
-    -- Pass your camera position; the layer offsets by (cam * scroll_factor).
-    local cam_x = 240
-    local cam_y = 0
-    hills:render(cam_x, cam_y)
-  end
+  -- render(cam_x, cam_y) draws the layer offset by the given camera position.
+  local hills = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/hills.png"),
+    scroll_factor_x = 0.5,
+  })
+  local cam_x, cam_y = 200, 0
+  hills:render(cam_x, cam_y)
 end
 ```
 
@@ -746,20 +732,12 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  local mountains
-  function lurek.init()
-    -- renderAuto() reads camera position from lurek's internal camera state.
-    -- Ideal when you use lurek.camera for all camera control.
-    mountains = lurek.parallax.newLayer({
-      texture = lurek.render.newImage("assets/parallax/mountains.png"),
-      scroll_factor_x = 0.25,
-      repeat_x = true,
-    })
-  end
-  function lurek.draw()
-    -- No need to pass camera coords — the engine provides them.
-    mountains:renderAuto()
-  end
+  -- renderAuto uses the active runtime camera automatically (no manual coords needed).
+  local sky = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/sky.png"),
+    scroll_factor_x = 0.1,
+  })
+  sky:renderAuto()
 end
 ```
 
@@ -1154,14 +1132,10 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  function lurek.init()
-    -- setVisible(false) skips rendering but keeps the layer alive and updating.
-    -- Use it to toggle weather effects or hide layers during cutscenes.
-    local rain = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/rain.png") })
-
-    -- Hide rain until the storm event starts.
-    rain:setVisible(false)
-  end
+  -- setVisible(true/false) toggles drawing without destroying the layer.
+  local fog = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+  fog:setVisible(false)  -- hide fog during clear weather
+  lurek.log.info("fog hidden", "parallax")
 end
 ```
 
@@ -1202,15 +1176,9 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  function lurek.init()
-    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
-
-    -- type() returns "LParallaxLayer" — use it for runtime type checks
-    -- when you pass handles between systems (e.g., a generic "drawable" list).
-    if layer:type() == "LParallaxLayer" then
-      lurek.log.debug("confirmed parallax layer handle", "scene")
-    end
-  end
+  -- type() returns the engine type string for handle identification.
+  local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/sky.png") })
+  lurek.log.info("layer type: " .. layer:type(), "parallax")
 end
 ```
 
@@ -1228,20 +1196,12 @@ Exact example from [parallax.lua](../blob/main/content/examples/parallax.lua):
 
 ```lua
 do
-  local clouds
-  function lurek.init()
-    -- Layers with autoscroll need manual update() calls each frame.
-    -- This advances the internal scroll offset by (autoscroll * dt).
-    clouds = lurek.parallax.newLayer({
-      texture = lurek.render.newImage("assets/parallax/clouds.png"),
-      autoscroll_x = 12, -- drift 12 pixels/second to the right
-      autoscroll_y = 0,
-    })
-  end
-  function lurek.process(dt)
-    -- Pass the frame delta time so scroll speed is frame-rate independent.
-    clouds:update(dt)
-  end
+  -- Call update each frame to advance autoscroll (drifting clouds, flowing water).
+  local clouds = lurek.parallax.newLayer({
+    texture = lurek.render.newImage("assets/parallax/clouds.png"),
+    autoscroll_x = 20,
+  })
+  function lurek.process(dt) clouds:update(dt) end
 end
 ```
 

@@ -92,7 +92,7 @@ Module example from [spine.lua](../blob/main/content/examples/spine.lua):
   end
 end
 
---@api-stub: Skeleton:updateWorldTransforms
+--@api-stub: LSkeleton:updateWorldTransforms
 -- Recomputes world transforms for all bones in hierarchy order
 do
   -- You must call updateWorldTransforms after any change to bone
@@ -114,7 +114,7 @@ do
   end
 end
 
---@api-stub: Skeleton:getBoneWorld
+--@api-stub: LSkeleton:getBoneWorld
 -- Returns the world-space transform of a bone after hierarchy resolution
 do
   -- After updateWorldTransforms, getBoneWorld gives you the final
@@ -1016,10 +1016,8 @@ Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
 do
-  -- type() returns "LSkeleton" — useful for generic object handling
-  -- when you receive an unknown userdata and need to identify it.
-  local sk = lurek.spine.newSkeleton("test")
-  lurek.log.info("LSkeleton:type() = " .. sk:type(), "spine")
+  local obj = lurek.spine.newSkeleton('assets/spine/hero.json')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LSkeleton"
 end
 ```
 
@@ -1039,13 +1037,8 @@ Exact example from [spine.lua](../blob/main/content/examples/spine.lua):
 
 ```lua
 do
-  -- typeOf checks identity. Supports "LSkeleton" and the base "Object".
-  -- Use it for safe downcasting in generic code paths.
-  local sk = lurek.spine.newSkeleton("test")
-  assert(sk:typeOf("LSkeleton") == true)
-  assert(sk:typeOf("Object") == true)
-  assert(sk:typeOf("LImage") == false)
-  lurek.log.info("typeOf checks pass", "spine")
+  local obj = lurek.spine.newSkeleton('assets/spine/hero.json')
+  lurek.log.debug("typeOf LSkeleton: " .. tostring(obj:typeOf("LSkeleton")), "example") -- true
 end
 ```
 

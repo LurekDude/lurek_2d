@@ -544,13 +544,10 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- getHtml retrieves the full document source.
-  -- Useful for debugging, serialization, or saving UI state.
-  local doc = lurek.html.newDocument([[
-<body><div id="inventory"><span class="slot">Sword</span></div></body>
-]])
-  local markup = doc:getHtml()
-  lurek.log.info("getHtml length=" .. #markup .. " chars", "html")
+  local doc = lurek.html.newDocument()
+  doc:setHtml("<p>Hello</p>")
+  local html = doc:getHtml()
+  lurek.log.debug("html: " .. html, "html")
 end
 ```
 
@@ -773,15 +770,10 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- off() unregisters a listener. Pass the handle returned by on().
-  -- Use this to clean up listeners when switching screens or closing menus.
-  local doc = lurek.html.newDocument("<body><button>Temp</button></body>")
-  local handle = doc:on("click", function(ev)
-    lurek.log.info("this should not fire after off()", "html")
-  end)
-  -- Remove the listener — subsequent clicks won't trigger the callback
+  local doc = lurek.html.newDocument()
+  local handle = doc:on("click", function(evt) lurek.log.debug("clicked", "html") end)
   doc:off(handle)
-  lurek.log.info("off() removed listener, handle=" .. tostring(handle), "html")
+  lurek.log.debug("event listener removed", "html")
 end
 ```
 
@@ -802,22 +794,11 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- on() registers a callback for document-wide events.
-  -- Returns a numeric handle you can pass to off() to unregister later.
-  -- Common events: "click", "keydown", "input", "mousemove"
-  local doc = lurek.html.newDocument([[
-<body>
-  <button id="play">Play</button>
-  <button id="quit">Quit</button>
-</body>
-]])
-
-  -- A single document-level listener handles all button clicks
-  local handle = doc:on("click", function(ev)
-    -- The event table contains: target (element), x, y, button, etc.
-    lurek.log.info("doc-level click event fired", "html")
+  local doc = lurek.html.newDocument()
+  doc:setHtml('<button id="ok">OK</button>')
+  doc:on("click", function(evt)
+    lurek.log.debug("button clicked in HTML UI", "html")
   end)
-  lurek.log.info("on() returned handle=" .. tostring(handle), "html")
 end
 ```
 
@@ -837,24 +818,10 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- query() uses CSS selectors to find the first matching element.
-  -- Supports tag, class, id, and combined selectors.
-  local doc = lurek.html.newDocument([[
-<body>
-  <div class="quest-log">
-    <p class="quest active">Defeat the Dragon</p>
-    <p class="quest">Find the Sword</p>
-    <p class="quest">Talk to the Elder</p>
-  </div>
-</body>
-]])
-  doc:update(0)
-
-  -- Find the first active quest
-  local active = doc:query(".quest.active")
-  if active then
-    lurek.log.info("active quest: " .. active:getText(), "html")
-  end
+  local doc = lurek.html.newDocument()
+  doc:setHtml('<div id="hud"><span class="hp">100</span></div>')
+  local el = doc:query("#hud")
+  lurek.log.debug("found element: " .. tostring(el ~= nil), "html")
 end
 ```
 
@@ -874,26 +841,10 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- queryAll() returns an array of all matching elements.
-  -- Useful for iterating over lists (inventory slots, scoreboard rows, etc.).
-  local doc = lurek.html.newDocument([[
-<body>
-  <table id="scoreboard">
-    <tr class="row"><td>Player1</td><td>1500</td></tr>
-    <tr class="row"><td>Player2</td><td>1200</td></tr>
-    <tr class="row"><td>Player3</td><td>900</td></tr>
-  </table>
-</body>
-]])
-  doc:update(0)
-
-  local rows = doc:queryAll(".row")
-  lurek.log.info("scoreboard rows: " .. #rows, "html")
-  -- You can iterate and modify each row individually
-  for i, row in ipairs(rows) do
-    local text = row:getText()
-    lurek.log.info("  row " .. i .. ": " .. text, "html")
-  end
+  local doc = lurek.html.newDocument()
+  doc:setHtml('<ul><li>a</li><li>b</li><li>c</li></ul>')
+  local items = doc:queryAll("li")
+  lurek.log.debug("list items: " .. #items, "html") -- 3
 end
 ```
 
@@ -997,21 +948,9 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- setHtml completely replaces the document content.
-  -- WARNING: All previously obtained element handles become stale after this call.
-  -- Use this for full-screen transitions (e.g., switching from menu to gameplay HUD).
-  local doc = lurek.html.newDocument("<body><p>Loading...</p></body>")
-
-  -- Simulate transitioning from a loading screen to the gameplay HUD
-  doc:setHtml([[
-<body>
-  <div id="score">Score: 0</div>
-  <div id="health-bar">
-    <div id="health-fill" style="width:100%"></div>
-  </div>
-</body>
-]])
-  lurek.log.info("setHtml replaced entire markup for scene transition", "html")
+  local doc = lurek.html.newDocument()
+  doc:setHtml("<h1>Game Over</h1><p>Score: 1234</p>")
+  lurek.log.debug("html set", "html")
 end
 ```
 
@@ -1090,10 +1029,8 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- type() returns the string "LHtmlDocument". Used for runtime type checking.
-  local doc = lurek.html.newDocument("<body>type test</body>")
-  local t = doc:type()
-  lurek.log.info("doc:type() = " .. t, "html")
+  local obj = lurek.html.newDocument()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LHtmlDocument"
 end
 ```
 
@@ -1113,12 +1050,8 @@ Exact example from [html.lua](../blob/main/content/examples/html.lua):
 
 ```lua
 do
-  -- typeOf() checks if this handle is a specific type.
-  -- Matches "LHtmlDocument" and the base "Object" type.
-  local doc = lurek.html.newDocument("<body>typeOf test</body>")
-  lurek.log.info("typeOf(LHtmlDocument)=" .. tostring(doc:typeOf("LHtmlDocument")), "html")
-  lurek.log.info("typeOf(Object)=" .. tostring(doc:typeOf("Object")), "html")
-  lurek.log.info("typeOf(LImage)=" .. tostring(doc:typeOf("LImage")), "html")
+  local obj = lurek.html.newDocument()
+  lurek.log.debug("typeOf LHtmlDocument: " .. tostring(obj:typeOf("LHtmlDocument")), "example") -- true
 end
 ```
 

@@ -182,7 +182,7 @@ end
 
 -- Light methods
 
---@api-stub: Light:setPosition
+--@api-stub: LOccluder:setPosition
 -- Sets the position of this light.
 do
   -- Move a light to follow the player's lantern in world coordinates.
@@ -416,10 +416,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Check before performing expensive light operations to avoid wasted work
-  if lurek.light.isEnabled() then
-    lurek.log.info("lighting system active", "light")
-  end
+  lurek.light.setEnabled(true)
+  local on = lurek.light.isEnabled()
+  lurek.log.debug("lighting system enabled: " .. tostring(on), "light") -- true
 end
 ```
 
@@ -530,10 +529,10 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- When disabled, no lighting is rendered — the scene uses flat colors only.
-  -- Useful for cutscenes, menus, or debug views where lighting distracts.
-  local cinematic_mode = false
-  lurek.light.setEnabled(not cinematic_mode)
+  -- Toggle the entire lighting system on/off (e.g., for a brightness option).
+  lurek.light.setEnabled(false)
+  lurek.log.debug("lighting disabled globally", "light")
+  lurek.light.setEnabled(true)
 end
 ```
 
@@ -952,9 +951,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local lt = lurek.light.newLight(400, 300, 200)
-  lt:setLightMask(0b11111111)   -- illuminate all layers
-  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  local mask = l:getLightMask()
+  lurek.log.debug("light mask: " .. tostring(mask), "light")
 end
 ```
 
@@ -1041,9 +1040,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local lt = lurek.light.newLight(100, 200, 150)
-  local x, y = lt:getPosition()
-  lurek.log.info("x=" .. x .. " y=" .. y, "light")
+  local l = lurek.light.newLight(200, 150, 180)
+  local x, y = l:getPosition()
+  lurek.log.debug("light pos: " .. x .. "," .. y, "light") -- 200, 150
 end
 ```
 
@@ -1166,8 +1165,8 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local lt = lurek.light.newLight(400, 300, 200)
-  lurek.log.info("enabled by default=" .. tostring(lt:isEnabled()), "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  lurek.log.debug("enabled: " .. tostring(l:isEnabled()), "light") -- true
 end
 ```
 
@@ -1220,8 +1219,10 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local lt = lurek.light.newLight(400, 300, 200)
-  lurek.log.info("valid=" .. tostring(lt:isValid()), "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  lurek.log.debug("valid: " .. tostring(l:isValid()), "light") -- true
+  l:remove()
+  lurek.log.debug("valid after remove: " .. tostring(l:isValid()), "light") -- false
 end
 ```
 
@@ -1253,11 +1254,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- After remove(), the handle is stale — isValid() returns false
-  local lt = lurek.light.newLight(400, 300, 200)
-  lurek.log.info("valid before remove=" .. tostring(lt:isValid()), "light")
-  lt:remove()
-  lurek.log.info("valid after remove=" .. tostring(lt:isValid()), "light")
+  local l = lurek.light.newLight(400, 300, 150)
+  l:remove()
+  lurek.log.debug("light removed", "light")
 end
 ```
 
@@ -1389,12 +1388,11 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Toggle lights with player interaction (light switches, circuit breakers)
-  local lt = lurek.light.newLight(400, 300, 200)
-  lt:setEnabled(false)
-  lurek.log.info("enabled=" .. tostring(lt:isEnabled()), "light")
-  lt:setEnabled(true)
-  lurek.log.info("re-enabled=" .. tostring(lt:isEnabled()), "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  -- Flicker effect: disable then re-enable.
+  l:setEnabled(false)
+  lurek.log.debug("light off: " .. tostring(not l:isEnabled()), "light") -- true
+  l:setEnabled(true)
 end
 ```
 
@@ -1560,10 +1558,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Bit masks let you selectively light specific layers
-  local lt = lurek.light.newLight(400, 300, 200)
-  lt:setLightMask(0b00000011)   -- illuminate layers 1 and 2 only
-  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  l:setLightMask(0xFF)
+  lurek.log.debug("light mask set", "light")
 end
 ```
 
@@ -1669,11 +1666,10 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Move a spotlight to track enemy patrol routes
-  local lt = lurek.light.newLight(400, 300, 200)
-  lt:setPosition(512, 256)
-  local x, y = lt:getPosition()
-  lurek.log.info("position=" .. x .. "," .. y, "light")
+  local l = lurek.light.newLight(400, 300, 200)
+  l:setPosition(500, 200)
+  local x, y = l:getPosition()
+  lurek.log.debug("moved to: " .. x .. "," .. y, "light") -- 500, 200
 end
 ```
 
@@ -1927,9 +1923,8 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local light_obj = lurek.light.newLight(0, 0, 80)
-  local t = light_obj:type()
-  lurek.log.info("LLight:type = " .. t, "light")
+  local obj = lurek.light.newLight(400, 300, 200)
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LLight"
 end
 ```
 
@@ -1949,9 +1944,8 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local light_obj = lurek.light.newLight(0, 0, 80)
-  lurek.log.info("is LLight: " .. tostring(light_obj:typeOf("LLight")), "light")
-  lurek.log.info("is wrong: " .. tostring(light_obj:typeOf("Unknown")), "light")
+  local obj = lurek.light.newLight(400, 300, 200)
+  lurek.log.debug("typeOf LLight: " .. tostring(obj:typeOf("LLight")), "example") -- true
 end
 ```
 
@@ -2014,9 +2008,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
-  local mask = wall:getLightMask()
-  lurek.log.debug("wall mask=" .. mask, "light")
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightMask(0b11111111)   -- illuminate all layers
+  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
 end
 ```
 
@@ -2051,10 +2045,9 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local crate = lurek.light.newOccluder({ 0, 0, 64, 0, 64, 64, 0, 64 })
-  crate:setPosition(120, 80)
-  local x, y = crate:getPosition()
-  lurek.log.debug("crate at (" .. x .. "," .. y .. ")", "light")
+  local lt = lurek.light.newLight(100, 200, 150)
+  local x, y = lt:getPosition()
+  lurek.log.info("x=" .. x .. " y=" .. y, "light")
 end
 ```
 
@@ -2089,10 +2082,8 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
-  if wall:isEnabled() then
-    lurek.log.debug("wall is casting shadows", "light")
-  end
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("enabled by default=" .. tostring(lt:isEnabled()), "light")
 end
 ```
 
@@ -2108,13 +2099,8 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- After remove(), the handle becomes stale. Check before any method call
-  -- if the occluder might have been destroyed by physics or gameplay.
-  local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
-  wall:remove()
-  if not wall:isValid() then
-    lurek.log.debug("wall removed — handle is stale", "light")
-  end
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("valid=" .. tostring(lt:isValid()), "light")
 end
 ```
 
@@ -2128,9 +2114,11 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Permanently remove destroyed objects (exploded barrels, broken walls).
-  local debris = lurek.light.newOccluder({ 0, 0, 30, 0, 30, 30, 0, 30 })
-  debris:remove()  -- rubble no longer blocks light
+  -- After remove(), the handle is stale — isValid() returns false
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("valid before remove=" .. tostring(lt:isValid()), "light")
+  lt:remove()
+  lurek.log.info("valid after remove=" .. tostring(lt:isValid()), "light")
 end
 ```
 
@@ -2148,11 +2136,12 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Disabled occluders stop casting shadows but stay in memory for quick reactivation.
-  -- Use for doors: when open, disable the occluder so light passes through.
-  local door = lurek.light.newOccluder({ 0, 0, 40, 0, 40, 80, 0, 80 })
-  local door_open = true
-  door:setEnabled(not door_open)  -- shadows only when door is closed
+  -- Toggle lights with player interaction (light switches, circuit breakers)
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setEnabled(false)
+  lurek.log.info("enabled=" .. tostring(lt:isEnabled()), "light")
+  lt:setEnabled(true)
+  lurek.log.info("re-enabled=" .. tostring(lt:isEnabled()), "light")
 end
 ```
 
@@ -2170,11 +2159,10 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- An occluder only blocks lights whose mask bits overlap with its own mask.
-  -- Use to make foreground objects cast shadows only from foreground lights.
-  local FOREGROUND_LIGHTS = 0x01
-  local wall = lurek.light.newOccluder({ 0, 0, 100, 0, 100, 20, 0, 20 })
-  wall:setLightMask(FOREGROUND_LIGHTS)
+  -- Bit masks let you selectively light specific layers
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightMask(0b00000011)   -- illuminate layers 1 and 2 only
+  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
 end
 ```
 
@@ -2214,10 +2202,11 @@ Exact example from [light.lua](../blob/main/content/examples/light.lua):
 
 ```lua
 do
-  -- Position offsets all vertices. Use to move an occluder with a physics body
-  -- without recalculating vertex coordinates every frame.
-  local crate = lurek.light.newOccluder({ 0, 0, 64, 0, 64, 64, 0, 64 })
-  crate:setPosition(200, 150)  -- move crate shadow to match sprite position
+  -- Move a spotlight to track enemy patrol routes
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setPosition(512, 256)
+  local x, y = lt:getPosition()
+  lurek.log.info("position=" .. x .. "," .. y, "light")
 end
 ```
 

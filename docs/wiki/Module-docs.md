@@ -856,18 +856,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  -- validate() checks whether your authored docs cover the real API.
-  -- It returns a report with: missing (live but undocumented), phantom (documented
-  -- but not live), and incomplete (documented but lacking description/params/returns).
-  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
-  if ok then
-    local report = lurek.docs.validate(catalog)
-    if not report:isValid() then
-      lurek.log.error("docs", "missing " .. report:missingCount() .. " entries from docs")
-    else
-      lurek.log.info("docs", "all live APIs are documented")
-    end
-  end
+  local report = lurek.docs.validate()
+  lurek.log.debug("docs valid: " .. tostring(report ~= nil), "example")
 end
 ```
 
@@ -1164,12 +1154,10 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  -- toJSON() produces a JSON array of all entries with full metadata.
-  -- Useful for feeding catalog data to external tools or web UIs.
+  -- toJSON exports the catalog as a JSON string for external tools or CI checks.
   local catalog = lurek.docs.scan()
   local json = catalog:toJSON()
-  pcall(function() lurek.fs.write("build/api-catalog.json", json) end)
-  lurek.log.info("docs", "exported catalog JSON (" .. #json .. " bytes)")
+  lurek.log.info("docs", "JSON export length: " .. #json .. " chars")
 end
 ```
 
@@ -1185,14 +1173,10 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  -- toTable() returns an array of plain tables with name, qualifiedName, module,
-  -- kind, description, and score fields — no userdata, easy to serialize.
+  -- toTable returns a plain Lua table for custom processing or serialization.
   local catalog = lurek.docs.scan()
-  local raw = catalog:toTable()
-  lurek.log.info("docs", "raw catalog has " .. #raw .. " rows")
-  if #raw > 0 then
-    lurek.log.debug("docs", "first: " .. raw[1].qualifiedName)
-  end
+  local tbl = catalog:toTable()
+  lurek.log.info("docs", "catalog table has " .. #tbl .. " entries")
 end
 ```
 
@@ -1208,10 +1192,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local catalog = lurek.docs.scan()
-  -- type() returns the string "LApiCatalog" for catalog handles
-  local t = catalog:type()
-  assert(t == "LApiCatalog", "expected LApiCatalog, got " .. t)
+  local obj = lurek.docs.getCatalog()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LApiCatalog"
 end
 ```
 
@@ -1231,11 +1213,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local catalog = lurek.docs.scan()
-  -- typeOf() checks against "LApiCatalog" and "Object" (the base type)
-  assert(catalog:typeOf("LApiCatalog") == true)
-  assert(catalog:typeOf("Object") == true)
-  assert(catalog:typeOf("Unknown") == false)
+  local obj = lurek.docs.getCatalog()
+  lurek.log.debug("typeOf LApiCatalog: " .. tostring(obj:typeOf("LApiCatalog")), "example") -- true
 end
 ```
 
@@ -1625,7 +1604,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasReturnType
+--@api-stub: LDocEntry:hasReturnType
 -- Returns true if this entry has at least one return type documented
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -1640,7 +1619,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasExample
+--@api-stub: LDocEntry:hasExample
 -- Returns true if this entry has example code recorded
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -1655,7 +1634,7 @@ end
 
 -- ApiCatalog methods
 
---@api-stub: ApiCatalog:getModules
+--@api-stub: LApiCatalog:getModules
 -- Returns sorted array of module names present in this catalog
 do
   -- getModules() lists all distinct modules — use it to build navigation menus
@@ -1686,7 +1665,7 @@ do
   end
 end
 
---@api-stub: DocEntry:hasExample
+--@api-stub: LDocEntry:hasExample
 -- Returns true if this entry has example code recorded
 do
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
@@ -1701,7 +1680,7 @@ end
 
 -- ApiCatalog methods
 
---@api-stub: ApiCatalog:getModules
+--@api-stub: LApiCatalog:getModules
 -- Returns sorted array of module names present in this catalog
 do
   -- getModules() lists all distinct modules — use it to build navigation menus
@@ -1713,7 +1692,7 @@ do
   end
 end
 
---@api-stub: ApiCatalog:getEntries
+--@api-stub: LApiCatalog:getEntries
 -- Returns entry array, optionally filtered to one module
 do
   -- Pass a module name to getEntries() to retrieve only that module's entries.
@@ -1735,12 +1714,9 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local catalog = lurek.docs.scanModule("audio")
-  local entry = catalog:getEntries()[1]
-  if entry then
-    -- type() returns "LDocEntry" for documentation entry handles
-    assert(entry:type() == "LDocEntry")
-  end
+  local catalog = lurek.docs.getCatalog()
+  local obj = catalog:getEntry('lurek.log.info')
+  if obj then lurek.log.debug("type: " .. obj:type(), "example") end -- "LDocEntry"
 end
 ```
 
@@ -1760,13 +1736,9 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local catalog = lurek.docs.scanModule("audio")
-  local entry = catalog:getEntries()[1]
-  if entry then
-    assert(entry:typeOf("LDocEntry") == true)
-    assert(entry:typeOf("Object") == true)
-    assert(entry:typeOf("Unknown") == false)
-  end
+  local catalog = lurek.docs.getCatalog()
+  local obj = catalog:getEntry('lurek.log.info')
+  if obj then lurek.log.debug("typeOf LDocEntry: " .. tostring(obj:typeOf("LDocEntry")), "example") end -- true
 end
 ```
 
@@ -2012,11 +1984,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
-  if ok then
-    local q = lurek.docs.quality(catalog)
-    assert(q:type() == "LQualityReport")
-  end
+  local report = lurek.docs.validate(nil)
+  assert(report:type() == "LValidationReport")
 end
 ```
 
@@ -2036,13 +2005,10 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
-  if ok then
-    local q = lurek.docs.quality(catalog)
-    assert(q:typeOf("LQualityReport") == true)
-    assert(q:typeOf("Object") == true)
-    assert(q:typeOf("Unknown") == false)
-  end
+  local report = lurek.docs.validate(nil)
+  assert(report:typeOf("LValidationReport") == true)
+  assert(report:typeOf("Object") == true)
+  assert(report:typeOf("Unknown") == false)
 end
 ```
 
@@ -2154,10 +2120,9 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  -- getName() returns the name passed as the second arg to schema() or "schema" by default.
-  local schema = lurek.docs.schema({ x = { type = "number" } }, "Point")
-  local label = schema:getName()
-  lurek.log.debug("schema", "loaded schema: " .. label) -- prints "Point"
+  -- getName retrieves the label assigned at schema creation for logging or UI.
+  local schema = lurek.docs.schema({ hp = { type = "integer" } }, "EntityStats")
+  lurek.log.info("docs", "schema name: " .. schema:getName())
 end
 ```
 
@@ -2173,8 +2138,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local schema = lurek.docs.schema({ hp = { type = "integer", required = true } }, "Stats")
-  assert(schema:type() == "LSchema")
+  local obj = lurek.docs.schema({name = {type = 'string', required = true}}, 'example')
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LSchema"
 end
 ```
 
@@ -2194,10 +2159,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local schema = lurek.docs.schema({ hp = { type = "integer", required = true } }, "Stats")
-  assert(schema:typeOf("LSchema") == true)
-  assert(schema:typeOf("Object") == true)
-  assert(schema:typeOf("Unknown") == false)
+  local obj = lurek.docs.schema({name = {type = 'string', required = true}}, 'example')
+  lurek.log.debug("typeOf LSchema: " .. tostring(obj:typeOf("LSchema")), "example") -- true
 end
 ```
 
@@ -2242,18 +2205,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  -- validate() checks whether your authored docs cover the real API.
-  -- It returns a report with: missing (live but undocumented), phantom (documented
-  -- but not live), and incomplete (documented but lacking description/params/returns).
-  local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
-  if ok then
-    local report = lurek.docs.validate(catalog)
-    if not report:isValid() then
-      lurek.log.error("docs", "missing " .. report:missingCount() .. " entries from docs")
-    else
-      lurek.log.info("docs", "all live APIs are documented")
-    end
-  end
+  local report = lurek.docs.validate()
+  lurek.log.debug("docs valid: " .. tostring(report ~= nil), "example")
 end
 ```
 
@@ -2338,11 +2291,11 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
+  -- getSummary gives a one-line overview ideal for CI output or log messages.
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
   if ok then
     local report = lurek.docs.validate(catalog)
-    -- getSummary() produces "Missing: N, Phantom: N, Incomplete: N"
-    lurek.log.info("docs", report:getSummary())
+    lurek.log.info("docs", "validation: " .. report:getSummary())
   end
 end
 ```
@@ -2445,12 +2398,12 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
+  -- toJSON exports the validation report for external dashboards or CI artifacts.
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
   if ok then
     local report = lurek.docs.validate(catalog)
-    -- toJSON() is useful for CI pipelines that parse validation results
-    pcall(function() lurek.fs.write("build/docs-validation.json", report:toJSON()) end)
-    lurek.log.info("docs", "wrote validation report JSON")
+    local json = report:toJSON()
+    lurek.log.info("docs", "validation JSON length: " .. #json .. " chars")
   end
 end
 ```
@@ -2467,11 +2420,12 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
+  -- toTable returns structured data for custom processing or display.
   local ok, catalog = pcall(lurek.docs.loadAll, "docs/api")
   if ok then
     local report = lurek.docs.validate(catalog)
-    local data = report:toTable()
-    lurek.log.info("docs", "missing: " .. #(data.missing or {}) .. ", phantom: " .. #(data.phantom or {}))
+    local tbl = report:toTable()
+    lurek.log.info("docs", "report fields: missing=" .. tostring(#tbl.missing))
   end
 end
 ```
@@ -2488,8 +2442,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local report = lurek.docs.validate(nil)
-  assert(report:type() == "LValidationReport")
+  local obj = lurek.docs.validate()
+  lurek.log.debug("type: " .. obj:type(), "example") -- "LValidationReport"
 end
 ```
 
@@ -2509,10 +2463,8 @@ Exact example from [docs.lua](../blob/main/content/examples/docs.lua):
 
 ```lua
 do
-  local report = lurek.docs.validate(nil)
-  assert(report:typeOf("LValidationReport") == true)
-  assert(report:typeOf("Object") == true)
-  assert(report:typeOf("Unknown") == false)
+  local obj = lurek.docs.validate()
+  lurek.log.debug("typeOf LValidationReport: " .. tostring(obj:typeOf("LValidationReport")), "example") -- true
 end
 ```
 
